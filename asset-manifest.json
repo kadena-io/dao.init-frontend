@@ -1,0 +1,26 @@
+{
+  "files": {
+    "main.css": "/dao.init-frontend/static/css/main.34de6062.chunk.css",
+    "main.js": "/dao.init-frontend/static/js/main.d7d8e20e.chunk.js",
+    "main.js.map": "/dao.init-frontend/static/js/main.d7d8e20e.chunk.js.map",
+    "runtime-main.js": "/dao.init-frontend/static/js/runtime-main.c5e2302c.js",
+    "runtime-main.js.map": "/dao.init-frontend/static/js/runtime-main.c5e2302c.js.map",
+    "static/css/2.b0cf64bf.chunk.css": "/dao.init-frontend/static/css/2.b0cf64bf.chunk.css",
+    "static/js/2.c89ae929.chunk.js": "/dao.init-frontend/static/js/2.c89ae929.chunk.js",
+    "static/js/2.c89ae929.chunk.js.map": "/dao.init-frontend/static/js/2.c89ae929.chunk.js.map",
+    "index.html": "/dao.init-frontend/index.html",
+    "precache-manifest.773cc108e9cd6fdb255b06a23ae5add5.js": "/dao.init-frontend/precache-manifest.773cc108e9cd6fdb255b06a23ae5add5.js",
+    "service-worker.js": "/dao.init-frontend/service-worker.js",
+    "static/css/2.b0cf64bf.chunk.css.map": "/dao.init-frontend/static/css/2.b0cf64bf.chunk.css.map",
+    "static/css/main.34de6062.chunk.css.map": "/dao.init-frontend/static/css/main.34de6062.chunk.css.map",
+    "static/js/2.c89ae929.chunk.js.LICENSE.txt": "/dao.init-frontend/static/js/2.c89ae929.chunk.js.LICENSE.txt",
+    "static/media/semantic.min.css": "/dao.init-frontend/static/media/outline-icons.ef60a4f6.woff"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.c5e2302c.js",
+    "static/css/2.b0cf64bf.chunk.css",
+    "static/js/2.c89ae929.chunk.js",
+    "static/css/main.34de6062.chunk.css",
+    "static/js/main.d7d8e20e.chunk.js"
+  ]
+}
