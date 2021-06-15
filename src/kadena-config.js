@@ -22,10 +22,10 @@ var chainId = "0";
 var networkId = "testnet04";
 
 //network node
-var node = "us1.testnet.chainweb.com";
+var node = "api.testnet.chainweb.com";
 
 //unique contract name
-var contractName = "memory-wall";
+var contractName = "init";
 
 //unique gas station contract name
 var gasStationName = "memory-wall-gas-station";
