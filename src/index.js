@@ -8,13 +8,9 @@ import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
   <React.StrictMode>
-    <Router>
-      <Switch>
-        <Route exact path="/">
+        <Router basename={process.env.PUBLIC_URL}>
           <App />
-        </Route>
-      </Switch>
-    </Router>
+        </Router>
   </React.StrictMode>,
   document.getElementById('root')
 );
