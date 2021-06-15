@@ -318,6 +318,7 @@ const App = () => {
             Ambassadors
           </h2>
           <RenderAmbassadors ambassadors={ambassadors}/>
+          <h2>Add New Ambassador</h2>
           <AddAmbassador guardians={guardians}/>
         </div>
       </Segment>
