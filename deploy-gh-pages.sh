@@ -1,3 +1,3 @@
 #!/bin/sh
-echo 'Running: git subtree push --prefix build origin gh-pages'
-git subtree push --prefix build origin gh-pages
+echo 'git push origin `git subtree split --prefix build master`:gh-pages --force'
+git push origin `git subtree split --prefix build master`:gh-pages --force
