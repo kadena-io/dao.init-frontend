@@ -21,6 +21,7 @@ import { renderPactValue } from "./util.js";
 import { RenderGuardians, RegisterAmbassador } from "./Guardians.js";
 import { RenderAmbassadors } from "./Ambassadors.js";
 import { PactTxStatus } from "./PactTxStatus.js"
+import { KadenaConfig } from "./KadenaConfig.js"
 import { RenderInitState, getContractState } from "./InitState.js";
 
 const App = () => {
@@ -73,67 +74,25 @@ const App = () => {
 
 
   return (
-    <div>
-      <Segment raised padded="very">
-        <div style={{ margin: 30 }}>
-          <h1>
-            <a>Welcome to DAO.init</a>
-          </h1>
-
-          <table className="ui very basic collapsing celled table">
-            <thead>
-              <tr>
-              </tr>
-           </thead>
-           <tbody>
-             <tr>
-               <td>
-                 <h4>
-                   Contract Address
-                 </h4>
-               </td>
-               <td>
-                  {kadenaAPI.contractAddress}
-               </td>
-             </tr>
-             <tr>
-               <td>
-                 <h4>
-                   Chain ID
-                 </h4>
-               </td>
-               <td>
-                  {kadenaAPI.meta.chainId}
-               </td>
-             </tr>
-             <tr>
-               <td>
-                 <h4>
-                   Network ID
-                 </h4>
-               </td>
-               <td>
-                  {kadenaAPI.meta.networkId}
-               </td>
-             </tr>
-           </tbody>
-          </table>
-          <h2>
-            Contract State
-          </h2>
-          <RenderInitState initState={initState}/>
-          <h2>
-            Guardians
-          </h2>
-          <RenderGuardians guardians={guardians}/>
-          <h2>
-            Ambassadors
-          </h2>
-          <RenderAmbassadors ambassadors={ambassadors}/>
-          <RegisterAmbassador guardians={guardians}/>
-        </div>
-      </Segment>
-    </div>
+    <Segment>
+      <h1>
+        <a>Welcome to DAO.init</a>
+      </h1>
+      <KadenaConfig/>
+      <h2>
+        Contract State
+      </h2>
+      <RenderInitState initState={initState}/>
+      <h2>
+        Guardians
+      </h2>
+      <RenderGuardians guardians={guardians}/>
+      <h2>
+        Ambassadors
+      </h2>
+      <RenderAmbassadors ambassadors={ambassadors}/>
+        <RegisterAmbassador guardians={guardians}/>
+    </Segment>
   );
 };
 

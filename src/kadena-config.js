@@ -65,4 +65,8 @@ var kadenaAPI = {
     nonce: "some nonce that doesnt matter",
   },
 };
-module.exports = { kadenaAPI: kadenaAPI, }
+
+const keyFormatter = (str) =>
+  str.replace(new RegExp("[A-Z]+","gm")," $&").replace(new RegExp("^[a-z]","gm"),k => k.toUpperCase());
+
+module.exports = { kadenaAPI: kadenaAPI, keyFormatter: keyFormatter }
