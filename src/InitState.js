@@ -3,7 +3,7 @@ import React from "react";
 //config file for blockchain calls
 import Pact from "pact-lang-api";
 import { kadenaAPI } from "./kadena-config.js";
-import { renderPactValue, PactSingleJsonAsTable, dashStyleNames2Text } from "./util.js";
+import { PactSingleJsonAsTable, dashStyleNames2Text } from "./util.js";
 
 export const getContractState = async (cmd) => {
   //calling get-all() function from smart contract

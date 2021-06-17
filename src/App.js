@@ -10,9 +10,9 @@ import  {
   RegisterAmbassador,
   DeactivateAmbassador,
   ReactivateAmbassador,
+  RotateGuardian,
 } from "./Guardians.js";
 import { RenderAmbassadors } from "./Ambassadors.js";
-import { PactTxStatus } from "./PactTxStatus.js"
 import { KadenaConfig } from "./KadenaConfig.js"
 import { RenderInitState, getContractState } from "./InitState.js";
 
@@ -53,6 +53,10 @@ const App = () => {
     getGuardians();
   }, []);
 
+  useEffect(() => {
+    getInitState();
+  },[ambassadors,guardians]);
+
   /*
 
     BLOCKCHAIN TRANSACTIONS
@@ -83,9 +87,20 @@ const App = () => {
         Ambassadors
       </h2>
       <RenderAmbassadors ambassadors={ambassadors}/>
-      <RegisterAmbassador guardians={guardians}/>
-      <ReactivateAmbassador guardians={guardians}/>
-      <DeactivateAmbassador guardians={guardians}/>
+      <RegisterAmbassador
+        guardians={guardians}
+        refresh={() => getAmbassadors()}/>
+      <ReactivateAmbassador
+        guardians={guardians}
+        ambassadors={ambassadors}
+        refresh={() => getAmbassadors()}/>
+      <DeactivateAmbassador
+        guardians={guardians}
+        ambassadors={ambassadors}
+        refresh={() => getAmbassadors()}/>
+      <RotateGuardian
+        guardians={guardians}
+        refresh={() => getGuardians()}/>
     </Segment>
   );
 };

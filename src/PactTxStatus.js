@@ -1,10 +1,9 @@
 //basic React api imports
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Icon,
   Message,
 } from "semantic-ui-react";
-import Pact from "pact-lang-api";
 
 import { kadenaAPI } from "./kadena-config.js";
 
