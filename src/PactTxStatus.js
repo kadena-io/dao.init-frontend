@@ -1,16 +1,8 @@
 //basic React api imports
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  Segment,
-  Input,
-  Form,
-  Button,
-  Select,
-  Feed,
-  Dropdown,
   Icon,
   Message,
-  Loader,
 } from "semantic-ui-react";
 import Pact from "pact-lang-api";
 
@@ -18,23 +10,22 @@ import { kadenaAPI } from "./kadena-config.js";
 
 export const PactTxStatus = (props) => {
   // TODO: make these msgs hideable
-  const [hideTx,setHideTx] = useState( false );
   const tx = props.tx;
-  const txRes = props.res;
+  const txRes = props.txRes;
   const txStatus = props.txStatus;
 
   return (
-    <div key={tx.hash}>
+    <div>
     { txStatus === "pending" ? (
-      txPending(tx,setHideTx)
+      txPending(tx)
     ) : txStatus === "success" ? (
-      txSuccess(tx,setHideTx)
+      txSuccess(tx)
     ) : txStatus === "failure" ? (
-      txFailure(tx,txRes,setHideTx)
+      txFailure(tx,txRes)
     ) : txStatus === "timeout" ? (
-      txTimeout(tx,setHideTx)
+      txTimeout(tx)
     ) : txStatus === "validation-error" ? (
-      txValidationError(tx,txRes,setHideTx)
+      txValidationError(tx,txRes)
     ) : (
       <div />
     )}
@@ -43,9 +34,9 @@ export const PactTxStatus = (props) => {
 
 }
 
-const txPending = (tx, setHideTx) => {
+const txPending = (tx) => {
   return (
-    <Message icon attached="bottom" info onDismiss={setHideTx(true)}>
+    <Message icon attached="bottom" info>
       <Icon name='circle notched' loading />
       <Message.Content>
         <Message.Header>
@@ -59,9 +50,9 @@ const txPending = (tx, setHideTx) => {
     </Message>
   );
 };
-const txSuccess = (tx, setHideTx) => {
+const txSuccess = (tx) => {
   return (
-    <Message icon attached="bottom" info onDismiss={setHideTx(true)}>
+    <Message icon attached="bottom" info>
       <Icon name='check square outline' />
       <Message.Content>
         <Message.Header>
@@ -75,9 +66,9 @@ const txSuccess = (tx, setHideTx) => {
   );
 };
 
-const txFailure = (tx,txRes, setHideTx) => {
+const txFailure = (tx,txRes) => {
   return (
-    <Message icon attached="bottom" error onDismiss={setHideTx(true)}>
+    <Message icon attached="bottom" error>
       <Icon name='exclamation' />
       <Message.Content>
         <Message.Header>
@@ -92,9 +83,9 @@ const txFailure = (tx,txRes, setHideTx) => {
   );
 };
 
-const txValidationError = (tx, txRes, setHideTx) => {
+const txValidationError = (tx, txRes) => {
   return (
-    <Message icon attached="bottom" error onDismiss={setHideTx(true)}>
+    <Message icon attached="bottom" error>
       <Icon name='exclamation' />
       <Message.Content>
         <Message.Header>
@@ -106,9 +97,9 @@ const txValidationError = (tx, txRes, setHideTx) => {
   );
 };
 
-const txTimeout = (tx, setHideTx) => {
+const txTimeout = (tx) => {
   return (
-    <Message icon attached="bottom" warning onDismiss={setHideTx(true)}>
+    <Message icon attached="bottom" warning>
       <Icon name='hourglass outline' />
       <Message.Content>
         <Message.Header>

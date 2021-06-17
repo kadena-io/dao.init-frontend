@@ -3,22 +3,14 @@ import React, { useState, useEffect } from "react";
 //semantic ui for styling
 import {
   Segment,
-  Input,
-  Form,
-  Button,
-  Select,
-  Feed,
-  Dropdown,
-  Icon,
-  Message,
-  Loader,
 } from "semantic-ui-react";
-//pact-lang-api for blockchain calls
-import Pact from "pact-lang-api";
 //config file for blockchain calls
-import { kadenaAPI } from "./kadena-config.js";
-import { renderPactValue } from "./util.js";
-import { RenderGuardians, RegisterAmbassador } from "./Guardians.js";
+import  {
+  RenderGuardians,
+  RegisterAmbassador,
+  DeactivateAmbassador,
+  ReactivateAmbassador,
+} from "./Guardians.js";
 import { RenderAmbassadors } from "./Ambassadors.js";
 import { PactTxStatus } from "./PactTxStatus.js"
 import { KadenaConfig } from "./KadenaConfig.js"
@@ -91,7 +83,9 @@ const App = () => {
         Ambassadors
       </h2>
       <RenderAmbassadors ambassadors={ambassadors}/>
-        <RegisterAmbassador guardians={guardians}/>
+      <RegisterAmbassador guardians={guardians}/>
+      <ReactivateAmbassador guardians={guardians}/>
+      <DeactivateAmbassador guardians={guardians}/>
     </Segment>
   );
 };
