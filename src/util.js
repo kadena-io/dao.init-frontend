@@ -100,6 +100,7 @@ export const PactJsonListAsTable = (props) => {
       keyOrder = Object.keys(json[0]);
     }
   }
+  console.log("PactJsonListAsTable",json, header, keyOrder);
   const keyFormatter = props.keyFormatter ? props.keyFormatter : (k) => {return (k)};
   const valFormatter = props.valFormatter ? props.valFormatter : (str) => <code>{renderPactValue(str)}</code>
     return (

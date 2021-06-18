@@ -1,9 +1,14 @@
 //basic React api imports
 import React, { useState, useEffect } from "react";
+import { Route, Switch } from "react-router-dom";
 //semantic ui for styling
 import {
+  Container,
+  Divider,
   Segment,
 } from "semantic-ui-react";
+import styled from "styled-components";
+
 //config file for blockchain calls
 import  {
   RenderGuardians,
@@ -13,8 +18,20 @@ import  {
   RotateGuardian,
 } from "./Guardians.js";
 import { RenderAmbassadors } from "./Ambassadors.js";
-import { KadenaConfig } from "./KadenaConfig.js"
+import { KadenaConfig } from "./KadenaConfig.js";
 import { RenderInitState, getContractState } from "./InitState.js";
+import HeaderMenu from "./HeaderMenu";
+
+const Home = () => <h1>Welcome to dao.init</h1>;
+const MissingPage = () => <h1>URL doesn't exist</h1>;
+
+const Wrapper = styled.div`
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+`;
+
+
 
 const App = () => {
   /*
@@ -53,10 +70,6 @@ const App = () => {
     getGuardians();
   }, []);
 
-  useEffect(() => {
-    getInitState();
-  },[ambassadors,guardians]);
-
   /*
 
     BLOCKCHAIN TRANSACTIONS
@@ -70,40 +83,57 @@ const App = () => {
 
 
   return (
-    <Segment>
-      <h1>
-        <a>Welcome to DAO.init</a>
-      </h1>
-      <KadenaConfig/>
-      <h2>
-        Contract State
-      </h2>
-      <RenderInitState initState={initState}/>
-      <h2>
-        Guardians
-      </h2>
-      <RenderGuardians guardians={guardians}/>
-      <h2>
-        Ambassadors
-      </h2>
-      <RenderAmbassadors ambassadors={ambassadors}/>
-      <RegisterAmbassador
-        guardians={guardians}
-        refresh={() => getAmbassadors()}/>
-      <ReactivateAmbassador
-        guardians={guardians}
-        ambassadors={ambassadors}
-        refresh={() => getAmbassadors()}/>
-      <DeactivateAmbassador
-        guardians={guardians}
-        ambassadors={ambassadors}
-        refresh={() => getAmbassadors()}/>
-      <RotateGuardian
-        guardians={guardians}
-        refresh={() => getGuardians()}/>
-    </Segment>
+    <React.Fragment>
+      <HeaderMenu
+        onItemClick={item => this.onItemClick(item)}
+        items={[
+          ["Home", "/"],
+          ["Config", "/KadenaConfig"],
+          ["Init State", "/InitState"],
+          ["Guardians", "/Guardians"],
+          ["Ambassadors", "/Ambassadors"],
+        ]}
+        headerIcon={"compass outline"}
+      />
+      <Divider />
+      <Segment>
+        <Switch>
+          <Route path="/" exact component={Home} />
+          <Route path="/KadenaConfig" component={() =>
+              <KadenaConfig/>} />
+          <Route path="/InitState" component={() =>
+              <RenderInitState initState={initState}/>} />
+          <Route path="/Guardians" component={() =>
+              <RenderGuardians guardians={guardians}/>} />
+          <Route path="/Ambassadors" component={() =>
+              <RenderAmbassadors ambassadors={ambassadors}/>} />
+          <Route component={MissingPage} />
+        </Switch>
+      </Segment>
+    </React.Fragment>
   );
 };
 
+
+    //   <h1>
+    //     <a>Welcome to DAO.init</a>
+    //   </h1>
+    //
+    //   <RegisterAmbassador
+    //     guardians={guardians}
+    //     refresh={() => getAmbassadors()}/>
+    //   <ReactivateAmbassador
+    //     guardians={guardians}
+    //     ambassadors={ambassadors}
+    //     refresh={() => getAmbassadors()}/>
+    //   <DeactivateAmbassador
+    //     guardians={guardians}
+    //     ambassadors={ambassadors}
+    //     refresh={() => getAmbassadors()}/>
+    //   <RotateGuardian
+    //     guardians={guardians}
+    //     refresh={() => getGuardians()}/>
+    // </React.Fragment>
+    //
 
 export default App;
