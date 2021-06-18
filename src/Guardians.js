@@ -12,7 +12,7 @@ import { kadenaAPI } from "./kadena-config.js";
 import {
   PactJsonListAsTable,
  } from "./util.js";
-// import { PactTxStatus } from "./PactTxStatus.js"
+import { PactTxStatus } from "./PactTxStatus.js"
 
 const sendGuardianCmd = async (
   setTx,
