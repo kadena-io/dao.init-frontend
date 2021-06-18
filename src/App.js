@@ -1,16 +1,14 @@
 //basic React api imports
 import React, { useState, useEffect } from "react";
 //semantic ui for styling
-import {
-  Segment,
-} from "semantic-ui-react";
+import Container from '@material-ui/core/Container';
 //config file for blockchain calls
 import  {
   RenderGuardians,
-  RegisterAmbassador,
-  DeactivateAmbassador,
-  ReactivateAmbassador,
-  RotateGuardian,
+  // RegisterAmbassador,
+  // DeactivateAmbassador,
+  // ReactivateAmbassador,
+  // RotateGuardian,
 } from "./Guardians.js";
 import { RenderAmbassadors } from "./Ambassadors.js";
 import { KadenaConfig } from "./KadenaConfig.js"
@@ -48,14 +46,12 @@ const App = () => {
   };
 
   useEffect(() => {
+    getGuardians();
     getInitState();
     getAmbassadors();
-    getGuardians();
+    console.log('useEffect []',guardians,ambassadors)
   }, []);
 
-  useEffect(() => {
-    getInitState();
-  },[ambassadors,guardians]);
 
   /*
 
@@ -70,7 +66,7 @@ const App = () => {
 
 
   return (
-    <Segment>
+    <Container>
       <h1>
         <a>Welcome to DAO.init</a>
       </h1>
@@ -87,23 +83,23 @@ const App = () => {
         Ambassadors
       </h2>
       <RenderAmbassadors ambassadors={ambassadors}/>
-      <RegisterAmbassador
-        guardians={guardians}
-        refresh={() => getAmbassadors()}/>
-      <ReactivateAmbassador
-        guardians={guardians}
-        ambassadors={ambassadors}
-        refresh={() => getAmbassadors()}/>
-      <DeactivateAmbassador
-        guardians={guardians}
-        ambassadors={ambassadors}
-        refresh={() => getAmbassadors()}/>
-      <RotateGuardian
-        guardians={guardians}
-        refresh={() => getGuardians()}/>
-    </Segment>
+    </Container>
   );
 };
 
+      // <RegisterAmbassador
+      //   guardians={guardians}
+      //   refresh={() => getAmbassadors()}/>
+      // <ReactivateAmbassador
+      //   guardians={guardians}
+      //   ambassadors={ambassadors}
+      //   refresh={() => getAmbassadors()}/>
+      // <DeactivateAmbassador
+      //   guardians={guardians}
+      //   ambassadors={ambassadors}
+      //   refresh={() => getAmbassadors()}/>
+      // <RotateGuardian
+      //   guardians={guardians}
+      //   refresh={() => getGuardians()}/>
 
 export default App;
