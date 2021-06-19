@@ -16,30 +16,32 @@ import IconButton from '@material-ui/core/IconButton';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 
-
-const useStyles = makeStyles({
-  table: {
-    minWidth: 650,
-  },
-});
-
-const useNestedStyles = makeStyles({
-  table: {
-    minWidth: 650,
-  },
+export const useInputStyles = makeStyles((theme) => ({
   root: {
-    '& > *': {
-      borderBottom: 'unset',
+    display: 'flex',
+    flexWrap: 'wrap',
+    '& .MuiTextField-root': {
+      margin: theme.spacing(1),
+      width: '25ch',
     },
   },
-});
+  margin: {
+    margin: theme.spacing(1),
+  },
+  withoutLabel: {
+    marginTop: theme.spacing(3),
+  },
+  textField: {
+    width: '25ch',
+  },
+}));
 
 //config file for blockchain calls
 
 export const dashStyleNames2Text = str => str.split("-").map(k=>k.replace(new RegExp("^.","gm"),a=>a.toUpperCase())).join(' ');
 
 const isRootPactValue = (val) => {
-  if (typeof val === 'object' ) {
+  if (val && typeof val === 'object' ) {
     if ('timep' in val || 'int' in val || 'decimal' in val || 'time' in val ) {
       return true;
     } else {
@@ -51,7 +53,7 @@ const isRootPactValue = (val) => {
 };
 
 const isPactKeyset = (val) => {
-  if (typeof val === 'object' ) {
+  if (val && typeof val === 'object' ) {
     if (Object.keys(val).length === 2 &&'pred' in val && 'keys' in val) {
       return true;
     } else {
@@ -64,7 +66,7 @@ const isPactKeyset = (val) => {
 
 
 export const renderPactValue = (val) => {
-  if (typeof val === 'object' ) {
+  if (val && typeof val === 'object') {
     if ('time' in val) {
       return val['time'];
     } else if ('timep' in val) {
@@ -89,10 +91,27 @@ export const renderPactValue = (val) => {
   }
 };
 
+const useToplevelTableStyles = makeStyles({
+  table: {
+    minWidth: 650,
+  },
+});
+
+const useNestedTableStyles = makeStyles({
+  table: {
+    minWidth: 650,
+  },
+  root: {
+    '& > *': {
+      borderBottom: 'unset',
+    },
+  },
+});
+
 export const PactSingleJsonAsTable = (props) => {
   const json = props.json || {};
   const isNested = props.isNested || false;
-  const classes = isNested ? useNestedStyles : useStyles;
+  const classes = isNested ? useNestedTableStyles : useToplevelTableStyles;
   const header = props.header || [];
   const keyFormatter = props.keyFormatter ? props.keyFormatter : (k) => {return (k)};
   const valFormatter = props.valFormatter ? props.valFormatter : (str) => <code>{renderPactValue(str)}</code>;
@@ -151,7 +170,7 @@ export const PactSingleJsonAsTable = (props) => {
 export const PactJsonListAsTable = (props) => {
   const json = props.json || {};
   const isNested = props.isNested || false;
-  const classes = isNested ? useNestedStyles : useStyles;
+  const classes = isNested ? useNestedTableStyles : useToplevelTableStyles;
   const header = props.header || [];
   let keyOrder = [];
   if (props.keyOrder) {

@@ -1,16 +1,34 @@
 //basic React api imports
 import React, { useState, } from "react";
-//semantic ui for styling
+import clsx from 'clsx';
+//Material Stuff
 import {FormControl as Form} from '@material-ui/core';
-import Input from '@material-ui/core/Input';
-// import Message from '@material-ui/core/Message';
-import Button from '@material-ui/core/Button';
+import {
+  Button,
+  Box,
+  Typography,
+  IconButton,
+  Input,
+  FilledInput,
+  OutlinedInput,
+  InputLabel,
+  InputAdornment,
+  FormHelperText,
+  FormControl,
+  TextField,
+  MenuItem,
+  Card, CardHeader, CardContent, CardActions,
+  Grid,
+} from '@material-ui/core';
+import Visibility from '@material-ui/icons/Visibility';
+import VisibilityOff from '@material-ui/icons/VisibilityOff';
 //pact-lang-api for blockchain calls
 import Pact from "pact-lang-api";
 //config file for blockchain calls
 import { kadenaAPI } from "./kadena-config.js";
 import {
   PactJsonListAsTable,
+  useInputStyles,
  } from "./util.js";
 import { PactTxStatus } from "./PactTxStatus.js"
 
@@ -105,53 +123,77 @@ export const RenderGuardians = (props) => {
     />
 )};
 
-// export const RegisterAmbassador = (props) => {
-//   const [grd, setGrd] = useState( "" );
-//   const [newAmb, setNewAmb] = useState( "" );
-//   const [ambGrd, setAmbGrd] = useState( "" );
-//   const [txStatus, setTxStatus] = useState("");
-//   const [tx, setTx] = useState( {} );
-//   const [txRes, setTxRes] = useState( {} );
-//
-//   const handleSubmit = (evt) => {
-//       evt.preventDefault();
-//       console.log(grd,newAmb,ambGrd);
-//       sendGuardianCmd(setTx,setTxStatus,setTxRes,props.refresh
-//         ,grd
-//         ,`(${kadenaAPI.contractAddress}.register-ambassador "${grd}" "${newAmb}" (read-keyset 'ks))`
-//         ,{ks: JSON.parse(ambGrd)}
-//         )
-//       };
-//
-//   return (
-//     <div>
-//       <Message attached header="Add Ambassador"/>
-//       <Form onSubmit={evt => handleSubmit(evt)} className="attached fluid segment">
-//         <Form.Select
-//           label="Select Guardian"
-//           required
-//           options={props.guardians.map((g) => {return {key: g['k'], value:g['k'], text:g['k']};})}
-//           onChange={(e,d) => {setGrd(d.value)}}
-//           />
-//         <Form.Field required>
-//           <label>Ambassador Account Name</label>
-//           <Input required
-//             value={newAmb}
-//             onChange={e => setNewAmb(e.target.value)}/>
-//         </Form.Field>
-//         <Form.TextArea required
-//           label="Ambassador Account Guard"
-//           placeholder={JSON.stringify({"pred":"keys-all","keys":["8c59a322800b3650f9fc5b6742aa845bc1c35c2625dabfe5a9e9a4cada32c543"]},undefined,2)}
-//           value={ambGrd}
-//           onChange={e => setAmbGrd(e.target.value)}
-//           />
-//         <Button color='blue' type='submit'>Submit</Button>
-//       </Form>
-//       <PactTxStatus tx={tx} txRes={txRes} txStatus={txStatus}/>
-//     </div>
-//
-//   );
-// };
+export const RegisterAmbassador = (props) => {
+  const [grd, setGrd] = useState( "" );
+  const [newAmb, setNewAmb] = useState( "" );
+  const [ambGrd, setAmbGrd] = useState( "" );
+  const [txStatus, setTxStatus] = useState("");
+  const [tx, setTx] = useState( {} );
+  const [txRes, setTxRes] = useState( {} );
+
+  const handleSubmit = (evt) => {
+      evt.preventDefault();
+      console.log(grd,newAmb,ambGrd);
+      sendGuardianCmd(setTx,setTxStatus,setTxRes,props.refresh
+        ,grd
+        ,`(${kadenaAPI.contractAddress}.register-ambassador "${grd}" "${newAmb}" (read-keyset 'ks))`
+        ,{ks: JSON.parse(ambGrd)}
+        )
+      };
+
+  return (
+    <Grid item xs={12} sm={6}>
+    <Card>
+      <CardHeader title="Add Ambassador"/>
+      <CardContent>
+      <form
+        autoComplete="off"
+        onSubmit={evt => handleSubmit(evt)}>
+          <TextField
+            id="outlined-multiline-static"
+            select
+            required
+            fullWidth
+            variant="outlined"
+            label="Select Guardian"
+            onChange={e => setGrd(e.target.value)}
+            >
+            {props.guardians.map((g) =>
+              <MenuItem key={g['k']} value={g['k']}>
+                {g.['k']}
+              </MenuItem>
+            )}
+          </TextField>
+          <TextField
+            required
+            fullWidth
+            value={newAmb}
+            label="Ambassador Accout Name"
+            onChange={e => setNewAmb(e.target.value)}
+            />
+          <TextField
+            required
+            fullWidth
+            label="Ambassador Account Guard"
+            multiline
+            rows={4}
+            variant="outlined"
+            placeholder={JSON.stringify({"pred":"keys-all","keys":["8c59a322800b3650f9fc5b6742aa845bc1c35c2625dabfe5a9e9a4cada32c543"]},undefined,2)}
+            value={ambGrd}
+            onChange={e => setAmbGrd(e.target.value)}
+          />
+        <CardActions>
+          <Button variant="contained" color="primary" type="submit">
+            Submit
+          </Button>
+        </CardActions>
+      </form>
+      <PactTxStatus tx={tx} txRes={txRes} txStatus={txStatus}/>
+    </CardContent>
+  </Card>
+  </Grid>
+  );
+};
 //
 // export const DeactivateAmbassador = (props) => {
 //   const [grd, setGrd] = useState( "" );

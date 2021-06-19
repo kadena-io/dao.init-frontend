@@ -5,7 +5,7 @@ import Container from '@material-ui/core/Container';
 //config file for blockchain calls
 import  {
   RenderGuardians,
-  // RegisterAmbassador,
+  RegisterAmbassador,
   // DeactivateAmbassador,
   // ReactivateAmbassador,
   // RotateGuardian,
@@ -83,13 +83,13 @@ const App = () => {
         Ambassadors
       </h2>
       <RenderAmbassadors ambassadors={ambassadors}/>
+      <RegisterAmbassador
+        guardians={guardians}
+        refresh={() => getAmbassadors()}/>
     </Container>
   );
 };
 
-      // <RegisterAmbassador
-      //   guardians={guardians}
-      //   refresh={() => getAmbassadors()}/>
       // <ReactivateAmbassador
       //   guardians={guardians}
       //   ambassadors={ambassadors}
