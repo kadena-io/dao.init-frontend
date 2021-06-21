@@ -22,9 +22,9 @@ import {
 import  {
   RenderGuardians,
   RegisterAmbassador,
-  // DeactivateAmbassador,
-  // ReactivateAmbassador,
-  // RotateGuardian,
+  DeactivateAmbassador,
+  ReactivateAmbassador,
+  RotateGuardian,
 } from "./Guardians.js";
 import { RenderAmbassadors } from "./Ambassadors.js";
 import { KadenaConfig } from "./KadenaConfig.js"
@@ -126,6 +126,17 @@ const App = () => {
                 <CardHeader title="Guardians"/>
                 <CardContent>
                   <RenderGuardians guardians={guardians}/>
+                  <ScrollableTabs
+                    tabEntries={[
+                      {
+                        label:"Rotate Guardian",
+                        component:
+                          <DeactivateAmbassador
+                            guardians={guardians}
+                            ambassadors={ambassadors}
+                            refresh={() => getAmbassadors()}/>
+                      }
+                    ]}/>
                 </CardContent>
               </Card>
               }/>
@@ -136,13 +147,27 @@ const App = () => {
                   <RenderAmbassadors ambassadors={ambassadors}/>
                   <ScrollableTabs
                     tabEntries={[
-                    {
-                      label:"Register Ambassador",
-                      component:
-                        <RegisterAmbassador
-                          guardians={guardians}
-                          refresh={() => getAmbassadors()}/>
-                    }
+                      {
+                        label:"Register Ambassador",
+                        component:
+                          <RegisterAmbassador
+                            guardians={guardians}
+                            refresh={() => getAmbassadors()}/>
+                      },{
+                        label:"Deactivate Ambassador",
+                        component:
+                          <DeactivateAmbassador
+                            guardians={guardians}
+                            ambassadors={ambassadors}
+                            refresh={() => getAmbassadors()}/>
+                      },{
+                        label:"Reactivate Ambassador",
+                        component:
+                          <ReactivateAmbassador
+                            guardians={guardians}
+                            ambassadors={ambassadors}
+                            refresh={() => getAmbassadors()}/>
+                      }
                     ]}/>
                 </CardContent>
               </Card>

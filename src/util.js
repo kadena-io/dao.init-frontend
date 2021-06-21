@@ -1,20 +1,46 @@
 // For util functions
-import React from "react";
+import React, {useState, useEffect} from "react";
 import { makeStyles } from '@material-ui/core/styles';
 //Table Stuff
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-//Collapse-able Stuff
-import Box from '@material-ui/core/Box';
-import Collapse from '@material-ui/core/Collapse';
-import IconButton from '@material-ui/core/IconButton';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Box,
+  Collapse,
+  IconButton,
+} from '@material-ui/core';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+
+import {FormControl as Form} from '@material-ui/core';
+import {
+  Button,
+  Typography,
+  Input,
+  FilledInput,
+  LinearProgress,
+  OutlinedInput,
+  InputLabel,
+  InputAdornment,
+  FormHelperText,
+  FormControl,
+  TextField,
+  MenuItem,
+  Card, CardHeader, CardContent, CardActions,
+  Grid,
+} from '@material-ui/core';
+import Visibility from '@material-ui/icons/Visibility';
+import VisibilityOff from '@material-ui/icons/VisibilityOff';
+//pact-lang-api for blockchain calls
+import Pact from "pact-lang-api";
+//config file for blockchain calls
+import { kadenaAPI } from "./kadena-config.js";
+import { PactTxStatus } from "./PactTxStatus.js";
 
 export const useInputStyles = makeStyles((theme) => ({
   root: {
@@ -240,3 +266,91 @@ export const PactJsonListAsTable = (props) => {
     </TableContainer>
     )
 )};
+
+const MakeInputField = (props) => {
+  const {
+    type,
+    label,
+    options,
+    placeholder,
+    className,
+    onChange,
+    value,
+  } = props.inputField;
+
+  return ( type === 'select'
+    ? <TextField
+        id="outlined-multiline-static"
+        select
+        required
+        fullWidth
+        className={className}
+        variant="outlined"
+        label={label}
+        onChange={e => onChange(e.target.value)}
+        >
+        {options.map(k =>
+          <MenuItem key={k} value={k}>
+            {k}
+          </MenuItem>
+        )}
+      </TextField>
+    : type === 'textFieldSingle' ?
+      <TextField
+        required
+        fullWidth
+        value={value}
+        className={className}
+        variant='outlined'
+        label={label}
+        onChange={e => onChange(e.target.value)}
+      />
+    : type === 'textFieldMulti' ?
+      <TextField
+        required
+        fullWidth
+        label={label}
+        className={className}
+        multiline
+        rows={4}
+        variant="outlined"
+        placeholder={placeholder}
+        onChange={onChange}
+      />
+    : null
+  )
+
+};
+
+export const MakeForm = (props) => {
+  const {
+    inputFields,
+    onSubmit,
+    tx, txRes, txStatus, setTxStatus
+  } = props;
+  const [wasSubmitted,setWasSubmitted] = useState(false);
+  useEffect(()=>setWasSubmitted(false),[inputFields]);
+  useEffect(()=>txStatus !== "" ? setWasSubmitted(true) : setWasSubmitted(wasSubmitted), [txStatus])
+
+  return (
+    <div>
+      <form
+        autoComplete="off"
+        onSubmit={e => onSubmit(e)}>
+        {inputFields.map(f =>
+          <MakeInputField inputField={f}/>
+        )}
+        <CardActions>
+          {txStatus === 'pending'
+            ? null
+            : <Button variant="outlined" color="default" type="submit" disabled={wasSubmitted}>
+                Submit
+              </Button>
+          }
+        </CardActions>
+      </form>
+      { txStatus === 'pending' ? <LinearProgress /> : null }
+      <PactTxStatus tx={tx} txRes={txRes} txStatus={txStatus} setTxStatus={setTxStatus}/>
+    </div>
+  )
+};

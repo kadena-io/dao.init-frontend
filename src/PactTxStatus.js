@@ -32,6 +32,7 @@ export const PactTxStatus = (props) => {
   const tx = props.tx;
   const txRes = props.txRes;
   const txStatus = props.txStatus;
+  const setTxStatus = props.setTxStatus;
   const [open,setOpen] = useState(true);
   const [modalOpen,setModalOpen] = useState(false);
   const classes = useStyles();
@@ -54,7 +55,7 @@ export const PactTxStatus = (props) => {
                 aria-label="close"
                 color="inherit"
                 size="small"
-                onClick={() => {setOpen(false);}}>
+                onClick={() => {setOpen(false); setTxStatus("");}}>
                 <CloseIcon fontSize="inherit" />
               </IconButton>
 

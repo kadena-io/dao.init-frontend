@@ -33,8 +33,9 @@ import { kadenaAPI } from "./kadena-config.js";
 import {
   PactJsonListAsTable,
   useInputStyles,
+  MakeForm,
  } from "./util.js";
-import { PactTxStatus } from "./PactTxStatus.js"
+import { PactTxStatus } from "./PactTxStatus.js";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -138,6 +139,10 @@ export const RenderGuardians = (props) => {
 )};
 
 export const RegisterAmbassador = (props) => {
+  const {
+    refresh,
+    guardians,
+  } = props;
   const [grd, setGrd] = useState( "" );
   const [newAmb, setNewAmb] = useState( "" );
   const [ambGrd, setAmbGrd] = useState( "" );
@@ -147,12 +152,35 @@ export const RegisterAmbassador = (props) => {
   const [wasSubmitted,setWasSubmitted] = useState(false);
   const classes = useStyles();
 
-  useEffect(()=>setWasSubmitted(false),[grd,newAmb,ambGrd]);
+  const inputFields = [
+    {
+      type:'select',
+      label:'Select Guardian',
+      className:classes.formControl,
+      onChange:setGrd,
+      options:guardians.map((g)=>g['k']),
+    },
+    {
+      type:'textFieldSingle',
+      label:'Ambassador Account Name',
+      className:classes.formControl,
+      value:newAmb,
+      onChange:setNewAmb
+    },
+    {
+      type:'textFieldMulti',
+      label:'Ambassador Account Guard',
+      className:classes.formControl,
+      placeholder:JSON.stringify({"pred":"keys-all","keys":["8c59a322800b3650f9fc5b6742aa845bc1c35c2625dabfe5a9e9a4cada32c543"]},undefined,2),
+      value:ambGrd,
+      onChange:setAmbGrd,
+    }
+  ];
 
   const handleSubmit = (evt) => {
       evt.preventDefault();
       try {
-        sendGuardianCmd(setTx,setTxStatus,setTxRes,props.refresh
+        sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
           ,grd
           ,`(${kadenaAPI.contractAddress}.register-ambassador "${grd}" "${newAmb}" (read-keyset 'ks))`
           ,{ks: JSON.parse(ambGrd)}
@@ -162,180 +190,150 @@ export const RegisterAmbassador = (props) => {
         setTxRes(e);
         setTxStatus("validation-error");
       }
-      setWasSubmitted(true);
-    };
+  };
 
   return (
-    <div>
-      <form
-        autoComplete="off"
-        onSubmit={evt => handleSubmit(evt)}>
-          <TextField
-            id="outlined-multiline-static"
-            select
-            required
-            fullWidth
-            className={classes.formControl}
-            variant="outlined"
-            label="Select Guardian"
-            onChange={e => setGrd(e.target.value)}
-            >
-            {props.guardians.map((g) =>
-              <MenuItem key={g['k']} value={g['k']}>
-                {g.['k']}
-              </MenuItem>
-            )}
-          </TextField>
-          <TextField
-            required
-            fullWidth
-            value={newAmb}
-            className={classes.formControl}
-            variant='outlined'
-            label="Ambassador Accout Name"
-            onChange={e => setNewAmb(e.target.value)}
-            />
-          <TextField
-            required
-            fullWidth
-            label="Ambassador Account Guard"
-            className={classes.formControl}
-            multiline
-            rows={4}
-            variant="outlined"
-            placeholder={JSON.stringify({"pred":"keys-all","keys":["8c59a322800b3650f9fc5b6742aa845bc1c35c2625dabfe5a9e9a4cada32c543"]},undefined,2)}
-            value={ambGrd}
-            onChange={e => setAmbGrd(e.target.value)}
-          />
-        <CardActions>
-          {txStatus === 'pending'
-            ? null
-            : <Button variant="outlined" color="default" type="submit" disabled={wasSubmitted}>
-                Submit
-              </Button>
-          }
-        </CardActions>
-      </form>
-      { txStatus === 'pending' ? <LinearProgress /> : null }
-      <PactTxStatus tx={tx} txRes={txRes} txStatus={txStatus}/>
-    </div>
+    <MakeForm
+      inputFields={inputFields}
+      onSubmit={handleSubmit}
+      tx={tx} txStatus={txStatus} txRes={txRes}
+      setTxStatus={setTxStatus}/>
+  )
+};
+
+export const DeactivateAmbassador = (props) => {
+  const {refresh} = props;
+  const [grd, setGrd] = useState( "" );
+  const [amb, setAmb] = useState( "" );
+  const [txStatus, setTxStatus] = useState("");
+  const [tx, setTx] = useState( {} );
+  const [txRes, setTxRes] = useState( {} );
+  const classes = useStyles();
+
+  const handleSubmit = (evt) => {
+      evt.preventDefault();
+      // console.log(grd,newAmb);
+      sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
+        ,grd
+        ,`(${kadenaAPI.contractAddress}.deactivate-ambassador "${grd}" "${amb}")`
+        )
+      };
+  const inputFields = [
+    {
+      type:'select',
+      label:'Select Guardian',
+      className:classes.formControl,
+      onChange:setGrd,
+      options:props.guardians.map((g)=>g['k']),
+    },
+    {
+      type:'select',
+      label:'Select Ambassador',
+      className:classes.formControl,
+      onChange:setAmb,
+      options:props.ambassadors.map((g)=>g['k']),
+    },
+  ];
+
+  return (
+    <MakeForm
+      inputFields={inputFields}
+      onSubmit={handleSubmit}
+      tx={tx} txStatus={txStatus} txRes={txRes}
+      setTxStatus={setTxStatus}/>
   );
 };
-//
-// export const DeactivateAmbassador = (props) => {
-//   const [grd, setGrd] = useState( "" );
-//   const [newAmb, setNewAmb] = useState( "" );
-//   const [txStatus, setTxStatus] = useState("");
-//   const [tx, setTx] = useState( {} );
-//   const [txRes, setTxRes] = useState( {} );
-//
-//   const handleSubmit = (evt) => {
-//       evt.preventDefault();
-//       // console.log(grd,newAmb);
-//       sendGuardianCmd(setTx,setTxStatus,setTxRes,props.refresh
-//         ,grd
-//         ,`(${kadenaAPI.contractAddress}.deactivate-ambassador "${grd}" "${newAmb}")`
-//         )
-//       };
-//
-//   return (
-//     <div>
-//       <Message attached header="Deactivate Ambassador"/>
-//       <Form onSubmit={(evt)=>handleSubmit(evt)} className="attached fluid segment">
-//         <Form.Select
-//           label="Select Guardian"
-//           required
-//           options={props.guardians.map((g) => {return {key: g['k'], value:g['k'], text:g['k']};})}
-//           onChange={(e,d) => {setGrd(d.value)}}
-//           />
-//         <Form.Select
-//           label="Select Ambassador"
-//           required
-//           options={props.ambassadors.map((g) => {return {key: g['k'], value:g['k'], text:g['k']};})}
-//           onChange={e => setNewAmb(e.target.value)}/>
-//         <Button color='blue' type='submit'>Submit</Button>
-//       </Form>
-//       <PactTxStatus tx={tx} txRes={txRes} txStatus={txStatus}/>
-//     </div>
-//
-//   );
-// };
-//
-// export const ReactivateAmbassador = (props) => {
-//   const [grd, setGrd] = useState( "" );
-//   const [amb, setAmb] = useState( "" );
-//   const [txStatus, setTxStatus] = useState("");
-//   const [tx, setTx] = useState( {} );
-//   const [txRes, setTxRes] = useState( {} );
-//
-//   const handleSubmit = (evt) => {
-//       evt.preventDefault();
-//       // console.log(grd,newAmb);
-//       sendGuardianCmd(setTx,setTxStatus,setTxRes,props.refresh
-//         ,grd
-//         ,`(${kadenaAPI.contractAddress}.reactivate-ambassador "${grd}" "${amb}")`
-//         )
-//       };
-//
-//   return (
-//     <div>
-//       <Message attached header="Reactivate Ambassador"/>
-//       <Form onSubmit={evt => handleSubmit(evt)} className="attached fluid segment">
-//         <Form.Select
-//           label="Select Guardian"
-//           required
-//           options={props.guardians.map((g) => {return {key: g['k'], value:g['k'], text:g['k']};})}
-//           onChange={(e,d) => {setGrd(d.value)}}
-//           />
-//         <Form.Select
-//           label="Select Ambassador"
-//           required
-//           options={props.ambassadors.map((g) => {return {key: g['k'], value:g['k'], text:g['k']};})}
-//           onChange={(e,d) => setAmb(d.value)}/>
-//         <Button color='blue' type='submit'>Submit</Button>
-//       </Form>
-//       <PactTxStatus tx={tx} txRes={txRes} txStatus={txStatus}/>
-//     </div>
-//
-//   );
-// }
-//
-// export const RotateGuardian = (props) => {
-//   const [grd, setGrd] = useState( "" );
-//   const [ks, setKs] = useState( "" );
-//   const [txStatus, setTxStatus] = useState( "" );
-//   const [tx, setTx] = useState( {} );
-//   const [txRes, setTxRes] = useState( {} );
-//
-//   const handleSubmit = (evt) => {
-//       evt.preventDefault();
-//       // console.log(grd,newAmb);
-//       sendGuardianCmd(setTx,setTxStatus,setTxRes,props.refresh
-//         ,grd
-//         ,`(${kadenaAPI.contractAddress}.reactivate-ambassador "${grd}" (read-keyset 'ks))`
-//         ,{ks: JSON.parse(ks)})
-//       };
-//
-//   return (
-//     <div>
-//       <Message attached header="Rotate Guardian"/>
-//       <Form onSubmit={evt => handleSubmit(evt)} className="attached fluid segment">
-//         <Form.Select
-//           label="Select Guardian"
-//           required
-//           options={props.guardians.map((g) => {return {key: g['k'], value:g['k'], text:g['k']};})}
-//           onChange={(e,d) => {setGrd(d.value)}}
-//           />
-//         <Form.TextArea required
-//           label="Enter new KeySet"
-//           placeholder={JSON.stringify({"pred":"keys-all","keys":["8c59a322800b3650f9fc5b6742aa845bc1c35c2625dabfe5a9e9a4cada32c543"]},undefined,2)}
-//           value={ks}
-//           onChange={e => setKs(e.target.value)}
-//           />
-//         <Button color='blue' type='submit'>Submit</Button>
-//       </Form>
-//       <PactTxStatus tx={tx} txRes={txRes} txStatus={txStatus}/>
-//     </div>
-//
-//   );
-// }
+
+export const ReactivateAmbassador = (props) => {
+  const {
+    refresh,
+    guardians,
+    ambassadors,
+  } = props;
+  const [grd, setGrd] = useState( "" );
+  const [amb, setAmb] = useState( "" );
+  const [txStatus, setTxStatus] = useState("");
+  const [tx, setTx] = useState( {} );
+  const [txRes, setTxRes] = useState( {} );
+  const classes = useStyles();
+
+  const handleSubmit = (evt) => {
+      evt.preventDefault();
+      // console.log(grd,newAmb);
+      sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
+        ,grd
+        ,`(${kadenaAPI.contractAddress}.reactivate-ambassador "${grd}" "${amb}")`
+        )
+      };
+  const inputFields = [
+    {
+      type:'select',
+      label:'Select Guardian',
+      className:classes.formControl,
+      onChange:setGrd,
+      options:props.guardians.map((g)=>g['k']),
+    },
+    {
+      type:'select',
+      label:'Select Ambassador',
+      className:classes.formControl,
+      onChange:setAmb,
+      options:props.ambassadors.map((g)=>g['k']),
+    },
+  ];
+
+  return (
+    <MakeForm
+      inputFields={inputFields}
+      onSubmit={handleSubmit}
+      tx={tx} txStatus={txStatus} txRes={txRes}
+      setTxStatus={setTxStatus}/>
+  );
+}
+
+export const RotateGuardian = (props) => {
+  const {
+    refresh,
+    guardians,
+  } = props;
+  const [grd, setGrd] = useState( "" );
+  const [ks, setKs] = useState( "" );
+  const [txStatus, setTxStatus] = useState( "" );
+  const [tx, setTx] = useState( {} );
+  const [txRes, setTxRes] = useState( {} );
+  const classes = useStyles();
+
+  const handleSubmit = (evt) => {
+      evt.preventDefault();
+      // console.log(grd,newAmb);
+      sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
+        ,grd
+        ,`(${kadenaAPI.contractAddress}.reactivate-ambassador "${grd}" (read-keyset 'ks))`
+        ,{ks: JSON.parse(ks)})
+      };
+
+  const inputFields = [
+    {
+      type:'select',
+      label:'Select Guardian',
+      className:classes.formControl,
+      onChange:setGrd,
+      options:guardians.map((g)=>g['k']),
+    },{
+      type:'textFieldMulti',
+      label:'Guardian Account Guard',
+      className:classes.formControl,
+      placeholder:JSON.stringify({"pred":"keys-all","keys":["8c59a322800b3650f9fc5b6742aa845bc1c35c2625dabfe5a9e9a4cada32c543"]},undefined,2),
+      value:ks,
+      onChange:setKs,
+    }
+  ];
+
+  return (
+    <MakeForm
+      inputFields={inputFields}
+      onSubmit={handleSubmit}
+      tx={tx} txStatus={txStatus} txRes={txRes}
+      setTxStatus={setTxStatus}/>
+  );
+}
