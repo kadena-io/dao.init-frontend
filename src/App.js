@@ -28,7 +28,11 @@ import  {
   ProposeDaoUpgrade,
   GuardianApproveHash,
 } from "./Guardians.js";
-import { RenderAmbassadors } from "./Ambassadors.js";
+import {
+  RenderAmbassadors,
+  VoteToFreeze,
+  Freeze,
+} from "./Ambassadors.js";
 import { KadenaConfig } from "./KadenaConfig.js"
 import { RenderInitState, getContractState } from "./InitState.js";
 import { NavDrawer } from "./NavDrawer.js";
@@ -179,6 +183,18 @@ const App = () => {
                         component:
                           <ReactivateAmbassador
                             guardians={guardians}
+                            ambassadors={ambassadors}
+                            refresh={() => getAmbassadors()}/>
+                      },{
+                        label:"Vote to Freeze",
+                        component:
+                          <VoteToFreeze
+                            ambassadors={ambassadors}
+                            refresh={() => getAmbassadors()}/>
+                      },{
+                        label:"Freeze",
+                        component:
+                          <Freeze
                             ambassadors={ambassadors}
                             refresh={() => getAmbassadors()}/>
                       }

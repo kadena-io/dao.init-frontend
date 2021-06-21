@@ -53,16 +53,18 @@ const sendGuardianCmd = async (
   setTxStatus,
   setTxRes,
   refresh,
-  user, cmd, envData={}
+  user, cmd, envData={}, caps=[]
 ) => {
     try {
       //creates transaction to send to wallet
       const toSign = {
           pactCode: cmd,
-          caps: Pact.lang.mkCap("Guadian Cap"
-                           , "Authenticates that your a guardian"
+          caps: (caps
+            ? caps :
+            Pact.lang.mkCap("Guadian Cap"
+                           , "Authenticates that you're a guardian"
                            , `${kadenaAPI.contractAddress}.GUARDIAN`
-                           , [user]),
+                           , [user])),
           gasLimit: kadenaAPI.meta.gasLimit,
           chainId: kadenaAPI.meta.chainId,
           ttl: kadenaAPI.meta.ttl,
@@ -186,7 +188,7 @@ export const RegisterAmbassador = (props) => {
           ,{ks: JSON.parse(ambGrd)}
         );
       } catch (e) {
-        console.log("Guardian Registration Submit Error",typeof e, e, grd,newAmb,ambGrd);
+        console.log("Ambassador Registration Submit Error",typeof e, e, grd,newAmb,ambGrd);
         setTxRes(e);
         setTxStatus("validation-error");
       }
