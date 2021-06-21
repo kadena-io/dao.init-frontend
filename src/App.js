@@ -1,7 +1,23 @@
 //basic React api imports
 import React, { useState, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+} from 'react-router-dom';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import {
+  createMuiTheme,
+  ThemeProvider,
+ } from '@material-ui/core/styles';
+import NoSsr from '@material-ui/core/NoSsr';
 //semantic ui for styling
-import Container from '@material-ui/core/Container';
+import {
+  Container,
+  Card, CardHeader, CardContent, CardActions,
+  Typography,
+} from '@material-ui/core';
 //config file for blockchain calls
 import  {
   RenderGuardians,
@@ -13,18 +29,31 @@ import  {
 import { RenderAmbassadors } from "./Ambassadors.js";
 import { KadenaConfig } from "./KadenaConfig.js"
 import { RenderInitState, getContractState } from "./InitState.js";
+import { NavDrawer } from "./NavDrawer.js";
+import { ScrollableTabs } from "./ScrollableTabs.js";
+
 
 const App = () => {
-  /*
-
-    REACT COMPONENT SETUP
-
-      we will make use of standard react apis
-
-      useState -> page state management
-      useEffect -> fetch existing memories on page load
-
-  */
+  const theme = React.useMemo(
+      () =>
+        createMuiTheme({
+          palette: {
+            primary: {
+              light: '#cb4584',
+              main: '#960057',
+              dark: '#cb4584',
+              contrastText: '#fff',
+            },
+            secondary: {
+              light: '#ffffff',
+              main: '#e3e8ed',
+              dark: '#b1b6bb',
+              contrastText: '#000',
+            },
+          },
+        }),
+      [],
+    );
 
   const [initState, setInitState] = useState( {} );
   const [guardians, setGuardians] = useState( [] );
@@ -52,41 +81,78 @@ const App = () => {
     console.log('useEffect []',guardians,ambassadors)
   }, []);
 
-
-  /*
-
-    BLOCKCHAIN TRANSACTIONS
-
-      use pact-lang-api npm package to interact with Kadena blockchain networks
-        https://github.com/kadena-io/pact-lang-api
-
-      all transaction setup is ./kadena-config.js
-
-  */
-
-
   return (
-    <Container>
-      <h1>
-        <a>Welcome to DAO.init</a>
-      </h1>
-      <KadenaConfig/>
-      <h2>
-        Contract State
-      </h2>
-      <RenderInitState initState={initState}/>
-      <h2>
-        Guardians
-      </h2>
-      <RenderGuardians guardians={guardians}/>
-      <h2>
-        Ambassadors
-      </h2>
-      <RenderAmbassadors ambassadors={ambassadors}/>
-      <RegisterAmbassador
-        guardians={guardians}
-        refresh={() => getAmbassadors()}/>
-    </Container>
+    <ThemeProvider theme={theme}>
+      <NoSsr>
+        <CssBaseline/>
+        <Router basename={process.env.PUBLIC_URL}>
+          <NavDrawer title="dao.init"
+            entriesList={[
+              [{
+                primary:"Config",
+                to:"/config"
+              },{
+                primary:"Init State",
+                to:"/initState"
+              },{
+                primary:"Ambassadors",
+                to:"/ambassadors"
+              },{
+                primary:"Guardians",
+                to:"/guardians",
+              }
+            ]
+          ]}>
+          <Container>
+            <Switch>
+              <Route path="/config" component={ () =>
+                <Card>
+                  <CardHeader title="Contract and UI Configuration"/>
+                  <CardContent>
+                    <KadenaConfig/>
+                  </CardContent>
+                </Card>
+              }/>
+            <Route path="/initState" component={ () =>
+                <Card>
+                  <CardHeader title="Contract State"/>
+                  <CardContent>
+                    <RenderInitState initState={initState}/>
+                  </CardContent>
+                </Card>
+              }/>
+            <Route path="/guardians" component={ () =>
+              <Card>
+                <CardHeader title="Guardians"/>
+                <CardContent>
+                  <RenderGuardians guardians={guardians}/>
+                </CardContent>
+              </Card>
+              }/>
+            <Route path="/ambassadors" component={ () =>
+              <Card>
+                <CardHeader title="Ambassadors"/>
+                <CardContent>
+                  <RenderAmbassadors ambassadors={ambassadors}/>
+                  <ScrollableTabs
+                    tabEntries={[
+                    {
+                      label:"Register Ambassador",
+                      component:
+                        <RegisterAmbassador
+                          guardians={guardians}
+                          refresh={() => getAmbassadors()}/>
+                    }
+                    ]}/>
+                </CardContent>
+              </Card>
+              }/>
+            </Switch>
+          </Container>
+          </NavDrawer>
+        </Router>
+      </NoSsr>
+    </ThemeProvider>
   );
 };
 

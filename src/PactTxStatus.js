@@ -1,9 +1,16 @@
 //basic React api imports
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import Icon from '@material-ui/core/Icon';
 import { makeStyles } from '@material-ui/core/styles';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import CloseIcon from '@material-ui/icons/Close';
+import {
+  Container,
+  Paper,
+  Box,
+  Grid,
+  Divider,
+} from '@material-ui/core';
 import { Modal, Button } from '@material-ui/core';
 import Collapse from '@material-ui/core/Collapse';
 import IconButton from '@material-ui/core/IconButton';
@@ -32,6 +39,9 @@ export const PactTxStatus = (props) => {
                    : txStatus === "success" ? 'success'
                    : txStatus === "timeout" ? 'warning'
                    : 'error' ;
+  useEffect(()=>
+    setOpen(true)
+  ,[txStatus]);
 
   return (
     txStatus ?
@@ -47,10 +57,32 @@ export const PactTxStatus = (props) => {
                 onClick={() => {setOpen(false);}}>
                 <CloseIcon fontSize="inherit" />
               </IconButton>
+
             }
           >
 
-          <AlertTitle>{dashStyleNames2Text(txStatus)}</AlertTitle>
+          <AlertTitle>
+            <Grid
+              container
+              direction="row"
+              justify="flex-start"
+              alignItems="center"
+            >
+              <Grid item>
+                {dashStyleNames2Text(txStatus)}
+              </Grid>
+              {txStatus === 'validation-error' || txStatus === 'failure'
+                ?
+                  <Grid item>
+                    <Divider orientation="vertical" flexItem />
+                    <Button size='small' onClick={()=>setModalOpen(true)}>
+                      View
+                    </Button>
+                  </Grid>
+                : <React.Fragment/>}
+            </Grid>
+
+          </AlertTitle>
             { txStatus === "pending" ? (
               <React.Fragment>
                 <p>Awaiting Confirmation</p>
@@ -70,14 +102,13 @@ export const PactTxStatus = (props) => {
                   View transaction in Block Explorer
                 </a>
                 <div>
-                  <button type="button" color='secondary' onClick={()=>setModalOpen(true)}>
-                    View Error
-                  </button>
                   <Modal
                     open={modalOpen}
                     onClose={() => setModalOpen(false)}
                   >
-                    <PactSingleJsonAsTable json={txRes}/>
+                    <Container maxWidth="lg">
+                      <PactSingleJsonAsTable json={txRes}/>
+                    </Container>
                   </Modal>
                 </div>
               </React.Fragment>
@@ -89,11 +120,23 @@ export const PactTxStatus = (props) => {
                 </a>
               </React.Fragment>
             ) : txStatus === "validation-error" ? (
-              <p>
-                Transaction was not sent to Blockchain. Check your keys or metadata
-              </p>
+              <React.Fragment>
+                <Box>
+                  Transaction was not sent to Blockchain. Check your keys or metadata.
+                </Box>
+                <div>
+                  <Modal
+                    open={modalOpen}
+                    onClose={() => setModalOpen(false)}
+                  >
+                    <Container maxWidth="md">
+                        <Paper>{txRes.toString()}</Paper>
+                    </Container>
+                  </Modal>
+                </div>
+              </React.Fragment>
             ) : (
-              <React.Fragment></React.Fragment>
+              <React.Fragment/>
             )}
           </Alert>
         </Collapse>

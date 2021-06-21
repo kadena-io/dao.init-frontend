@@ -1,5 +1,5 @@
 //basic React api imports
-import React, { useState, } from "react";
+import React, { useState, useEffect } from "react";
 import clsx from 'clsx';
 //Material Stuff
 import {FormControl as Form} from '@material-ui/core';
@@ -10,6 +10,7 @@ import {
   IconButton,
   Input,
   FilledInput,
+  LinearProgress,
   OutlinedInput,
   InputLabel,
   InputAdornment,
@@ -20,6 +21,9 @@ import {
   Card, CardHeader, CardContent, CardActions,
   Grid,
 } from '@material-ui/core';
+import {
+  makeStyles,
+} from '@material-ui/styles';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 //pact-lang-api for blockchain calls
@@ -31,6 +35,17 @@ import {
   useInputStyles,
  } from "./util.js";
 import { PactTxStatus } from "./PactTxStatus.js"
+
+const useStyles = makeStyles((theme) => ({
+  formControl: {
+    margin: "5px auto",
+    minWidth: 120,
+  },
+  selectEmpty: {
+    marginTop: "10px auto",
+  },
+}));
+
 
 const sendGuardianCmd = async (
   setTx,
@@ -107,8 +122,7 @@ const sendGuardianCmd = async (
         setTxStatus('failure');
       }
     } catch(e) {
-      console.log(e);
-      console.log("tx status set to validation error");
+      console.log("tx status set to validation error",e);
       //set state for transaction construction error
       setTxStatus('validation-error');
     }
@@ -130,22 +144,29 @@ export const RegisterAmbassador = (props) => {
   const [txStatus, setTxStatus] = useState("");
   const [tx, setTx] = useState( {} );
   const [txRes, setTxRes] = useState( {} );
+  const [wasSubmitted,setWasSubmitted] = useState(false);
+  const classes = useStyles();
+
+  useEffect(()=>setWasSubmitted(false),[grd,newAmb,ambGrd]);
 
   const handleSubmit = (evt) => {
       evt.preventDefault();
-      console.log(grd,newAmb,ambGrd);
-      sendGuardianCmd(setTx,setTxStatus,setTxRes,props.refresh
-        ,grd
-        ,`(${kadenaAPI.contractAddress}.register-ambassador "${grd}" "${newAmb}" (read-keyset 'ks))`
-        ,{ks: JSON.parse(ambGrd)}
-        )
-      };
+      try {
+        sendGuardianCmd(setTx,setTxStatus,setTxRes,props.refresh
+          ,grd
+          ,`(${kadenaAPI.contractAddress}.register-ambassador "${grd}" "${newAmb}" (read-keyset 'ks))`
+          ,{ks: JSON.parse(ambGrd)}
+        );
+      } catch (e) {
+        console.log("Guardian Registration Submit Error",typeof e, e, grd,newAmb,ambGrd);
+        setTxRes(e);
+        setTxStatus("validation-error");
+      }
+      setWasSubmitted(true);
+    };
 
   return (
-    <Grid item xs={12} sm={6}>
-    <Card>
-      <CardHeader title="Add Ambassador"/>
-      <CardContent>
+    <div>
       <form
         autoComplete="off"
         onSubmit={evt => handleSubmit(evt)}>
@@ -154,6 +175,7 @@ export const RegisterAmbassador = (props) => {
             select
             required
             fullWidth
+            className={classes.formControl}
             variant="outlined"
             label="Select Guardian"
             onChange={e => setGrd(e.target.value)}
@@ -168,6 +190,8 @@ export const RegisterAmbassador = (props) => {
             required
             fullWidth
             value={newAmb}
+            className={classes.formControl}
+            variant='outlined'
             label="Ambassador Accout Name"
             onChange={e => setNewAmb(e.target.value)}
             />
@@ -175,6 +199,7 @@ export const RegisterAmbassador = (props) => {
             required
             fullWidth
             label="Ambassador Account Guard"
+            className={classes.formControl}
             multiline
             rows={4}
             variant="outlined"
@@ -183,15 +208,17 @@ export const RegisterAmbassador = (props) => {
             onChange={e => setAmbGrd(e.target.value)}
           />
         <CardActions>
-          <Button variant="contained" color="primary" type="submit">
-            Submit
-          </Button>
+          {txStatus === 'pending'
+            ? null
+            : <Button variant="outlined" color="default" type="submit" disabled={wasSubmitted}>
+                Submit
+              </Button>
+          }
         </CardActions>
       </form>
+      { txStatus === 'pending' ? <LinearProgress /> : null }
       <PactTxStatus tx={tx} txRes={txRes} txStatus={txStatus}/>
-    </CardContent>
-  </Card>
-  </Grid>
+    </div>
   );
 };
 //
