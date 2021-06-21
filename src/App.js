@@ -25,6 +25,8 @@ import  {
   DeactivateAmbassador,
   ReactivateAmbassador,
   RotateGuardian,
+  ProposeDaoUpgrade,
+  GuardianApproveHash,
 } from "./Guardians.js";
 import { RenderAmbassadors } from "./Ambassadors.js";
 import { KadenaConfig } from "./KadenaConfig.js"
@@ -135,7 +137,19 @@ const App = () => {
                             guardians={guardians}
                             ambassadors={ambassadors}
                             refresh={() => getAmbassadors()}/>
-                      }
+                        },{
+                          label:"Propose DAO Upgrade",
+                          component:
+                            <ProposeDaoUpgrade
+                              guardians={guardians}
+                              refresh={() => getAmbassadors()}/>
+                        },{
+                          label:"Approve DAO Upgrade",
+                          component:
+                            <GuardianApproveHash
+                              guardians={guardians}
+                              refresh={() => getAmbassadors()}/>
+                        }
                     ]}/>
                 </CardContent>
               </Card>

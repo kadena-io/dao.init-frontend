@@ -213,10 +213,16 @@ export const DeactivateAmbassador = (props) => {
   const handleSubmit = (evt) => {
       evt.preventDefault();
       // console.log(grd,newAmb);
-      sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
+      try {
+        sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
         ,grd
         ,`(${kadenaAPI.contractAddress}.deactivate-ambassador "${grd}" "${amb}")`
         )
+      } catch (e) {
+        console.log("deactivate-ambassador Submit Error",typeof e, e, grd,);
+        setTxRes(e);
+        setTxStatus("validation-error");
+      }
       };
   const inputFields = [
     {
@@ -260,11 +266,17 @@ export const ReactivateAmbassador = (props) => {
   const handleSubmit = (evt) => {
       evt.preventDefault();
       // console.log(grd,newAmb);
-      sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
+      try {
+        sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
         ,grd
         ,`(${kadenaAPI.contractAddress}.reactivate-ambassador "${grd}" "${amb}")`
         )
-      };
+      } catch (e) {
+        console.log("reactivate-ambassador Submit Error",typeof e, e, grd,);
+        setTxRes(e);
+        setTxStatus("validation-error");
+      }
+    };
   const inputFields = [
     {
       type:'select',
@@ -306,11 +318,17 @@ export const RotateGuardian = (props) => {
   const handleSubmit = (evt) => {
       evt.preventDefault();
       // console.log(grd,newAmb);
-      sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
+      try {
+        sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
         ,grd
-        ,`(${kadenaAPI.contractAddress}.reactivate-ambassador "${grd}" (read-keyset 'ks))`
+        ,`(${kadenaAPI.contractAddress}.rotate-guardian "${grd}" (read-keyset 'ks))`
         ,{ks: JSON.parse(ks)})
-      };
+      } catch (e) {
+        console.log("rotate-guardian Submit Error",typeof e, e, grd,);
+        setTxRes(e);
+        setTxStatus("validation-error");
+      }
+    };
 
   const inputFields = [
     {
@@ -336,4 +354,110 @@ export const RotateGuardian = (props) => {
       tx={tx} txStatus={txStatus} txRes={txRes}
       setTxStatus={setTxStatus}/>
   );
-}
+};
+
+export const ProposeDaoUpgrade = (props) => {
+  const {
+    refresh,
+    guardians,
+  } = props;
+  const [acct, setAcct] = useState( "" );
+  const [hsh, setHsh] = useState( "" );
+  const [txStatus, setTxStatus] = useState("");
+  const [tx, setTx] = useState( {} );
+  const [txRes, setTxRes] = useState( {} );
+  const [wasSubmitted,setWasSubmitted] = useState(false);
+  const classes = useStyles();
+
+  const inputFields = [
+    {
+      type:'select',
+      label:'Select Guardian',
+      className:classes.formControl,
+      onChange:setAcct,
+      options:guardians.map((g)=>g['k']),
+    },
+    {
+      type:'textFieldSingle',
+      label:'Proposed Upgrade Hash',
+      className:classes.formControl,
+      value:hsh,
+      onChange:setHsh
+    }
+  ];
+
+  const handleSubmit = (evt) => {
+      evt.preventDefault();
+      try {
+        sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
+          ,acct
+          ,`(${kadenaAPI.contractAddress}.propose-dao-upgrade "${acct}" "${hsh}")`
+        );
+      } catch (e) {
+        console.log("propose-dao-upgrade Submit Error",typeof e, e, acct,hsh,);
+        setTxRes(e);
+        setTxStatus("validation-error");
+      }
+  };
+
+  return (
+    <MakeForm
+      inputFields={inputFields}
+      onSubmit={handleSubmit}
+      tx={tx} txStatus={txStatus} txRes={txRes}
+      setTxStatus={setTxStatus}/>
+  )
+};
+
+export const GuardianApproveHash = (props) => {
+  const {
+    refresh,
+    guardians,
+  } = props;
+  const [acct, setAcct] = useState( "" );
+  const [hsh, setHsh] = useState( "" );
+  const [txStatus, setTxStatus] = useState("");
+  const [tx, setTx] = useState( {} );
+  const [txRes, setTxRes] = useState( {} );
+  const [wasSubmitted,setWasSubmitted] = useState(false);
+  const classes = useStyles();
+
+  const inputFields = [
+    {
+      type:'select',
+      label:'Select Guardian',
+      className:classes.formControl,
+      onChange:setAcct,
+      options:guardians.map((g)=>g['k']),
+    },
+    {
+      type:'select',
+      label:'Proposed Upgrade Hash',
+      className:classes.formControl,
+      value:setHsh,
+      options:guardians.map((g)=>g['approved-hash']),
+    }
+  ];
+
+  const handleSubmit = (evt) => {
+      evt.preventDefault();
+      try {
+        sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
+          ,acct
+          ,`(${kadenaAPI.contractAddress}.guardian-approve-hash "${acct}" "${hsh}")`
+        );
+      } catch (e) {
+        console.log("guardian-approve-hash Submit Error",typeof e, e, acct,hsh,);
+        setTxRes(e);
+        setTxStatus("validation-error");
+      }
+  };
+
+  return (
+    <MakeForm
+      inputFields={inputFields}
+      onSubmit={handleSubmit}
+      tx={tx} txStatus={txStatus} txRes={txRes}
+      setTxStatus={setTxStatus}/>
+  )
+};
