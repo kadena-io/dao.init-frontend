@@ -295,7 +295,7 @@ const MakeInputField = (props) => {
         rows={4}
         variant="outlined"
         placeholder={placeholder}
-        onChange={onChange}
+        onChange={e => onChange(e.target.value)}
       />
     : null
   )

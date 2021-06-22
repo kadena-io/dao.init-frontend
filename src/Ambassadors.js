@@ -121,9 +121,9 @@ export const VoteToFreeze = (props) => {
     ambassadors,
   } = props;
   const [amb, setAmb] = useState( "" );
-  const [txStatus, setTxStatus] = useState("");
-  const [tx, setTx] = useState( {} );
-  const [txRes, setTxRes] = useState( {} );
+  const {txStatus, setTxStatus,
+         tx, setTx,
+         txRes, setTxRes} = props.pactTxStatus;
   const classes = useStyles();
 
   const inputFields = [
@@ -165,9 +165,9 @@ export const Freeze = (props) => {
     ambassadors,
   } = props;
   const [amb, setAmb] = useState( "" );
-  const [txStatus, setTxStatus] = useState("");
-  const [tx, setTx] = useState( {} );
-  const [txRes, setTxRes] = useState( {} );
+  const {txStatus, setTxStatus,
+         tx, setTx,
+         txRes, setTxRes} = props.pactTxStatus;
   const classes = useStyles();
 
   const inputFields = [
@@ -201,4 +201,57 @@ export const Freeze = (props) => {
       tx={tx} txStatus={txStatus} txRes={txRes}
       setTxStatus={setTxStatus}/>
   )
+};
+
+export const RotateAmbassador = (props) => {
+  const {
+    refresh,
+    ambassadors,
+  } = props;
+  const [acct, setAcct] = useState( "" );
+  const [ks, setKs] = useState( "" );
+  const {txStatus, setTxStatus,
+         tx, setTx,
+         txRes, setTxRes} = props.pactTxStatus;
+  const classes = useStyles();
+
+  const handleSubmit = (evt) => {
+      evt.preventDefault();
+      // console.log(grd,newAmb);
+      try {
+        sendAmbassadorCmd(setTx,setTxStatus,setTxRes,refresh
+        ,acct
+        ,`(${kadenaAPI.contractAddress}.rotate-ambassador "${acct}" (read-keyset 'ks))`
+        ,{ks: JSON.parse(ks)})
+      } catch (e) {
+        console.log("rotate-ambassador Submit Error",typeof e, e, acct,ks);
+        setTxRes(e);
+        setTxStatus("validation-error");
+      }
+    };
+
+  const inputFields = [
+    {
+      type:'select',
+      label:'Select Ambassador',
+      className:classes.formControl,
+      onChange:setAcct,
+      options:ambassadors.map((g)=>g['k']),
+    },{
+      type:'textFieldMulti',
+      label:'Guardian Account Guard',
+      className:classes.formControl,
+      placeholder:JSON.stringify({"pred":"keys-all","keys":["8c59a322800b3650f9fc5b6742aa845bc1c35c2625dabfe5a9e9a4cada32c543"]},undefined,2),
+      value:ks,
+      onChange:setKs,
+    }
+  ];
+
+  return (
+    <MakeForm
+      inputFields={inputFields}
+      onSubmit={handleSubmit}
+      tx={tx} txStatus={txStatus} txRes={txRes}
+      setTxStatus={setTxStatus}/>
+  );
 };

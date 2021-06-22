@@ -124,9 +124,9 @@ export const RegisterAmbassador = (props) => {
   const [grd, setGrd] = useState( "" );
   const [newAmb, setNewAmb] = useState( "" );
   const [ambGrd, setAmbGrd] = useState( "" );
-  const [txStatus, setTxStatus] = useState("");
-  const [tx, setTx] = useState( {} );
-  const [txRes, setTxRes] = useState( {} );
+  const {txStatus, setTxStatus,
+    tx, setTx,
+    txRes, setTxRes} = props.pactTxStatus;
   const classes = useStyles();
 
   const inputFields = [
@@ -182,9 +182,9 @@ export const DeactivateAmbassador = (props) => {
   const {refresh} = props;
   const [grd, setGrd] = useState( "" );
   const [amb, setAmb] = useState( "" );
-  const [txStatus, setTxStatus] = useState("");
-  const [tx, setTx] = useState( {} );
-  const [txRes, setTxRes] = useState( {} );
+  const {txStatus, setTxStatus,
+    tx, setTx,
+    txRes, setTxRes} = props.pactTxStatus;
   const classes = useStyles();
 
   const handleSubmit = (evt) => {
@@ -233,9 +233,9 @@ export const ReactivateAmbassador = (props) => {
   } = props;
   const [grd, setGrd] = useState( "" );
   const [amb, setAmb] = useState( "" );
-  const [txStatus, setTxStatus] = useState("");
-  const [tx, setTx] = useState( {} );
-  const [txRes, setTxRes] = useState( {} );
+  const {txStatus, setTxStatus,
+    tx, setTx,
+    txRes, setTxRes} = props.pactTxStatus;
   const classes = useStyles();
 
   const handleSubmit = (evt) => {
@@ -285,9 +285,9 @@ export const RotateGuardian = (props) => {
   } = props;
   const [grd, setGrd] = useState( "" );
   const [ks, setKs] = useState( "" );
-  const [txStatus, setTxStatus] = useState( "" );
-  const [tx, setTx] = useState( {} );
-  const [txRes, setTxRes] = useState( {} );
+  const {txStatus, setTxStatus,
+    tx, setTx,
+    txRes, setTxRes} = props.pactTxStatus;
   const classes = useStyles();
 
   const handleSubmit = (evt) => {
@@ -338,9 +338,9 @@ export const ProposeDaoUpgrade = (props) => {
   } = props;
   const [acct, setAcct] = useState( "" );
   const [hsh, setHsh] = useState( "" );
-  const [txStatus, setTxStatus] = useState("");
-  const [tx, setTx] = useState( {} );
-  const [txRes, setTxRes] = useState( {} );
+  const {txStatus, setTxStatus,
+    tx, setTx,
+    txRes, setTxRes} = props.pactTxStatus;
   const classes = useStyles();
 
   const inputFields = [
@@ -390,9 +390,9 @@ export const GuardianApproveHash = (props) => {
   } = props;
   const [acct, setAcct] = useState( "" );
   const [hsh, setHsh] = useState( "" );
-  const [txStatus, setTxStatus] = useState("");
-  const [tx, setTx] = useState( {} );
-  const [txRes, setTxRes] = useState( {} );
+  const {txStatus, setTxStatus,
+         tx, setTx,
+         txRes, setTxRes} = props.pactTxStatus;
   const classes = useStyles();
 
   const inputFields = [

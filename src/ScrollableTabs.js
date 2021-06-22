@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useRef} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
   AppBar,
@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
 export const ScrollableTabs = (props) => {
   const { tabEntries } = props;
   const classes = useStyles();
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = props.tabIdx;
 
   const handleChange = (event, newValue) => {
     setValue(newValue);

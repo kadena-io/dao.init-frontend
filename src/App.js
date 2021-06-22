@@ -12,6 +12,7 @@ import {
  } from '@material-ui/core/styles';
 //semantic ui for styling
 import {
+  Button,
   Container,
   Card, CardHeader, CardContent,
   CssBaseline, NoSsr
@@ -22,11 +23,13 @@ import  {
   RegisterAmbassador,
   DeactivateAmbassador,
   ReactivateAmbassador,
+  RotateGuardian,
   ProposeDaoUpgrade,
   GuardianApproveHash,
 } from "./Guardians.js";
 import {
   RenderAmbassadors,
+  RotateAmbassador,
   VoteToFreeze,
   Freeze,
 } from "./Ambassadors.js";
@@ -34,6 +37,8 @@ import { KadenaConfig } from "./KadenaConfig.js"
 import { RenderInitState, getContractState } from "./InitState.js";
 import { NavDrawer } from "./NavDrawer.js";
 import { ScrollableTabs } from "./ScrollableTabs.js";
+import { BookTwoTone } from "@material-ui/icons";
+import { PactTxStatus } from "./PactTxStatus.js";
 
 
 const App = () => {
@@ -61,6 +66,16 @@ const App = () => {
   const [initState, setInitState] = useState( {} );
   const [guardians, setGuardians] = useState( [] );
   const [ambassadors, setAmbassadors] = useState( [] );
+  const ambTabIdx = useState(0);
+  const grdTabIdx = useState(0);
+  const [txStatus, setTxStatus] = useState("");
+  const [tx, setTx] = useState( {} );
+  const [txRes, setTxRes] = useState( {} );
+  const pactTxStatus = {
+    tx:tx,setTx:setTx,
+    txStatus:txStatus,setTxStatus:setTxStatus,
+    txRes:txRes,setTxRes:setTxRes,
+  };
 
   const getInitState = async () => {
     const res = await getContractState("view-state");
@@ -128,27 +143,32 @@ const App = () => {
               <Card>
                 <CardHeader title="Guardians"/>
                 <CardContent>
+                  <Button onClick={()=>getGuardians()}>getGuardians</Button>
                   <RenderGuardians guardians={guardians}/>
                   <ScrollableTabs
+                    tabIdx={grdTabIdx}
                     tabEntries={[
-                      {
-                        label:"Rotate Guardian",
-                        component:
-                          <DeactivateAmbassador
-                            guardians={guardians}
-                            ambassadors={ambassadors}
-                            refresh={() => getAmbassadors()}/>
+                        {
+                          label:"Rotate Guardian",
+                          component:
+                            <RotateGuardian
+                              guardians={guardians}
+                              ambassadors={ambassadors}
+                              pactTxStatus={pactTxStatus}
+                              refresh={() => getAmbassadors()}/>
                         },{
                           label:"Propose DAO Upgrade",
                           component:
                             <ProposeDaoUpgrade
                               guardians={guardians}
+                              pactTxStatus={pactTxStatus}
                               refresh={() => getAmbassadors()}/>
                         },{
                           label:"Approve DAO Upgrade",
                           component:
                             <GuardianApproveHash
                               guardians={guardians}
+                              pactTxStatus={pactTxStatus}
                               refresh={() => getAmbassadors()}/>
                         }
                     ]}/>
@@ -161,12 +181,14 @@ const App = () => {
                 <CardContent>
                   <RenderAmbassadors ambassadors={ambassadors}/>
                   <ScrollableTabs
+                    tabIdx={ambTabIdx}
                     tabEntries={[
                       {
                         label:"Register Ambassador",
                         component:
                           <RegisterAmbassador
                             guardians={guardians}
+                            pactTxStatus={pactTxStatus}
                             refresh={() => getAmbassadors()}/>
                       },{
                         label:"Deactivate Ambassador",
@@ -174,6 +196,7 @@ const App = () => {
                           <DeactivateAmbassador
                             guardians={guardians}
                             ambassadors={ambassadors}
+                            pactTxStatus={pactTxStatus}
                             refresh={() => getAmbassadors()}/>
                       },{
                         label:"Reactivate Ambassador",
@@ -181,18 +204,28 @@ const App = () => {
                           <ReactivateAmbassador
                             guardians={guardians}
                             ambassadors={ambassadors}
+                            pactTxStatus={pactTxStatus}
+                            refresh={() => getAmbassadors()}/>
+                      },{
+                        label:"Rotate Ambassador",
+                        component:
+                          <RotateAmbassador
+                            ambassadors={ambassadors}
+                            pactTxStatus={pactTxStatus}
                             refresh={() => getAmbassadors()}/>
                       },{
                         label:"Vote to Freeze",
                         component:
                           <VoteToFreeze
                             ambassadors={ambassadors}
+                            pactTxStatus={pactTxStatus}
                             refresh={() => getAmbassadors()}/>
                       },{
                         label:"Freeze",
                         component:
                           <Freeze
                             ambassadors={ambassadors}
+                            pactTxStatus={pactTxStatus}
                             refresh={() => getAmbassadors()}/>
                       }
                     ]}/>
