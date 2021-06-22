@@ -105,22 +105,26 @@ const App = () => {
       <NoSsr>
         <CssBaseline/>
         <Router basename={process.env.PUBLIC_URL}>
-          <NavDrawer title="dao.init"
+          <NavDrawer
             entriesList={[
-              [{
-                primary:"Config",
-                to:"/config"
-              },{
-                primary:"Init State",
-                to:"/initState"
-              },{
-                primary:"Ambassadors",
-                to:"/ambassadors"
-              },{
-                primary:"Guardians",
-                to:"/guardians",
-              }
-            ]
+                [{
+                  primary:"dao.init",
+                  subList:  
+                    [{
+                      primary:"Config",
+                      to:"/config"
+                    },{
+                      primary:"Init State",
+                      to:"/initState"
+                    },{
+                      primary:"Ambassadors",
+                      to:"/ambassadors"
+                    },{
+                      primary:"Guardians",
+                      to:"/guardians",
+                    }
+                  ]
+                }]
           ]}>
           <Container>
             <Switch>
@@ -144,7 +148,6 @@ const App = () => {
               <Card>
                 <CardHeader title="Guardians"/>
                 <CardContent>
-                  <Button onClick={()=>getGuardians()}>getGuardians</Button>
                   <RenderGuardians guardians={guardians}/>
                   <ScrollableTabs
                     tabIdx={grdTabIdx}

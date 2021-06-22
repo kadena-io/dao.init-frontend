@@ -51,7 +51,12 @@ const sendGuardianCmd = async (
       //sends transaction to wallet to sign and awaits signed transaction
       const signed = await Pact.wallet.sign(toSign)
       console.log("signed", signed)
-      setTx(signed)
+      if ( typeof signed === 'object' && 'hash' in signed ) {
+        setTx(signed);
+      } else {
+        throw new Error("Signing API Failed");
+      }
+
       //sends signed transaction to blockchain
       const txReqKeys = await Pact.wallet.sendSigned(signed, kadenaAPI.meta.host)
       console.log("txReqKeys", txReqKeys)

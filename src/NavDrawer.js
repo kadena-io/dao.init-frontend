@@ -2,8 +2,8 @@ import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import {
   AppBar,
-  CssBaseline,
   Collapse,
+  CssBaseline,
   Divider,
   Drawer,
   Hidden,
@@ -12,15 +12,21 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  ListSubheader,
   Toolbar,
   Typography,
 } from '@material-ui/core';
-
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
-import MenuIcon from '@material-ui/icons/Menu';
+import DraftsIcon from '@material-ui/icons/Drafts';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
+import InboxIcon from '@material-ui/icons/MoveToInbox';
+import MenuIcon from '@material-ui/icons/Menu';
+import SendIcon from '@material-ui/icons/Send';
+import StarBorder from '@material-ui/icons/StarBorder';
+
+import logo from "./kadena_r_rev_3_whi_lor.png";
 
 const drawerWidth = 240;
 
@@ -54,12 +60,19 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     padding: theme.spacing(3),
   },
+  nested: {
+    paddingLeft: theme.spacing(4),
+  },
+  logo: {
+    height: "60px",
+  }
 }));
 
 const ListItemLink = (props) => {
   const { icon, primary, to, subList } = props;
   const hasSubList = subList && Array.isArray(subList) ;
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
+  const classes = useStyles();
 
   const renderLink = React.useMemo(
     () => React.forwardRef((itemProps, ref) => <RouterLink to={to} ref={ref} {...itemProps} />),
@@ -80,13 +93,14 @@ const ListItemLink = (props) => {
       </li>
         {hasSubList ?
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
+            <List component="div" disablePadding className={classes.nested} dense>
               {subList.map(entry =>
                 <ListItemLink
                   icon={entry.icon}
                   primary={entry.primary}
                   to={entry.to}
-                  subList={entry.subList}/>
+                  subList={entry.subList}
+                  />
               )}
             </List>
           </Collapse>
@@ -141,9 +155,7 @@ export const NavDrawer = (props) => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap>
-            {props.title}
-          </Typography>
+          <img src={logo} alt="logo" className={classes.logo}/>
         </Toolbar>
       </AppBar>
       <nav className={classes.drawer} aria-label="mailbox folders">
