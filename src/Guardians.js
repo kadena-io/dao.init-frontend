@@ -1,43 +1,19 @@
 //basic React api imports
-import React, { useState, useEffect } from "react";
-import clsx from 'clsx';
+import React, { useState } from "react";
 //Material Stuff
-import {FormControl as Form} from '@material-ui/core';
-import {
-  Button,
-  Box,
-  Typography,
-  IconButton,
-  Input,
-  FilledInput,
-  LinearProgress,
-  OutlinedInput,
-  InputLabel,
-  InputAdornment,
-  FormHelperText,
-  FormControl,
-  TextField,
-  MenuItem,
-  Card, CardHeader, CardContent, CardActions,
-  Grid,
-} from '@material-ui/core';
 import {
   makeStyles,
 } from '@material-ui/styles';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
 //pact-lang-api for blockchain calls
 import Pact from "pact-lang-api";
 //config file for blockchain calls
 import { kadenaAPI } from "./kadena-config.js";
 import {
   PactJsonListAsTable,
-  useInputStyles,
   MakeForm,
  } from "./util.js";
-import { PactTxStatus } from "./PactTxStatus.js";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   formControl: {
     margin: "5px auto",
     minWidth: 120,
@@ -59,7 +35,7 @@ const sendGuardianCmd = async (
       //creates transaction to send to wallet
       const toSign = {
           pactCode: cmd,
-          caps: (caps
+          caps: (Array.isArray(caps) && caps.length
             ? caps :
             Pact.lang.mkCap("Guadian Cap"
                            , "Authenticates that you're a guardian"
@@ -151,7 +127,6 @@ export const RegisterAmbassador = (props) => {
   const [txStatus, setTxStatus] = useState("");
   const [tx, setTx] = useState( {} );
   const [txRes, setTxRes] = useState( {} );
-  const [wasSubmitted,setWasSubmitted] = useState(false);
   const classes = useStyles();
 
   const inputFields = [
@@ -255,8 +230,6 @@ export const DeactivateAmbassador = (props) => {
 export const ReactivateAmbassador = (props) => {
   const {
     refresh,
-    guardians,
-    ambassadors,
   } = props;
   const [grd, setGrd] = useState( "" );
   const [amb, setAmb] = useState( "" );
@@ -368,7 +341,6 @@ export const ProposeDaoUpgrade = (props) => {
   const [txStatus, setTxStatus] = useState("");
   const [tx, setTx] = useState( {} );
   const [txRes, setTxRes] = useState( {} );
-  const [wasSubmitted,setWasSubmitted] = useState(false);
   const classes = useStyles();
 
   const inputFields = [
@@ -421,7 +393,6 @@ export const GuardianApproveHash = (props) => {
   const [txStatus, setTxStatus] = useState("");
   const [tx, setTx] = useState( {} );
   const [txRes, setTxRes] = useState( {} );
-  const [wasSubmitted,setWasSubmitted] = useState(false);
   const classes = useStyles();
 
   const inputFields = [

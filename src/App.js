@@ -1,22 +1,19 @@
 //basic React api imports
 import React, { useState, useEffect } from "react";
 import {
-  BrowserRouter as Router,
+  MemoryRouter as Router,
   Switch,
   Route,
 } from 'react-router-dom';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
 import {
   createMuiTheme,
   ThemeProvider,
  } from '@material-ui/core/styles';
-import NoSsr from '@material-ui/core/NoSsr';
 //semantic ui for styling
 import {
   Container,
-  Card, CardHeader, CardContent, CardActions,
-  Typography,
+  Card, CardHeader, CardContent,
+  CssBaseline, NoSsr
 } from '@material-ui/core';
 //config file for blockchain calls
 import  {
@@ -24,7 +21,6 @@ import  {
   RegisterAmbassador,
   DeactivateAmbassador,
   ReactivateAmbassador,
-  RotateGuardian,
   ProposeDaoUpgrade,
   GuardianApproveHash,
 } from "./Guardians.js";
@@ -210,17 +206,5 @@ const App = () => {
     </ThemeProvider>
   );
 };
-
-      // <ReactivateAmbassador
-      //   guardians={guardians}
-      //   ambassadors={ambassadors}
-      //   refresh={() => getAmbassadors()}/>
-      // <DeactivateAmbassador
-      //   guardians={guardians}
-      //   ambassadors={ambassadors}
-      //   refresh={() => getAmbassadors()}/>
-      // <RotateGuardian
-      //   guardians={guardians}
-      //   refresh={() => getGuardians()}/>
 
 export default App;

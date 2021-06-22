@@ -1,6 +1,5 @@
 //basic React api imports
 import React, {useState, useEffect} from "react";
-import Icon from '@material-ui/core/Icon';
 import { makeStyles } from '@material-ui/core/styles';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import CloseIcon from '@material-ui/icons/Close';
@@ -32,7 +31,6 @@ export const PactTxStatus = (props) => {
   const tx = props.tx;
   const txRes = props.txRes;
   const txStatus = props.txStatus;
-  const setTxStatus = props.setTxStatus;
   const [open,setOpen] = useState(true);
   const [modalOpen,setModalOpen] = useState(false);
   const classes = useStyles();
@@ -55,7 +53,7 @@ export const PactTxStatus = (props) => {
                 aria-label="close"
                 color="inherit"
                 size="small"
-                onClick={() => {setOpen(false); setTxStatus("");}}>
+                onClick={() => setOpen(false)}>
                 <CloseIcon fontSize="inherit" />
               </IconButton>
 

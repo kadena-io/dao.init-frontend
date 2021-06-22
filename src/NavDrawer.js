@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import {
   AppBar,
-  Box,
   CssBaseline,
   Collapse,
   Divider,
@@ -19,12 +18,9 @@ import {
 
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
-import MailIcon from '@material-ui/icons/Mail';
 import MenuIcon from '@material-ui/icons/Menu';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
-import StarBorder from '@material-ui/icons/StarBorder';
 
 const drawerWidth = 240;
 
@@ -100,7 +96,7 @@ const ListItemLink = (props) => {
 };
 
 export const NavDrawer = (props) => {
-  const { window, entriesList, title } = props;
+  const { window, entriesList } = props;
   const classes = useStyles();
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);

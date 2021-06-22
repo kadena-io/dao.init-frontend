@@ -10,36 +10,16 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Box,
-  Collapse,
-  IconButton,
 } from '@material-ui/core';
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-
-import {FormControl as Form} from '@material-ui/core';
 import {
   Button,
-  Typography,
-  Input,
-  FilledInput,
   LinearProgress,
-  OutlinedInput,
-  InputLabel,
-  InputAdornment,
-  FormHelperText,
-  FormControl,
   TextField,
   MenuItem,
-  Card, CardHeader, CardContent, CardActions,
-  Grid,
+  CardActions,
 } from '@material-ui/core';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
 //pact-lang-api for blockchain calls
-import Pact from "pact-lang-api";
 //config file for blockchain calls
-import { kadenaAPI } from "./kadena-config.js";
 import { PactTxStatus } from "./PactTxStatus.js";
 
 export const useInputStyles = makeStyles((theme) => ({
@@ -78,7 +58,7 @@ const isRootPactValue = (val) => {
   }
 };
 
-const isPactKeyset = (val) => {
+export const isPactKeyset = (val) => {
   if (val && typeof val === 'object' ) {
     if (Object.keys(val).length === 2 &&'pred' in val && 'keys' in val) {
       return true;
