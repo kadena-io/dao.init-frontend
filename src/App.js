@@ -4,6 +4,7 @@ import {
   MemoryRouter as Router,
   Switch,
   Route,
+  Redirect,
 } from 'react-router-dom';
 import {
   createMuiTheme,
@@ -197,7 +198,10 @@ const App = () => {
                     ]}/>
                 </CardContent>
               </Card>
-              }/>
+              }/>  
+              <Route path="/">
+                <Redirect to="/config" />
+              </Route>
             </Switch>
           </Container>
           </NavDrawer>
