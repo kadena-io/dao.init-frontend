@@ -26,6 +26,9 @@ var node = "api.testnet.chainweb.com";
 
 //unique contract name
 var contractName = "init";
+var constants = {
+  "DAO_ACCT_NAME":"init",
+  "GUARDIAN_KDA_REQUIRED": 0.5};
 
 //unique gas station contract name
 var gasStationName = "memory-wall-gas-station";
@@ -47,6 +50,7 @@ var kadenaAPI = {
   contractAddress: `${namespace}.${contractName}`,
   gasStationAddress: `${namespace}.${gasStationName}`,
   explorerURL: `https://explorer.chainweb.com/${networkId.slice(0, -2)}`,
+  constants: constants,
   meta: {
     networkId: networkId,
     chainId: chainId,

@@ -434,3 +434,60 @@ export const GuardianApproveHash = (props) => {
       setTxStatus={setTxStatus}/>
   )
 };
+
+export const RegisterGuardian = (props) => {
+  const {
+    refresh,
+  } = props;
+  const [grd, setGrd] = useState( "" );
+  const [ks, setKs] = useState( "" );
+  const {txStatus, setTxStatus,
+    tx, setTx,
+    txRes, setTxRes} = props.pactTxStatus;
+  const classes = useStyles();
+
+  const inputFields = [
+    {
+      type:'textFieldSingle',
+      label:'Guardian Account Name',
+      className:classes.formControl,
+      value:grd,
+      onChange:setGrd
+    },
+    {
+      type:'textFieldMulti',
+      label:'Guardian Account Guard',
+      className:classes.formControl,
+      placeholder:JSON.stringify({"pred":"keys-all","keys":["8c59a322800b3650f9fc5b6742aa845bc1c35c2625dabfe5a9e9a4cada32c543"]},undefined,2),
+      value:ks,
+      onChange:setKs,
+    }
+  ];
+
+  const handleSubmit = (evt) => {
+      evt.preventDefault();
+      try {
+        sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
+          ,grd
+          ,`(${kadenaAPI.contractAddress}.register-guardian "${grd}" (read-keyset 'ks))`
+          ,{ks: JSON.parse(ks)}
+          ,[Pact.lang.mkCap("TRANSFER Cap"
+                           , "Stake the needed amount"
+                           , `coin.TRANSFER`
+                           , [grd, kadenaAPI.constants["DAO_ACCT_NAME"], kadenaAPI.constants["GUARDIAN_KDA_REQUIRED"]])]
+        );
+      } catch (e) {
+        console.log("Guardian Registration Submit Error",typeof e, e, grd,ks);
+        setTxRes(e);
+        setTxStatus("validation-error");
+      }
+  };
+
+  return (
+    <MakeForm
+      inputFields={inputFields}
+      onSubmit={handleSubmit}
+      tx={tx} txStatus={txStatus} txRes={txRes}
+      setTxStatus={setTxStatus}/>
+  )
+};

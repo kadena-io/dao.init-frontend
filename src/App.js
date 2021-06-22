@@ -19,6 +19,7 @@ import {
 } from '@material-ui/core';
 //config file for blockchain calls
 import  {
+  RegisterGuardian,
   RenderGuardians,
   RegisterAmbassador,
   DeactivateAmbassador,
@@ -149,6 +150,12 @@ const App = () => {
                     tabIdx={grdTabIdx}
                     tabEntries={[
                         {
+                          label:"Register Guardian",
+                          component:
+                            <RegisterGuardian
+                              pactTxStatus={pactTxStatus}
+                              refresh={() => getGuardians()}/>
+                        },{
                           label:"Rotate Guardian",
                           component:
                             <RotateGuardian
