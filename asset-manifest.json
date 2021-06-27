@@ -1,20 +1,20 @@
 {
   "files": {
-    "main.js": "/dao.init-frontend/static/js/main.be26583a.chunk.js",
-    "main.js.map": "/dao.init-frontend/static/js/main.be26583a.chunk.js.map",
+    "main.js": "/dao.init-frontend/static/js/main.9b20cea8.chunk.js",
+    "main.js.map": "/dao.init-frontend/static/js/main.9b20cea8.chunk.js.map",
     "runtime-main.js": "/dao.init-frontend/static/js/runtime-main.c5e2302c.js",
     "runtime-main.js.map": "/dao.init-frontend/static/js/runtime-main.c5e2302c.js.map",
-    "static/js/2.ff1a6e1e.chunk.js": "/dao.init-frontend/static/js/2.ff1a6e1e.chunk.js",
-    "static/js/2.ff1a6e1e.chunk.js.map": "/dao.init-frontend/static/js/2.ff1a6e1e.chunk.js.map",
+    "static/js/2.b7c36a69.chunk.js": "/dao.init-frontend/static/js/2.b7c36a69.chunk.js",
+    "static/js/2.b7c36a69.chunk.js.map": "/dao.init-frontend/static/js/2.b7c36a69.chunk.js.map",
     "index.html": "/dao.init-frontend/index.html",
-    "precache-manifest.e5723d8e3a686515e34a6dae53d4a724.js": "/dao.init-frontend/precache-manifest.e5723d8e3a686515e34a6dae53d4a724.js",
+    "precache-manifest.95d99504f0a2012d296841bdf0a3c538.js": "/dao.init-frontend/precache-manifest.95d99504f0a2012d296841bdf0a3c538.js",
     "service-worker.js": "/dao.init-frontend/service-worker.js",
-    "static/js/2.ff1a6e1e.chunk.js.LICENSE.txt": "/dao.init-frontend/static/js/2.ff1a6e1e.chunk.js.LICENSE.txt",
+    "static/js/2.b7c36a69.chunk.js.LICENSE.txt": "/dao.init-frontend/static/js/2.b7c36a69.chunk.js.LICENSE.txt",
     "static/media/kadena_r_rev_3_whi_lor.png": "/dao.init-frontend/static/media/kadena_r_rev_3_whi_lor.184cc2aa.png"
   },
   "entrypoints": [
     "static/js/runtime-main.c5e2302c.js",
-    "static/js/2.ff1a6e1e.chunk.js",
-    "static/js/main.be26583a.chunk.js"
+    "static/js/2.b7c36a69.chunk.js",
+    "static/js/main.9b20cea8.chunk.js"
   ]
 }
