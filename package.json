@@ -2,6 +2,7 @@
   "name": "dao.init-frontend",
   "version": "0.1.0",
   "private": true,
+  "type":"module",
   "dependencies": {
     "@material-ui/core": "^4.11.4",
     "@material-ui/icons": "^4.11.2",
@@ -9,19 +10,30 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "chalk": "^4.1.1",
     "clsx": "^1.1.1",
+    "envinfo": "^7.8.1",
+    "esm": "^3.2.25",
+    "fs": "^0.0.1-security",
+    "ncp": "^2.0.0",
     "pact-lang-api": "^4.1.2",
+    "path": "^0.12.7",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "3.4.1"
+    "react-scripts": "3.4.1",
+    "replace-in-file": "^6.2.0",
+    "util": "^0.12.4",
+    "which": "^2.0.2",
+    "yargs": "^17.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "autogen": "./autogen-components.js"
   },
   "eslintConfig": {
     "extends": "react-app"
