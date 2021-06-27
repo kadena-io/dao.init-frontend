@@ -7,7 +7,7 @@ import {
 //pact-lang-api for blockchain calls
 import Pact from "pact-lang-api";
 //config file for blockchain calls
-import { kadenaAPI } from "./kadena-config.js";
+import { daoAPI } from "./kadena-config.js";
 import {
   PactJsonListAsTable,
   MakeForm,
@@ -47,11 +47,11 @@ const sendAmbassadorCmd = async (
             ? caps :
             Pact.lang.mkCap("Ambassador Cap"
                            , "Authenticates that you're an ambassador"
-                           , `${kadenaAPI.contractAddress}.AMBASSADOR`
+                           , `${daoAPI.contractAddress}.AMBASSADOR`
                            , [user])),
-          gasLimit: kadenaAPI.meta.gasLimit,
-          chainId: kadenaAPI.meta.chainId,
-          ttl: kadenaAPI.meta.ttl,
+          gasLimit: daoAPI.meta.gasLimit,
+          chainId: daoAPI.meta.chainId,
+          ttl: daoAPI.meta.ttl,
           sender: user,
           envData: envData
       }
@@ -61,7 +61,7 @@ const sendAmbassadorCmd = async (
       console.log("signed", signed)
       setTx(signed)
       //sends signed transaction to blockchain
-      const txReqKeys = await Pact.wallet.sendSigned(signed, kadenaAPI.meta.host)
+      const txReqKeys = await Pact.wallet.sendSigned(signed, daoAPI.meta.host)
       console.log("txReqKeys", txReqKeys)
       //set html to wait for transaction response
       //set state to wait for transaction response
@@ -75,7 +75,7 @@ const sendAmbassadorCmd = async (
         while (retries > 0) {
           //sleep the polling
           await new Promise(r => setTimeout(r, 15000));
-          res = await Pact.fetch.poll(txReqKeys, kadenaAPI.meta.host);
+          res = await Pact.fetch.poll(txReqKeys, daoAPI.meta.host);
           try {
             if (res[signed.hash].result.status) {
               retries = -1;
@@ -141,7 +141,7 @@ export const VoteToFreeze = (props) => {
       try {
         sendAmbassadorCmd(setTx,setTxStatus,setTxRes,refresh
           ,amb
-          ,`(${kadenaAPI.contractAddress}.vote-to-freeze "${amb}")`
+          ,`(${daoAPI.contractAddress}.vote-to-freeze "${amb}")`
         );
       } catch (e) {
         console.log("vote to freeze Submit Error",typeof e, e, amb);
@@ -185,7 +185,7 @@ export const Freeze = (props) => {
       try {
         sendAmbassadorCmd(setTx,setTxStatus,setTxRes,refresh
           ,amb
-          ,`(${kadenaAPI.contractAddress}.freeze "${amb}")`
+          ,`(${daoAPI.contractAddress}.freeze "${amb}")`
         );
       } catch (e) {
         console.log("freeze Submit Error",typeof e, e, amb);
@@ -221,7 +221,7 @@ export const RotateAmbassador = (props) => {
       try {
         sendAmbassadorCmd(setTx,setTxStatus,setTxRes,refresh
         ,acct
-        ,`(${kadenaAPI.contractAddress}.rotate-ambassador "${acct}" (read-keyset 'ks))`
+        ,`(${daoAPI.contractAddress}.rotate-ambassador "${acct}" (read-keyset 'ks))`
         ,{ks: JSON.parse(ks)})
       } catch (e) {
         console.log("rotate-ambassador Submit Error",typeof e, e, acct,ks);

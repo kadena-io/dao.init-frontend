@@ -34,8 +34,11 @@ import {
   VoteToFreeze,
   Freeze,
 } from "./Ambassadors.js";
-import { KadenaConfig } from "./KadenaConfig.js"
+import { InitConfig } from "./InitConfig.js"
 import { RenderInitState, getContractState } from "./InitState.js";
+
+import { ForumConfig, RenderForumState, getForumContractState } from "./Forum/ForumConfig.js";
+
 import { NavDrawer } from "./NavDrawer.js";
 import { ScrollableTabs } from "./ScrollableTabs.js";
 import { BookTwoTone } from "@material-ui/icons";
@@ -93,10 +96,18 @@ const App = () => {
     setGuardians(res);
   };
 
+  const [forumState, setForumState] = useState( {} );
+
+  const getForumState = async () => {
+    const res = await getForumContractState("view-forum-state");
+    setForumState(res);
+  };
+
   useEffect(() => {
     getGuardians();
     getInitState();
     getAmbassadors();
+    getForumState();
     console.log('useEffect []',guardians,ambassadors)
   }, []);
 
@@ -112,7 +123,7 @@ const App = () => {
                   subList:  
                     [{
                       primary:"Config",
-                      to:"/config"
+                      to:"/daoConfig"
                     },{
                       primary:"Init State",
                       to:"/initState"
@@ -124,15 +135,26 @@ const App = () => {
                       to:"/guardians",
                     }
                   ]
+                },{
+                  primary:"dao.forum",
+                  subList:  
+                    [{
+                      primary:"Config",
+                      to:"/forumConfig"
+                    },{
+                      primary:"Forum State",
+                      to:"/forumState"
+                    }
+                  ]
                 }]
           ]}>
           <Container>
             <Switch>
-              <Route path="/config" component={ () =>
+              <Route path="/initConfig" component={ () =>
                 <Card>
                   <CardHeader title="Contract and UI Configuration"/>
                   <CardContent>
-                    <KadenaConfig/>
+                    <InitConfig/>
                   </CardContent>
                 </Card>
               }/>
@@ -242,9 +264,27 @@ const App = () => {
                 </CardContent>
               </Card>
               }/>  
-              <Route path="/">
-                <Redirect to="/config" />
-              </Route>
+              <Route path="/forumConfig" component={ () =>
+                <Card>
+                  <CardHeader title="Contract and UI Configuration"/>
+                  <CardContent>
+                    <ForumConfig/>
+                  </CardContent>
+                </Card>
+              }/>
+            <Route path="/forumState" component={ () =>
+                <Card>
+                  <CardHeader title="Contract State"/>
+                  <CardContent>
+                    <RenderForumState forumState={forumState}/>
+                  </CardContent>
+                </Card>
+              }/>
+
+            <Route path="/">
+              <Redirect to="/initConfig" />
+            </Route>
+
             </Switch>
           </Container>
           </NavDrawer>

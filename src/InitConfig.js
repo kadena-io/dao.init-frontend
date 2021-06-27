@@ -1,12 +1,12 @@
 //basic React api imports
 import React from "react";
-import { kadenaAPI, keyFormatter } from "./kadena-config.js";
+import { daoAPI, keyFormatter } from "./kadena-config.js";
 import { PactSingleJsonAsTable } from "./util.js";
 
-export const KadenaConfig = () => {
+export const InitConfig = () => {
   return (
     <PactSingleJsonAsTable
-      json={kadenaAPI}
+      json={daoAPI}
       keyFormatter={keyFormatter}
       />
   )

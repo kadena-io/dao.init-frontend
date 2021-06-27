@@ -2,25 +2,25 @@
 import React from "react";
 //config file for blockchain calls
 import Pact from "pact-lang-api";
-import { kadenaAPI } from "./kadena-config.js";
+import { daoAPI } from "./kadena-config.js";
 import { PactSingleJsonAsTable, dashStyleNames2Text } from "./util.js";
 
 export const getContractState = async (cmd) => {
   //calling get-all() function from smart contract
     const res = await Pact.fetch.local(
       {
-        pactCode: `(${kadenaAPI.contractAddress}.${cmd})`,
+        pactCode: `(${daoAPI.contractAddress}.${cmd})`,
         //pact-lang-api function to construct transaction meta data
         meta: Pact.lang.mkMeta(
-          kadenaAPI.meta.sender,
-          kadenaAPI.meta.chainId,
-          kadenaAPI.meta.gasPrice,
-          kadenaAPI.meta.gasLimit,
-          kadenaAPI.meta.creationTime(),
-          kadenaAPI.meta.ttl
+          daoAPI.meta.sender,
+          daoAPI.meta.chainId,
+          daoAPI.meta.gasPrice,
+          daoAPI.meta.gasLimit,
+          daoAPI.meta.creationTime(),
+          daoAPI.meta.ttl
         ),
       },
-      kadenaAPI.meta.host
+      daoAPI.meta.host
     );
     const all = res.result.data;
     //sorts memories by least recent

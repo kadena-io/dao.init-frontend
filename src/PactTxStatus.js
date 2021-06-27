@@ -14,7 +14,7 @@ import { Modal, Button } from '@material-ui/core';
 import Collapse from '@material-ui/core/Collapse';
 import IconButton from '@material-ui/core/IconButton';
 
-import { kadenaAPI } from "./kadena-config.js";
+import { daoAPI } from "./kadena-config.js";
 import {dashStyleNames2Text, PactSingleJsonAsTable} from "./util.js";
 
 const useStyles = makeStyles((theme) => ({
@@ -85,19 +85,19 @@ export const PactTxStatus = (props) => {
             { txStatus === "pending" ? (
               <React.Fragment>
                 <p>Awaiting Confirmation</p>
-                <a href={`${kadenaAPI.explorerURL}/tx/${tx.hash}`}>
+                <a href={`${daoAPI.explorerURL}/tx/${tx.hash}`}>
                   Eventual Block Explorer Link
                 </a>
               </React.Fragment>
             ) : txStatus === "success" ? (
               <React.Fragment>
-                <a href={`${kadenaAPI.explorerURL}/tx/${tx.hash}`}>
+                <a href={`${daoAPI.explorerURL}/tx/${tx.hash}`}>
                   View transaction in Block Explorer
                 </a>
               </React.Fragment>
             ) : txStatus === "failure" ? (
               <React.Fragment>
-                <a href={`${kadenaAPI.explorerURL}/tx/${tx.hash}`}>
+                <a href={`${daoAPI.explorerURL}/tx/${tx.hash}`}>
                   View transaction in Block Explorer
                 </a>
                 <div>
@@ -114,7 +114,7 @@ export const PactTxStatus = (props) => {
             ) : txStatus === "timeout" ? (
               <React.Fragment>
                 <p>...but your tx was sent.</p>
-                <a href={`${kadenaAPI.explorerURL}/tx/${tx.hash}`}>
+                <a href={`${daoAPI.explorerURL}/tx/${tx.hash}`}>
                   View transaction in Block Explorer
                 </a>
               </React.Fragment>

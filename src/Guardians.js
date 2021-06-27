@@ -7,7 +7,7 @@ import {
 //pact-lang-api for blockchain calls
 import Pact from "pact-lang-api";
 //config file for blockchain calls
-import { kadenaAPI } from "./kadena-config.js";
+import { daoAPI } from "./kadena-config.js";
 import {
   PactJsonListAsTable,
   MakeForm,
@@ -39,11 +39,11 @@ const sendGuardianCmd = async (
             ? caps :
             Pact.lang.mkCap("Guadian Cap"
                            , "Authenticates that you're a guardian"
-                           , `${kadenaAPI.contractAddress}.GUARDIAN`
+                           , `${daoAPI.contractAddress}.GUARDIAN`
                            , [user])),
-          gasLimit: kadenaAPI.meta.gasLimit,
-          chainId: kadenaAPI.meta.chainId,
-          ttl: kadenaAPI.meta.ttl,
+          gasLimit: daoAPI.meta.gasLimit,
+          chainId: daoAPI.meta.chainId,
+          ttl: daoAPI.meta.ttl,
           sender: user,
           envData: envData
       }
@@ -58,7 +58,7 @@ const sendGuardianCmd = async (
       }
 
       //sends signed transaction to blockchain
-      const txReqKeys = await Pact.wallet.sendSigned(signed, kadenaAPI.meta.host)
+      const txReqKeys = await Pact.wallet.sendSigned(signed, daoAPI.meta.host)
       console.log("txReqKeys", txReqKeys)
       //set html to wait for transaction response
       //set state to wait for transaction response
@@ -72,7 +72,7 @@ const sendGuardianCmd = async (
         while (retries > 0) {
           //sleep the polling
           await new Promise(r => setTimeout(r, 15000));
-          res = await Pact.fetch.poll(txReqKeys, kadenaAPI.meta.host);
+          res = await Pact.fetch.poll(txReqKeys, daoAPI.meta.host);
           try {
             if (res[signed.hash].result.status) {
               retries = -1;
@@ -115,8 +115,8 @@ const sendGuardianCmd = async (
 export const RenderGuardians = (props) => {
   return (
     <PactJsonListAsTable
-      header={["Guardian","Committed KDA","Approved Hash","Approval Date","Guard"]}
-      keyOrder={["k","committed-kda","approved-hash","approved-date","guard"]}
+      header={["Guardian","Committed KDA","Approved Hash","Approval Date","Voting Guard","Forum Moderation Guard"]}
+      keyOrder={["k","committed-kda","approved-hash","approved-date","guard","moderate-guard"]}
       json={props.guardians}
     />
 )};
@@ -164,7 +164,7 @@ export const RegisterAmbassador = (props) => {
       try {
         sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
           ,grd
-          ,`(${kadenaAPI.contractAddress}.register-ambassador "${grd}" "${newAmb}" (read-keyset 'ks))`
+          ,`(${daoAPI.contractAddress}.register-ambassador "${grd}" "${newAmb}" (read-keyset 'ks))`
           ,{ks: JSON.parse(ambGrd)}
         );
       } catch (e) {
@@ -198,7 +198,7 @@ export const DeactivateAmbassador = (props) => {
       try {
         sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
         ,grd
-        ,`(${kadenaAPI.contractAddress}.deactivate-ambassador "${grd}" "${amb}")`
+        ,`(${daoAPI.contractAddress}.deactivate-ambassador "${grd}" "${amb}")`
         )
       } catch (e) {
         console.log("deactivate-ambassador Submit Error",typeof e, e, grd,);
@@ -249,7 +249,7 @@ export const ReactivateAmbassador = (props) => {
       try {
         sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
         ,grd
-        ,`(${kadenaAPI.contractAddress}.reactivate-ambassador "${grd}" "${amb}")`
+        ,`(${daoAPI.contractAddress}.reactivate-ambassador "${grd}" "${amb}")`
         )
       } catch (e) {
         console.log("reactivate-ambassador Submit Error",typeof e, e, grd,);
@@ -289,7 +289,7 @@ export const RotateGuardian = (props) => {
     guardians,
   } = props;
   const [grd, setGrd] = useState( "" );
-  const [ks, setKs] = useState( "" );
+  const [voteKs, setVoteKs] = useState( "" );
   const {txStatus, setTxStatus,
     tx, setTx,
     txRes, setTxRes} = props.pactTxStatus;
@@ -301,10 +301,10 @@ export const RotateGuardian = (props) => {
       try {
         sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
         ,grd
-        ,`(${kadenaAPI.contractAddress}.rotate-guardian "${grd}" (read-keyset 'ks))`
-        ,{ks: JSON.parse(ks)})
+        ,`(${daoAPI.contractAddress}.rotate-guardian "${grd}" (read-keyset 'voteKs))`
+        ,{voteKs: JSON.parse(voteKs)})
       } catch (e) {
-        console.log("rotate-guardian Submit Error",typeof e, e, grd,);
+        console.log("rotate-guardian Submit Error",typeof e, e, grd, voteKs,);
         setTxRes(e);
         setTxStatus("validation-error");
       }
@@ -319,11 +319,11 @@ export const RotateGuardian = (props) => {
       options:guardians.map((g)=>g['k']),
     },{
       type:'textFieldMulti',
-      label:'Guardian Account Guard',
+      label:'Guardian Voting Guard',
       className:classes.formControl,
       placeholder:JSON.stringify({"pred":"keys-all","keys":["8c59a322800b3650f9fc5b6742aa845bc1c35c2625dabfe5a9e9a4cada32c543"]},undefined,2),
-      value:ks,
-      onChange:setKs,
+      value:voteKs,
+      onChange:setVoteKs,
     }
   ];
 
@@ -370,7 +370,7 @@ export const ProposeDaoUpgrade = (props) => {
       try {
         sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
           ,acct
-          ,`(${kadenaAPI.contractAddress}.propose-dao-upgrade "${acct}" "${hsh}")`
+          ,`(${daoAPI.contractAddress}.propose-dao-upgrade "${acct}" "${hsh}")`
         );
       } catch (e) {
         console.log("propose-dao-upgrade Submit Error",typeof e, e, acct,hsh,);
@@ -422,7 +422,7 @@ export const GuardianApproveHash = (props) => {
       try {
         sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
           ,acct
-          ,`(${kadenaAPI.contractAddress}.guardian-approve-hash "${acct}" "${hsh}")`
+          ,`(${daoAPI.contractAddress}.guardian-approve-hash "${acct}" "${hsh}")`
         );
       } catch (e) {
         console.log("guardian-approve-hash Submit Error",typeof e, e, acct,hsh,);
@@ -445,7 +445,7 @@ export const RegisterGuardian = (props) => {
     refresh,
   } = props;
   const [grd, setGrd] = useState( "" );
-  const [ks, setKs] = useState( "" );
+  const [voteKs, setVoteKs] = useState( "" );
   const {txStatus, setTxStatus,
     tx, setTx,
     txRes, setTxRes} = props.pactTxStatus;
@@ -461,11 +461,11 @@ export const RegisterGuardian = (props) => {
     },
     {
       type:'textFieldMulti',
-      label:'Guardian Account Guard',
+      label:'Guardian Voting Guard',
       className:classes.formControl,
       placeholder:JSON.stringify({"pred":"keys-all","keys":["8c59a322800b3650f9fc5b6742aa845bc1c35c2625dabfe5a9e9a4cada32c543"]},undefined,2),
-      value:ks,
-      onChange:setKs,
+      value:voteKs,
+      onChange:setVoteKs,
     }
   ];
 
@@ -474,15 +474,15 @@ export const RegisterGuardian = (props) => {
       try {
         sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
           ,grd
-          ,`(${kadenaAPI.contractAddress}.register-guardian "${grd}" (read-keyset 'ks))`
-          ,{ks: JSON.parse(ks)}
+          ,`(${daoAPI.contractAddress}.register-guardian "${grd}" (read-keyset 'voteKs))`
+          ,{voteKs: JSON.parse(voteKs)}
           ,[Pact.lang.mkCap("TRANSFER Cap"
                            , "Stake the needed amount"
                            , `coin.TRANSFER`
-                           , [grd, kadenaAPI.constants["DAO_ACCT_NAME"], kadenaAPI.constants["GUARDIAN_KDA_REQUIRED"]])]
+                           , [grd, daoAPI.constants["DAO_ACCT_NAME"], daoAPI.constants["GUARDIAN_KDA_REQUIRED"]])]
         );
       } catch (e) {
-        console.log("Guardian Registration Submit Error",typeof e, e, grd,ks);
+        console.log("Guardian Registration Submit Error",typeof e, e, grd,voteKs);
         setTxRes(e);
         setTxStatus("validation-error");
       }
