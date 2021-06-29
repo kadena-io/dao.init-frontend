@@ -24,7 +24,7 @@ export const getForumContractState = async (cmd) => {
     );
     const all = res.result.data;
     //sorts memories by least recent
-    console.log(`local query data: (${forumAPI.contractAddress}.${cmd})`, all);
+    console.log(`local query data: (${forumAPI.contractAddress}.${cmd})`, res);
     return(all);
 };
 

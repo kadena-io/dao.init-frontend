@@ -44,6 +44,13 @@ import { RenderInitState, getContractState } from "./InitState.js";
 
 import { ForumConfig, RenderForumState, getForumContractState } from "./Forum/ForumConfig.js";
 import { MjolnirActionForms } from "./Forum/Mjolnir.js";
+import { 
+  RenderModerators,
+  RenderMembers,
+  MemberActionForms,
+  ModeratorActionForms,
+} from "./Forum/Members.js";
+import { RenderModLog } from "./Forum/ModLog.js";
 
 
 const App = () => {
@@ -104,9 +111,12 @@ const App = () => {
   const [forumState, setForumState] = useState( {} );
   const [members, setMembers] = useState([]);
   const [moderators, setModerators] = useState([]);
+  const [modLog, setModLog] = useState( [] );
 
   //Forum UI States
   const mjolnirTabIdx = useState(0);
+  const memberTabIdx = useState(0);
+  const moderatorTabIdx = useState(0);
 
   const getForumState = async () => {
     const res = await getForumContractState("view-forum-state");
@@ -117,6 +127,11 @@ const App = () => {
     const res = await getForumContractState("view-members");
     setMembers(res.filter(m=>m.moderator === false));
     setModerators(res.filter(m=>m.moderator === true));
+  };
+
+  const getModLog = async () => {
+    const res = await getForumContractState("view-modlogs");
+    setModLog(res);
   };
 
   const refresh = {
@@ -130,6 +145,7 @@ const App = () => {
     getAmbassadors();
     getForumState();
     getMembers();
+    getModLog();
     console.log('useEffect App.js Fired');
   }, []);
 
@@ -167,8 +183,17 @@ const App = () => {
                       primary:"Forum State",
                       to:"/forumState"
                     },{
+                      primary:"Mod Log",
+                      to:"/modlog"
+                    },{
                       primary:"Mjolnir",
                       to:"/mjolnir"
+                    },{
+                      primary:"Moderators",
+                      to:"/moderators"
+                    },{
+                      primary:"Members",
+                      to:"/members"
                     }
                   ]
                 }]
@@ -316,6 +341,48 @@ const App = () => {
                       pactTxStatus={pactTxStatus}
                       refresh={refresh}
                     />
+                  </CardContent>
+                </Card>
+              }/>
+              <Route path="/moderators" component={ () =>
+                <Card>
+                  <CardHeader title="Moderators"/>
+                  <CardContent>
+                    <RenderModerators moderators={moderators}/>
+                    <ModeratorActionForms
+                      members={members}
+                      moderators={moderators}
+                      guardians={guardians}
+                      ambassadors={ambassadors}
+                      tabIdx={moderatorTabIdx}
+                      pactTxStatus={pactTxStatus}
+                      refresh={refresh}
+                    />
+                  </CardContent>
+                </Card>
+              }/>
+              <Route path="/members" component={ () =>
+                <Card>
+                  <CardHeader title="Members"/>
+                  <CardContent>
+                    <RenderMembers members={members}/>
+                    <MemberActionForms
+                      members={members}
+                      moderators={moderators}
+                      guardians={guardians}
+                      ambassadors={ambassadors}
+                      tabIdx={memberTabIdx}
+                      pactTxStatus={pactTxStatus}
+                      refresh={refresh}
+                    />
+                  </CardContent>
+                </Card>
+              }/>
+              <Route path="/modlog" component={ () =>
+                <Card>
+                  <CardHeader title="Moderation Log"/>
+                  <CardContent>
+                    <RenderModLog modLog={modLog}/>
                   </CardContent>
                 </Card>
               }/>

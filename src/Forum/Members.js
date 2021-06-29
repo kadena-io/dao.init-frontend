@@ -7,11 +7,12 @@ import {
 //pact-lang-api for blockchain calls
 import Pact from "pact-lang-api";
 //config file for blockchain calls
-import { daoAPI } from "./kadena-config.js";
+import { daoAPI, forumAPI } from "../kadena-config.js";
 import {
   PactJsonListAsTable,
   MakeForm,
- } from "./util.js";
+ } from "../util.js";
+import { ScrollableTabs } from "../ScrollableTabs.js";
 
 const useStyles = makeStyles(() => ({
   formControl: {
@@ -23,27 +24,53 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
+export const RenderMembers = (props) => {
+  return (
+    <PactJsonListAsTable
+      header={["Name","Disabled","Guard"]}
+      keyOrder={["name","disabled","guard"]}
+      json={props.members}
+    />
+)};
 
-const sendGuardianCmd = async (
+export const RenderModerators = (props) => {
+  return (
+    <PactJsonListAsTable
+      header={["Name","Disabled","Guard"]}
+      keyOrder={["name","disabled","guard"]}
+      json={props.moderators}
+    />
+)};
+
+const sendMemberCmd = async (
   setTx,
   setTxStatus,
   setTxRes,
   refresh,
-  user, cmd, envData={}, caps=[]
+  user,
+  cmd, envData={}, role="member", caps=[]
 ) => {
     try {
       //creates transaction to send to wallet
       const toSign = {
           pactCode: cmd,
-          caps: (Array.isArray(caps) && caps.length
-            ? caps :
-            Pact.lang.mkCap("Guadian Cap"
-                           , "Authenticates that you're a guardian"
-                           , `${daoAPI.contractAddress}.GUARDIAN`
-                           , [user])),
-          gasLimit: daoAPI.meta.gasLimit,
-          chainId: daoAPI.meta.chainId,
-          ttl: daoAPI.meta.ttl,
+          caps: (
+            Array.isArray(caps) && caps.length ?
+              caps :
+            role === "moderator" ?
+              Pact.lang.mkCap("MODERATOR Cap"
+                            , "Authenticates that you're a MODERATOR"
+                            , `${forumAPI.contractAddress}.MODERATOR`
+                            , [user]) :
+            role === "member" ? 
+              Pact.lang.mkCap("MEMBER Cap"
+              , "Authenticates that you're a MEMBER"
+              , `${forumAPI.contractAddress}.MEMBER`
+              , [user]) 
+            : Error(`sendForumCmd(role=["member"|"moderator"]), got role=${role}`)),
+          gasLimit: forumAPI.meta.gasLimit,
+          chainId: forumAPI.meta.chainId,
+          ttl: forumAPI.meta.ttl,
           sender: user,
           envData: envData
       }
@@ -58,7 +85,7 @@ const sendGuardianCmd = async (
       }
 
       //sends signed transaction to blockchain
-      const txReqKeys = await Pact.wallet.sendSigned(signed, daoAPI.meta.host)
+      const txReqKeys = await Pact.wallet.sendSigned(signed, forumAPI.meta.host)
       console.log("txReqKeys", txReqKeys)
       //set html to wait for transaction response
       //set state to wait for transaction response
@@ -72,7 +99,7 @@ const sendGuardianCmd = async (
         while (retries > 0) {
           //sleep the polling
           await new Promise(r => setTimeout(r, 15000));
-          res = await Pact.fetch.poll(txReqKeys, daoAPI.meta.host);
+          res = await Pact.fetch.poll(txReqKeys, forumAPI.meta.host);
           try {
             if (res[signed.hash].result.status) {
               retries = -1;
@@ -112,81 +139,10 @@ const sendGuardianCmd = async (
     }
 };
 
-export const RenderGuardians = (props) => {
-  return (
-    <PactJsonListAsTable
-      header={["Guardian","Committed KDA","Approved Hash","Approval Date","Voting Guard","Forum Moderation Guard"]}
-      keyOrder={["k","committed-kda","approved-hash","approved-date","guard","moderate-guard"]}
-      json={props.guardians}
-    />
-)};
-
-export const RegisterAmbassador = (props) => {
-  const {
-    refresh,
-    guardians,
-  } = props;
-  const [grd, setGrd] = useState( "" );
-  const [newAmb, setNewAmb] = useState( "" );
-  const [ambGrd, setAmbGrd] = useState( "" );
-  const {txStatus, setTxStatus,
-    tx, setTx,
-    txRes, setTxRes} = props.pactTxStatus;
-  const classes = useStyles();
-
-  const inputFields = [
-    {
-      type:'select',
-      label:'Select Guardian',
-      className:classes.formControl,
-      onChange:setGrd,
-      options:guardians.map((g)=>g['k']),
-    },
-    {
-      type:'textFieldSingle',
-      label:'Ambassador Account Name',
-      className:classes.formControl,
-      value:newAmb,
-      onChange:setNewAmb
-    },
-    {
-      type:'textFieldMulti',
-      label:'Ambassador Account Guard',
-      className:classes.formControl,
-      placeholder:JSON.stringify({"pred":"keys-all","keys":["8c59a322800b3650f9fc5b6742aa845bc1c35c2625dabfe5a9e9a4cada32c543"]},undefined,2),
-      value:ambGrd,
-      onChange:setAmbGrd,
-    }
-  ];
-
-  const handleSubmit = (evt) => {
-      evt.preventDefault();
-      try {
-        sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
-          ,grd
-          ,`(${daoAPI.contractAddress}.register-ambassador "${grd}" "${newAmb}" (read-keyset 'ks))`
-          ,{ks: JSON.parse(ambGrd)}
-        );
-      } catch (e) {
-        console.log("Ambassador Registration Submit Error",typeof e, e, grd,newAmb,ambGrd);
-        setTxRes(e);
-        setTxStatus("validation-error");
-      }
-  };
-
-  return (
-    <MakeForm
-      inputFields={inputFields}
-      onSubmit={handleSubmit}
-      tx={tx} txStatus={txStatus} txRes={txRes}
-      setTxStatus={setTxStatus}/>
-  )
-};
-
-export const DeactivateAmbassador = (props) => {
-  const {refresh} = props;
-  const [grd, setGrd] = useState( "" );
-  const [amb, setAmb] = useState( "" );
+const BecomeModerator = (props) => {
+  const {refresh, guardians} = props;
+  const [user, setUser] = useState( "" );
+  const [newKs, setNewKs] = useState({});
   const {txStatus, setTxStatus,
     tx, setTx,
     txRes, setTxRes} = props.pactTxStatus;
@@ -194,14 +150,18 @@ export const DeactivateAmbassador = (props) => {
 
   const handleSubmit = (evt) => {
       evt.preventDefault();
-      // console.log(grd,newAmb);
       try {
-        sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
-        ,grd
-        ,`(${daoAPI.contractAddress}.deactivate-ambassador "${grd}" "${amb}")`
-        )
+        sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,user
+          ,`(${forumAPI.contractAddress}.become-moderator "${user}" (read-keyset 'ks))`
+          ,{ks: JSON.parse(newKs)}
+          ,"moderator"
+          ,[Pact.lang.mkCap("GUARDIAN Cap"
+            , "Authenticates that you're a GUARDIAN"
+            , `${daoAPI.contractAddress}.GUARDIAN`
+            , [user])]);
       } catch (e) {
-        console.log("deactivate-ambassador Submit Error",typeof e, e, grd,);
+        console.log("mjolnir-write-member Submit Error",typeof e, e, user, newKs);
         setTxRes(e);
         setTxStatus("validation-error");
       }
@@ -209,121 +169,17 @@ export const DeactivateAmbassador = (props) => {
   const inputFields = [
     {
       type:'select',
-      label:'Select Guardian',
+      label:'Select your Guardian Account',
       className:classes.formControl,
-      onChange:setGrd,
-      options:props.guardians.map((g)=>g['k']),
-    },
-    {
-      type:'select',
-      label:'Select Ambassador',
-      className:classes.formControl,
-      onChange:setAmb,
-      options:props.ambassadors.map((g)=>g['k']),
-    },
-  ];
-
-  return (
-    <MakeForm
-      inputFields={inputFields}
-      onSubmit={handleSubmit}
-      tx={tx} txStatus={txStatus} txRes={txRes}
-      setTxStatus={setTxStatus}/>
-  );
-};
-
-export const ReactivateAmbassador = (props) => {
-  const {
-    refresh,
-  } = props;
-  const [grd, setGrd] = useState( "" );
-  const [amb, setAmb] = useState( "" );
-  const {txStatus, setTxStatus,
-    tx, setTx,
-    txRes, setTxRes} = props.pactTxStatus;
-  const classes = useStyles();
-
-  const handleSubmit = (evt) => {
-      evt.preventDefault();
-      // console.log(grd,newAmb);
-      try {
-        sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
-        ,grd
-        ,`(${daoAPI.contractAddress}.reactivate-ambassador "${grd}" "${amb}")`
-        )
-      } catch (e) {
-        console.log("reactivate-ambassador Submit Error",typeof e, e, grd,);
-        setTxRes(e);
-        setTxStatus("validation-error");
-      }
-    };
-  const inputFields = [
-    {
-      type:'select',
-      label:'Select Guardian',
-      className:classes.formControl,
-      onChange:setGrd,
-      options:props.guardians.map((g)=>g['k']),
-    },
-    {
-      type:'select',
-      label:'Select Ambassador',
-      className:classes.formControl,
-      onChange:setAmb,
-      options:props.ambassadors.map((g)=>g['k']),
-    },
-  ];
-
-  return (
-    <MakeForm
-      inputFields={inputFields}
-      onSubmit={handleSubmit}
-      tx={tx} txStatus={txStatus} txRes={txRes}
-      setTxStatus={setTxStatus}/>
-  );
-}
-
-export const RotateGuardian = (props) => {
-  const {
-    refresh,
-    guardians,
-  } = props;
-  const [grd, setGrd] = useState( "" );
-  const [voteKs, setVoteKs] = useState( "" );
-  const {txStatus, setTxStatus,
-    tx, setTx,
-    txRes, setTxRes} = props.pactTxStatus;
-  const classes = useStyles();
-
-  const handleSubmit = (evt) => {
-      evt.preventDefault();
-      // console.log(grd,newAmb);
-      try {
-        sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
-        ,grd
-        ,`(${daoAPI.contractAddress}.rotate-guardian "${grd}" (read-keyset 'voteKs))`
-        ,{voteKs: JSON.parse(voteKs)})
-      } catch (e) {
-        console.log("rotate-guardian Submit Error",typeof e, e, grd, voteKs,);
-        setTxRes(e);
-        setTxStatus("validation-error");
-      }
-    };
-
-  const inputFields = [
-    {
-      type:'select',
-      label:'Select Guardian',
-      className:classes.formControl,
-      onChange:setGrd,
+      onChange:setUser,
       options:guardians.map((g)=>g['k']),
     },{
       type:'textFieldMulti',
-      label:'Guardian Voting Guard',
+      label:'Moderator Keyset',
       className:classes.formControl,
       placeholder:JSON.stringify({"pred":"keys-all","keys":["8c59a322800b3650f9fc5b6742aa845bc1c35c2625dabfe5a9e9a4cada32c543"]},undefined,2),
-      value:voteKs,
-      onChange:setVoteKs,
+      value:newKs,
+      onChange:setNewKs,
     }
   ];
 
@@ -336,157 +192,50 @@ export const RotateGuardian = (props) => {
   );
 };
 
-export const ProposeDaoUpgrade = (props) => {
-  const {
-    refresh,
-    guardians,
-  } = props;
-  const [acct, setAcct] = useState( "" );
-  const [hsh, setHsh] = useState( "" );
+const BecomeMember = (props) => {
+  const {refresh, ambassadors} = props;
+  const [user, setUser] = useState( "" );
+  const [newKs, setNewKs] = useState({});
   const {txStatus, setTxStatus,
     tx, setTx,
     txRes, setTxRes} = props.pactTxStatus;
   const classes = useStyles();
 
-  const inputFields = [
-    {
-      type:'select',
-      label:'Select Guardian',
-      className:classes.formControl,
-      onChange:setAcct,
-      options:guardians.map((g)=>g['k']),
-    },
-    {
-      type:'textFieldSingle',
-      label:'Proposed Upgrade Hash',
-      className:classes.formControl,
-      value:hsh,
-      onChange:setHsh
-    }
-  ];
-
   const handleSubmit = (evt) => {
       evt.preventDefault();
       try {
-        sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
-          ,acct
-          ,`(${daoAPI.contractAddress}.propose-dao-upgrade "${acct}" "${hsh}")`
+        sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,user
+          ,`(${forumAPI.contractAddress}.become-member "${user}" (read-keyset 'ks))`
+          ,{ks: JSON.parse(newKs)}
+          ,"member"
+          ,[Pact.lang.mkCap("AMBASSADOR Cap"
+            , "Authenticates that you're a AMBASSADOR"
+            , `${daoAPI.contractAddress}.AMBASSADOR`
+            , [user])] 
         );
       } catch (e) {
-        console.log("propose-dao-upgrade Submit Error",typeof e, e, acct,hsh,);
+        console.log("mjolnir-write-member Submit Error",typeof e, e, user, newKs);
         setTxRes(e);
         setTxStatus("validation-error");
       }
-  };
-
-  return (
-    <MakeForm
-      inputFields={inputFields}
-      onSubmit={handleSubmit}
-      tx={tx} txStatus={txStatus} txRes={txRes}
-      setTxStatus={setTxStatus}/>
-  )
-};
-
-export const GuardianApproveHash = (props) => {
-  const {
-    refresh,
-    guardians,
-  } = props;
-  const [acct, setAcct] = useState( "" );
-  const [hsh, setHsh] = useState( "" );
-  const {txStatus, setTxStatus,
-         tx, setTx,
-         txRes, setTxRes} = props.pactTxStatus;
-  const classes = useStyles();
-
+      };
   const inputFields = [
     {
       type:'select',
-      label:'Select Guardian',
+      label:'Select your Ambassador Account',
       className:classes.formControl,
-      onChange:setAcct,
-      options:guardians.map((g)=>g['k']),
-    },
-    {
-      type:'select',
-      label:'Proposed Upgrade Hash',
-      className:classes.formControl,
-      value:setHsh,
-      options:guardians.map((g)=>g['approved-hash']),
-    }
-  ];
-
-  const handleSubmit = (evt) => {
-      evt.preventDefault();
-      try {
-        sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
-          ,acct
-          ,`(${daoAPI.contractAddress}.guardian-approve-hash "${acct}" "${hsh}")`
-        );
-      } catch (e) {
-        console.log("guardian-approve-hash Submit Error",typeof e, e, acct,hsh,);
-        setTxRes(e);
-        setTxStatus("validation-error");
-      }
-  };
-
-  return (
-    <MakeForm
-      inputFields={inputFields}
-      onSubmit={handleSubmit}
-      tx={tx} txStatus={txStatus} txRes={txRes}
-      setTxStatus={setTxStatus}/>
-  )
-};
-
-export const RegisterGuardian = (props) => {
-  const {
-    refresh,
-  } = props;
-  const [grd, setGrd] = useState( "" );
-  const [voteKs, setVoteKs] = useState( "" );
-  const {txStatus, setTxStatus,
-    tx, setTx,
-    txRes, setTxRes} = props.pactTxStatus;
-  const classes = useStyles();
-
-  const inputFields = [
-    {
-      type:'textFieldSingle',
-      label:'Guardian Account Name',
-      className:classes.formControl,
-      value:grd,
-      onChange:setGrd
-    },
-    {
+      onChange:setUser,
+      options:ambassadors.map((g)=>g['k']),
+    },{
       type:'textFieldMulti',
-      label:'Guardian Voting Guard',
+      label:'Member Keyset',
       className:classes.formControl,
       placeholder:JSON.stringify({"pred":"keys-all","keys":["8c59a322800b3650f9fc5b6742aa845bc1c35c2625dabfe5a9e9a4cada32c543"]},undefined,2),
-      value:voteKs,
-      onChange:setVoteKs,
+      value:newKs,
+      onChange:setNewKs,
     }
   ];
-
-  const handleSubmit = (evt) => {
-      evt.preventDefault();
-      try {
-        sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
-          ,grd
-          ,`(${daoAPI.contractAddress}.register-guardian "${grd}" (read-keyset 'voteKs))`
-          ,{voteKs: JSON.parse(voteKs)}
-          ,[Pact.lang.mkCap("TRANSFER Cap"
-                           , "Stake the needed amount"
-                           , `coin.TRANSFER`
-                           , [grd, daoAPI.constants["DAO_ACCT_NAME"], daoAPI.constants["GUARDIAN_KDA_REQUIRED"]])]
-        );
-      } catch (e) {
-        console.log("Guardian Registration Submit Error",typeof e, e, grd,voteKs);
-        setTxRes(e);
-        setTxStatus("validation-error");
-      }
-  };
 
   return (
     <MakeForm
@@ -494,5 +243,64 @@ export const RegisterGuardian = (props) => {
       onSubmit={handleSubmit}
       tx={tx} txStatus={txStatus} txRes={txRes}
       setTxStatus={setTxStatus}/>
-  )
+  );
 };
+
+export const ModeratorActionForms = (props) => {
+  const {
+    members,
+    moderators,
+    guardians,
+    tabIdx,
+    pactTxStatus,
+  } = props;
+  const {
+    getForumState,
+    getMembers,
+  } = props.refresh;
+
+  return (
+    <ScrollableTabs
+      tabIdx={tabIdx}
+      tabEntries={[
+          {
+            label:"Become Moderator",
+            component:
+              <BecomeModerator
+                guardians={guardians}
+                pactTxStatus={pactTxStatus}
+                refresh={()=>getMembers()}/>
+          }
+      ]}/>
+  );
+}
+
+export const MemberActionForms = (props) => {
+  const {
+    members,
+    moderators,
+    guardians,
+    ambassadors,
+    tabIdx,
+    pactTxStatus,
+  } = props;
+  const {
+    getForumState,
+    getMembers,
+  } = props.refresh;
+
+  return (
+    <ScrollableTabs
+      tabIdx={tabIdx}
+      tabEntries={[
+          {
+            label:"Become Member",
+            component:
+              <BecomeMember
+                ambassadors={ambassadors}
+                pactTxStatus={pactTxStatus}
+                refresh={()=>getMembers()}/>
+          }
+      ]}/>
+  );
+}
