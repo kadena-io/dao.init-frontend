@@ -9,6 +9,10 @@ import replaceInFile from "replace-in-file";
 
 import { renderConfig } from "./templates/ConfigTemplates.js";
 import { fetchStateTemplate, renderState } from "./templates/StateTemplates.js";
+import { 
+  dashStyleNames2ReactText,
+  dashStyleNames2ReactVar,
+ } from "./autogen-utils.js";
 
 const { ncp } = ncpImportWorkaround;
 // import CONTRACT_UI_API from "./forum.json";
@@ -19,7 +23,7 @@ const copy = promisify(ncp);
 
 const engineFileDepPaths = (fname) => `./src/${fname}`;
 
-export const makeTemplateDeps = (deps, targetPath) => {
+export const makeTemplateDeps = (deps, fileNameWithPath) => {
   let fileDeps = {};
   let packageDeps = {};
   for (let dep of deps) {
@@ -43,7 +47,7 @@ export const makeTemplateDeps = (deps, targetPath) => {
   const toplevels = (ts) => Array.from(ts).join(', ');
   const funcs = (fs) => fs.size ? `{\n  ${Array.from(fs).join(',\n  ')}\n}`:'';
   const packageTemplate = (pname, p) => `import ${toplevels(p.top)}${p.top.size && p.funcs.size ? ', ' : ''}${funcs(p.funcs)} from "${pname}";`;
-  const fileNameTemplate = (fname) => `"${path.relative(targetPath,engineFileDepPaths(fname))}"`;
+  const fileNameTemplate = (fname) => `"${path.relative(fileNameWithPath,engineFileDepPaths(fname))}"`;
   const fileTemplate = (fname,f) => `import ${toplevels(f.top)}${f.top.size && f.funcs.size ? ', ' : ''}${funcs(f.funcs)} from ${fileNameTemplate(fname)};`;
   const pdeps = Object.entries(packageDeps).map(([pname,p]) => packageTemplate(pname,p)).join('\n');
   const fdeps = Object.entries(fileDeps).map(([fname,f]) => fileTemplate(fname,f)).join('\n');
@@ -55,12 +59,59 @@ const r1 = renderConfig("forum-state", "forumAPI");
 const r2 = fetchStateTemplate("forum-state", "forumAPI");
 const r3 = renderState("forum-state", "forumState");
 
+const combineComponents = (pactName, comps) => {
+  const name = dashStyleNames2ReactText(pactName);
+  const deps = [].concat.apply([],comps.map(c=>c.deps));
+  const result = comps.map((c)=>["// autogen: ",c.name,"\n",c.result].join('')).join("\n\n");
+  return {name: name, deps: deps, result: result};
+}
+const r4 = combineComponents("forum-state",[r1,r2,r3]);
 
+const processTableTypeState = (tableAPI) => {
+  const tableName = tableAPI.keys()[0];
 
-console.log([r1.name,makeTemplateDeps(r1.deps,`./src/Forum/${r1.name}.js`),r1.result].join("\n\n"))
-console.log([r2.name,makeTemplateDeps(r2.deps,`./src/Forum/${r2.name}.js`),r2.result].join("\n\n"))
-console.log([r3.name,makeTemplateDeps(r3.deps,`./src/Forum/${r3.name}.js`),r3.result].join("\n\n"))
+};
 
+const __dirname = ".";
+
+const generateComponent = async (options,comp) => {
+  const targetDir = options.targetDir ;
+  let fp = path.join(targetDir,[comp.name,"js"].join('.'));
+  let contents = [makeTemplateDeps(comp.deps,fp),comp.result].join('\n\n');
+  console.log(`Generated ${fp} with contents \n\n${contents}`);
+  fs.writeFileSync(fp,contents,e => {throw new Error(`generateComp error: ${fp} \n\n ${e}`)});
+};
+
+const generateComponents = async (comps) => {
+      const targetDir = path.join(__dirname,"src","Forum");
+      const templateDir = path.join(__dirname,"templates");
+  
+      try {
+        await access(templateDir, fs.constants.R_OK);
+      } catch (err) {
+        console.error("%s Invalid template name", chalk.red.bold("ERROR"));
+        process.exit(1);
+      }
+  
+      try {
+        await access(targetDir, fs.constants.R_OK);
+      } catch (err) {
+        console.error("%s Invalid targetDir name", chalk.red.bold("ERROR"));
+        process.exit(1);
+      }
+  
+  
+      const options = {
+        templateDir: templateDir,
+        targetDir: targetDir,
+      };
+
+      for (let comp of comps) {
+        await generateComponent(options, comp);
+      };
+  return process.exit(0)};
+
+  generateComponents([r4]);
 
 // module.exports = {
 //   generateComponents: async () => {

@@ -5,7 +5,7 @@
     "identifies":["mjolnir"],
     "funcs":{
       "getters":[{
-        "type":"view-all"
+        "type":"view-all",
         "name":"view-forum-state",
         "args":"",
         "caps":""
@@ -24,7 +24,7 @@
     "identifies":["member", "moderator"],
     "funcs":{
       "getters":[{
-        "type":"view-all"
+        "type":"view-all",
         "name":"view-members",
         "args":"",
         "caps":""
@@ -87,7 +87,7 @@
         "type":"rotation",
         "name":"mjolnir-write-member",
         "args":
-          [{"type":"string"},{"type":"keyset"},{"type":bool}]
+          [{"type":"string"},{"type":"keyset"},{"type":"bool"}],
         "caps":["MJOLNIR"]
       }]
     }
@@ -97,7 +97,7 @@
     "identifies":[],
     "funcs":{
       "getters":[{
-        "type":"view-all"
+        "type":"view-all",
         "name":"view-members",
         "args":"",
         "caps":""
@@ -110,12 +110,12 @@
     "identifies":["comment"],
     "funcs":{
       "getters":[{
-        "type":"view-all"
+        "type":"view-all",
         "name":"view-comments",
         "args":"",
         "caps":""
         },{
-        "type":"view-one"
+        "type":"view-one",
         "name":"view-comment",
         "args":[{"type":"string","from":"comment"}],
         "caps":""
@@ -124,8 +124,8 @@
     }
   }
 },"caps":{
-  "MJOLNIR":{"args":""},
-  "MODERATOR":{"args":""},
-  "MEMBER":{"args":""}
+  "MJOLNIR":{"args":"","type":"keyset"},
+  "MODERATOR":{"args":"","type":"row-enforced"},
+  "MEMBER":{"args":"","type":"row-enforced"}
 }
 }

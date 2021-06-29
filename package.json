@@ -33,7 +33,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "autogen": "./autogen-components.js"
+    "autogen": "node ./autogen-components.js"
   },
   "eslintConfig": {
     "extends": "react-app"
