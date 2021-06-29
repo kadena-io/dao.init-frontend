@@ -17,6 +17,11 @@ import {
   Card, CardHeader, CardContent,
   CssBaseline, NoSsr
 } from '@material-ui/core';
+import { NavDrawer } from "./NavDrawer.js";
+import { ScrollableTabs } from "./ScrollableTabs.js";
+import { BookTwoTone } from "@material-ui/icons";
+import { PactTxStatus } from "./PactTxStatus.js";
+
 //config file for blockchain calls
 import  {
   RegisterGuardian,
@@ -38,11 +43,7 @@ import { InitConfig } from "./InitConfig.js"
 import { RenderInitState, getContractState } from "./InitState.js";
 
 import { ForumConfig, RenderForumState, getForumContractState } from "./Forum/ForumConfig.js";
-
-import { NavDrawer } from "./NavDrawer.js";
-import { ScrollableTabs } from "./ScrollableTabs.js";
-import { BookTwoTone } from "@material-ui/icons";
-import { PactTxStatus } from "./PactTxStatus.js";
+import { MjolnirActionForms } from "./Forum/Mjolnir.js";
 
 
 const App = () => {
@@ -66,21 +67,14 @@ const App = () => {
         }),
       [],
     );
-
+  
+  //Init Top Level States
   const [initState, setInitState] = useState( {} );
   const [guardians, setGuardians] = useState( [] );
   const [ambassadors, setAmbassadors] = useState( [] );
   const ambTabIdx = useState(0);
   const grdTabIdx = useState(0);
-  const [txStatus, setTxStatus] = useState("");
-  const [tx, setTx] = useState( {} );
-  const [txRes, setTxRes] = useState( {} );
-  const pactTxStatus = {
-    tx:tx,setTx:setTx,
-    txStatus:txStatus,setTxStatus:setTxStatus,
-    txRes:txRes,setTxRes:setTxRes,
-  };
-
+  
   const getInitState = async () => {
     const res = await getContractState("view-state");
     setInitState(res);
@@ -96,19 +90,47 @@ const App = () => {
     setGuardians(res);
   };
 
+  // Tx Status Top Level State
+  const [txStatus, setTxStatus] = useState("");
+  const [tx, setTx] = useState( {} );
+  const [txRes, setTxRes] = useState( {} );
+  const pactTxStatus = {
+    tx:tx,setTx:setTx,
+    txStatus:txStatus,setTxStatus:setTxStatus,
+    txRes:txRes,setTxRes:setTxRes,
+  };
+
+  //Forum Top Level States
   const [forumState, setForumState] = useState( {} );
+  const [members, setMembers] = useState([]);
+  const [moderators, setModerators] = useState([]);
+
+  //Forum UI States
+  const mjolnirTabIdx = useState(0);
 
   const getForumState = async () => {
     const res = await getForumContractState("view-forum-state");
     setForumState(res);
   };
 
+  const getMembers = async () => {
+    const res = await getForumContractState("view-members");
+    setMembers(res.filter(m=>m.moderator === false));
+    setModerators(res.filter(m=>m.moderator === true));
+  };
+
+  const refresh = {
+    getForumState: getForumState,
+    getMembers: getMembers,
+  }
+
   useEffect(() => {
     getGuardians();
     getInitState();
     getAmbassadors();
     getForumState();
-    console.log('useEffect []',guardians,ambassadors)
+    getMembers();
+    console.log('useEffect App.js Fired');
   }, []);
 
   return (
@@ -144,6 +166,9 @@ const App = () => {
                     },{
                       primary:"Forum State",
                       to:"/forumState"
+                    },{
+                      primary:"Mjolnir",
+                      to:"/mjolnir"
                     }
                   ]
                 }]
@@ -272,11 +297,25 @@ const App = () => {
                   </CardContent>
                 </Card>
               }/>
-            <Route path="/forumState" component={ () =>
+              <Route path="/forumState" component={ () =>
                 <Card>
                   <CardHeader title="Contract State"/>
                   <CardContent>
                     <RenderForumState forumState={forumState}/>
+                  </CardContent>
+                </Card>
+              }/>
+              <Route path="/mjolnir" component={ () =>
+                <Card>
+                  <CardHeader title="Mjolnir Powers"/>
+                  <CardContent>
+                    <MjolnirActionForms 
+                      members={members}
+                      moderators={moderators}
+                      tabIdx={mjolnirTabIdx}
+                      pactTxStatus={pactTxStatus}
+                      refresh={refresh}
+                    />
                   </CardContent>
                 </Card>
               }/>

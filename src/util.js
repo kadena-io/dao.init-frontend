@@ -10,6 +10,8 @@ import {
   TableHead,
   TableRow,
   Paper,
+  ListSubheader,
+  Checkbox,
 } from '@material-ui/core';
 import {
   Button,
@@ -269,11 +271,24 @@ const MakeInputField = (props) => {
         label={label}
         onChange={e => onChange(e.target.value)}
         >
-        {options.map(k =>
-          <MenuItem key={k} value={k}>
-            {k}
-          </MenuItem>
-        )}
+        { Array.isArray(options) ?
+            options.map(k =>
+              <MenuItem key={k} value={k}>
+                {k}
+              </MenuItem>
+            )
+          : Object.keys(options).map(k => 
+              <React.Fragment>
+                <ListSubheader>{k}</ListSubheader>
+                {
+                  options[k].map(v => 
+                    <MenuItem key={`${k}-${v}`} value={v}>
+                      {v}
+                    </MenuItem>
+                  )
+                }
+              </React.Fragment>)
+        }
       </TextField>
     : type === 'textFieldSingle' ?
       <TextField
@@ -297,6 +312,13 @@ const MakeInputField = (props) => {
         placeholder={placeholder}
         onChange={e => onChange(e.target.value)}
       />
+    : type === 'checkbox' ? 
+        <Checkbox
+          checked={value}
+          onChange={e=>onChange(e.target.value)}
+          color="primary"
+          label={label}
+        />
     : null
   )
 
