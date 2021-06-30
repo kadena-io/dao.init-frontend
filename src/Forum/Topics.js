@@ -40,7 +40,7 @@ export const RenderTopics = (props) => {
 
 export const RenderTopic = (props) => {
   const {topicID,topics} = props;
-  return <RenderMD mdText="**Hellow world**\n- foo" />
+  return <RenderMD mdText="**Hellow world**\n- fo" />
 }
 
 const PostTopic = (props) => {
