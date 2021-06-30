@@ -51,6 +51,11 @@ import {
   ModeratorActionForms,
 } from "./Forum/Members.js";
 import { RenderModLog } from "./Forum/ModLog.js";
+import {
+  RenderTopics,
+  RenderTopic,
+  TopicActionForms,
+} from "./Forum/Topics.js";
 
 
 const App = () => {
@@ -112,11 +117,14 @@ const App = () => {
   const [members, setMembers] = useState([]);
   const [moderators, setModerators] = useState([]);
   const [modLog, setModLog] = useState( [] );
-
+  const [topics,setTopics] = useState( {} );
+  const [comments, setComments] = useState( {} );
+   
   //Forum UI States
   const mjolnirTabIdx = useState(0);
   const memberTabIdx = useState(0);
   const moderatorTabIdx = useState(0);
+  const topicTabIdx = useState(0);
 
   const getForumState = async () => {
     const res = await getForumContractState("view-forum-state");
@@ -134,10 +142,22 @@ const App = () => {
     setModLog(res);
   };
 
+  const getTopics = async () => {
+    const res = await getForumContractState("view-topics");
+    setTopics(res);
+  };
+
+  const getComments = async () => {
+    const res = await getForumContractState("view-comments");
+    setComments(res);
+  };
+
   const refresh = {
     getForumState: getForumState,
     getMembers: getMembers,
-  }
+    getTopics: getTopics,
+    getComments: getComments,
+  };
 
   useEffect(() => {
     getGuardians();
@@ -146,6 +166,8 @@ const App = () => {
     getForumState();
     getMembers();
     getModLog();
+    getTopics();
+    getComments();
     console.log('useEffect App.js Fired');
   }, []);
 
@@ -194,6 +216,9 @@ const App = () => {
                     },{
                       primary:"Members",
                       to:"/members"
+                    },{
+                      primary:"Topics",
+                      to:"/topics"
                     }
                   ]
                 }]
@@ -386,9 +411,25 @@ const App = () => {
                   </CardContent>
                 </Card>
               }/>
+              <Route path="/topics" component={ () =>
+                <Card>
+                  <CardHeader title="Topics"/>
+                  <CardContent>
+                    <RenderTopics topics={topics}/>
+                    <TopicActionForms
+                      members={members}
+                      moderators={moderators}
+                      topics={topics}
+                      tabIdx={topicTabIdx}
+                      pactTxStatus={pactTxStatus}
+                      refresh={refresh}
+                    />
+                  </CardContent>
+                </Card>
+              }/>
 
             <Route path="/">
-              <Redirect to="/initConfig" />
+              <Redirect to="/topics" />
             </Route>
 
             </Switch>

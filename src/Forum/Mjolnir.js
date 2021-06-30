@@ -262,7 +262,7 @@ const MjolnirWriteMember = (props) => {
       label:'Select User',
       className:classes.formControl,
       onChange:setUser,
-      options:{moderators: moderators.map((g)=>g['name']), members: members.map((m)=>m["name"])},
+      options:moderators.map(g=>g.name).concat(members.map(m=>m.name)),
     },{
       type:'textFieldMulti',
       label:'New Guard',

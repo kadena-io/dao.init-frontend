@@ -1,5 +1,7 @@
 // For util functions
 import React, {useState, useEffect} from "react";
+//make JS less terrible
+import _ from "lodash";
 import { makeStyles } from '@material-ui/core/styles';
 //Table Stuff
 import {
@@ -10,7 +12,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  ListSubheader,
   Checkbox,
 } from '@material-ui/core';
 import {
@@ -23,6 +24,7 @@ import {
 //pact-lang-api for blockchain calls
 //config file for blockchain calls
 import { PactTxStatus } from "./PactTxStatus.js";
+import { MDEditor } from "./Markdown";
 
 export const useInputStyles = makeStyles((theme) => ({
   root: {
@@ -176,7 +178,7 @@ export const PactSingleJsonAsTable = (props) => {
 )};
 
 export const PactJsonListAsTable = (props) => {
-  const json = props.json || {};
+  const json = _.isArray(props.json) ? props.json : [];
   const isNested = props.isNested || false;
   const classes = isNested ? useNestedTableStyles : useToplevelTableStyles;
   const header = props.header || [];
@@ -196,7 +198,7 @@ export const PactJsonListAsTable = (props) => {
         <TableHead>
           <TableRow>
           {header.map((val) => (
-            <TableCell>{val}</TableCell>
+            <TableCell key={val}>{val}</TableCell>
           ))}
           </TableRow>
         </TableHead>
@@ -206,7 +208,7 @@ export const PactJsonListAsTable = (props) => {
               { keyOrder.map(k => {
                   const v = obj[k];
                   return (
-                    <TableCell>
+                    <TableCell key={k}>
                       {isRootPactValue(v) ? (
                           valFormatter(v)
                       ) : Array.isArray(v) ? (
@@ -269,25 +271,17 @@ const MakeInputField = (props) => {
         className={className}
         variant="outlined"
         label={label}
-        onChange={e => onChange(e.target.value)}
+        onChange={e => {
+          // console.log(`Selected ${e.target.value}`,e); 
+          onChange(e.target.value)}
+          }
         >
-        { Array.isArray(options) ?
-            options.map(k =>
-              <MenuItem key={k} value={k}>
-                {k}
-              </MenuItem>
-            )
-          : Object.keys(options).map(k => 
-              <React.Fragment>
-                <ListSubheader>{k}</ListSubheader>
-                {
-                  options[k].map(v => 
-                    <MenuItem key={`${k}-${v}`} value={v}>
-                      {v}
-                    </MenuItem>
-                  )
-                }
-              </React.Fragment>)
+        
+        { options.map(k =>
+            <MenuItem key={k} value={k}>
+              {k}
+            </MenuItem>
+          )
         }
       </TextField>
     : type === 'textFieldSingle' ?
@@ -319,6 +313,10 @@ const MakeInputField = (props) => {
           color="primary"
           label={label}
         />
+    : type === 'markdown' ?
+        <MDEditor
+          value={value}
+          onChange={onChange}/>
     : null
   )
 

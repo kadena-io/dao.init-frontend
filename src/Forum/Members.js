@@ -42,7 +42,7 @@ export const RenderModerators = (props) => {
     />
 )};
 
-const sendMemberCmd = async (
+export const sendMemberCmd = async (
   setTx,
   setTxStatus,
   setTxRes,
