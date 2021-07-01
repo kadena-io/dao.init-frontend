@@ -5,8 +5,10 @@ import {
   Switch,
   Route,
   Redirect,
+  useHistory,
 } from 'react-router-dom';
 import qs from "qs";
+import _ from "lodash";
 import {
   createMuiTheme,
   ThemeProvider,
@@ -54,10 +56,11 @@ import {
 import { RenderModLog } from "./Forum/ModLog.js";
 import {
   RenderTopics,
-  RenderTopic,
   TopicActionForms,
 } from "./Forum/Topics.js";
-
+import {
+  RenderTopic,
+} from "./Forum/Topic.js";
 
 const App = () => {
   const theme = React.useMemo(
@@ -228,6 +231,7 @@ const App = () => {
             <Switch>
               <Route exact path="/" component={ ({match, location}) => {
                 const loc = qs.parse(location.search, { ignoreQueryPrefix: true });
+                console.log("routing, loc=",loc);
                 return ( 
   loc.app === "init" ?
       ( loc.ui === "config" ?
@@ -340,10 +344,7 @@ const App = () => {
               ]}/>
           </CardContent>
         </Card>
-      : 
-      <Card>
-        <CardHeader>404 UI not found</CardHeader>
-      </Card>)
+      : <Redirect to="/?app=forum&ui=topics">{console.log(`redirecting, got :${loc}`)}</Redirect> )
     : loc.app === "forum" ? 
       ( loc.ui === "config" ? 
         <Card>
@@ -426,14 +427,17 @@ const App = () => {
           />
         </CardContent>
       </Card>
-      : 
-      <Card>
-        <CardHeader>404 UI not found</CardHeader>
-      </Card>)
-    : 
-    <Card>
-      <CardHeader>404 UI not found</CardHeader>
-    </Card>)}}/>
+      : loc.ui === "topic" && _.has(loc, 'topicId') ?
+      <RenderTopic 
+        topics={topics}
+        topicId={loc.topicId}
+      />
+      : <Redirect to="/?app=forum&ui=topics">{console.log(`redirecting, got :${loc}`,loc)}</Redirect> )
+    : <Redirect to="/?app=forum&ui=topics">{console.log(`redirecting, got :${loc}`,loc)}</Redirect> 
+    )}}/>
+    <Route path="/">
+      <Redirect to="/?app=forum&ui=topics"/>
+    </Route>
             </Switch>
           </Container>
           </NavDrawer>

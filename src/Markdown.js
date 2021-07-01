@@ -5,7 +5,7 @@ import gfm from 'remark-gfm';
 import "react-mde/lib/styles/css/react-mde-all.css";
 
 import {
-  Paper,
+  Container,
 } from '@material-ui/core';
 
 export const MDEditor = (props) => {
@@ -43,9 +43,7 @@ export const MDEditor = (props) => {
 }
 
 export const RenderMD = (props) => {
-  console.log(`renderMD mdText=${props.mdText}`);
-
-  return  <Paper>
+  return  <Container>
             <ReactMarkdown remarkPlugins={[gfm]} children={props.mdText}/>
-          </Paper>
+          </Container>
 }

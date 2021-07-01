@@ -2,6 +2,7 @@
 import React, {useState, useEffect} from "react";
 //make JS less terrible
 import _ from "lodash";
+import qs from "qs";
 import { makeStyles } from '@material-ui/core/styles';
 //Table Stuff
 import {
@@ -25,6 +26,13 @@ import {
 //config file for blockchain calls
 import { PactTxStatus } from "./PactTxStatus.js";
 import { MDEditor } from "./Markdown";
+
+export const updateParams = (newParams, history) => {
+  const curSearch = qs.parse(history.location.search, { ignoreQueryPrefix: true });
+  const merged = _.merge(curSearch,newParams);
+  console.log(`updateParams: /?${qs.stringify(merged)}`);
+  history.push(`/?${qs.stringify(merged)}`);
+};
 
 export const useInputStyles = makeStyles((theme) => ({
   root: {
@@ -192,6 +200,7 @@ export const PactJsonListAsTable = (props) => {
   }
   const keyFormatter = props.keyFormatter ? props.keyFormatter : (k) => {return (k)};
   const valFormatter = props.valFormatter ? props.valFormatter : (str) => <code>{renderPactValue(str)}</code>;
+  const kvFunc = props.kvFunc || {};
 
   const internals = () =>
     <React.Fragment>
@@ -209,7 +218,9 @@ export const PactJsonListAsTable = (props) => {
                   const v = obj[k];
                   return (
                     <TableCell key={k}>
-                      {isRootPactValue(v) ? (
+                      { _.has(kvFunc,k) ? (
+                          kvFunc[k](obj)
+                      ) : isRootPactValue(v) ? (
                           valFormatter(v)
                       ) : Array.isArray(v) ? (
                           <PactJsonListAsTable

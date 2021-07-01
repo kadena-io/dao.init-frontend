@@ -1,8 +1,41 @@
 //basic React api imports
 import React, { useState } from "react";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+  useHistory,
+} from 'react-router-dom';
 //make JS less terrible
 import _ from "lowdash";
 //Material Stuff
+import {
+  Button,
+  ButtonGroup,
+  CardActions,
+  Card,
+  CardHeader,
+  CardContent,
+  Checkbox,
+  ClickAwayListener,
+  Grid,
+  Grow,
+  LinearProgress,
+  IconButton,
+  MenuItem,
+  MenuList,
+  Paper,
+  Popper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
+} from '@material-ui/core';
 import {
   makeStyles,
 } from '@material-ui/styles';
@@ -14,6 +47,7 @@ import {
   PactJsonListAsTable,
   PactSingleJsonAsTable,
   MakeForm,
+  updateParams,
  } from "../util.js";
 import { sendMemberCmd } from "./Members.js";
 import { ScrollableTabs } from "../ScrollableTabs.js";
@@ -29,19 +63,25 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
+const ViewTopicButton = ({index}) => {
+  const history = useHistory();
+  return <Button 
+    variant="outlined" 
+    color="default" 
+    onClick={()=> updateParams({app:"forum",ui:"topic","topicId":index},history)}>
+    View
+  </Button>
+}
+
 export const RenderTopics = (props) => {
   return (
     <PactJsonListAsTable
-      header={["Index","Author","Headline","Timestamp","Modified","Locked"]}
+      header={["","Author","Headline","Timestamp","Modified","Locked"]}
       keyOrder={["index","author","headline","timestamp","modified","locked"]}
+      kvFunc={{"index": ViewTopicButton}}
       json={props.topics}
     />
 )};
-
-export const RenderTopic = (props) => {
-  const {topicID,topics} = props;
-  return <RenderMD mdText="**Hellow world**\n- fo" />
-}
 
 const PostTopic = (props) => {
   const {refresh, members, moderators} = props;
