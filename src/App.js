@@ -1,11 +1,12 @@
 //basic React api imports
 import React, { useState, useEffect } from "react";
 import {
-  MemoryRouter as Router,
+  BrowserRouter as Router,
   Switch,
   Route,
   Redirect,
 } from 'react-router-dom';
+import qs from "qs";
 import {
   createMuiTheme,
   ThemeProvider,
@@ -183,16 +184,16 @@ const App = () => {
                   subList:  
                     [{
                       primary:"Config",
-                      to:"/daoConfig"
+                      to:"/?app=init&ui=config"
                     },{
                       primary:"Init State",
-                      to:"/initState"
+                      to:"/?app=init&ui=state"
                     },{
                       primary:"Ambassadors",
-                      to:"/ambassadors"
+                      to:"/?app=init&ui=ambassadors"
                     },{
                       primary:"Guardians",
-                      to:"/guardians",
+                      to:"/?app=init&ui=guardians",
                     }
                   ]
                 },{
@@ -200,238 +201,239 @@ const App = () => {
                   subList:  
                     [{
                       primary:"Config",
-                      to:"/forumConfig"
+                      to:"/?app=forum&ui=config"
                     },{
                       primary:"Forum State",
-                      to:"/forumState"
+                      to:"/?app=forum&ui=state"
                     },{
                       primary:"Mod Log",
-                      to:"/modlog"
+                      to:"/?app=forum&ui=modlog"
                     },{
                       primary:"Mjolnir",
-                      to:"/mjolnir"
+                      to:"/?app=forum&ui=mjolnir"
                     },{
                       primary:"Moderators",
-                      to:"/moderators"
+                      to:"/?app=forum&ui=moderators"
                     },{
                       primary:"Members",
-                      to:"/members"
+                      to:"/?app=forum&ui=members"
                     },{
                       primary:"Topics",
-                      to:"/topics"
+                      to:"/?app=forum&ui=topics"
                     }
                   ]
                 }]
           ]}>
           <Container>
             <Switch>
-              <Route path="/initConfig" component={ () =>
-                <Card>
-                  <CardHeader title="Contract and UI Configuration"/>
-                  <CardContent>
-                    <InitConfig/>
-                  </CardContent>
-                </Card>
-              }/>
-            <Route path="/initState" component={ () =>
-                <Card>
-                  <CardHeader title="Contract State"/>
-                  <CardContent>
-                    <RenderInitState initState={initState}/>
-                  </CardContent>
-                </Card>
-              }/>
-            <Route path="/guardians" component={ () =>
-              <Card>
-                <CardHeader title="Guardians"/>
-                <CardContent>
-                  <RenderGuardians guardians={guardians}/>
-                  <ScrollableTabs
-                    tabIdx={grdTabIdx}
-                    tabEntries={[
-                        {
-                          label:"Register Guardian",
-                          component:
-                            <RegisterGuardian
-                              pactTxStatus={pactTxStatus}
-                              refresh={() => getGuardians()}/>
-                        },{
-                          label:"Rotate Guardian",
-                          component:
-                            <RotateGuardian
-                              guardians={guardians}
-                              ambassadors={ambassadors}
-                              pactTxStatus={pactTxStatus}
-                              refresh={() => getAmbassadors()}/>
-                        },{
-                          label:"Propose DAO Upgrade",
-                          component:
-                            <ProposeDaoUpgrade
-                              guardians={guardians}
-                              pactTxStatus={pactTxStatus}
-                              refresh={() => getAmbassadors()}/>
-                        },{
-                          label:"Approve DAO Upgrade",
-                          component:
-                            <GuardianApproveHash
-                              guardians={guardians}
-                              pactTxStatus={pactTxStatus}
-                              refresh={() => getAmbassadors()}/>
-                        }
-                    ]}/>
-                </CardContent>
-              </Card>
-              }/>
-            <Route path="/ambassadors" component={ () =>
-              <Card>
-                <CardHeader title="Ambassadors"/>
-                <CardContent>
-                  <RenderAmbassadors ambassadors={ambassadors}/>
-                  <ScrollableTabs
-                    tabIdx={ambTabIdx}
-                    tabEntries={[
-                      {
-                        label:"Register Ambassador",
-                        component:
-                          <RegisterAmbassador
-                            guardians={guardians}
-                            pactTxStatus={pactTxStatus}
-                            refresh={() => getAmbassadors()}/>
-                      },{
-                        label:"Deactivate Ambassador",
-                        component:
-                          <DeactivateAmbassador
-                            guardians={guardians}
-                            ambassadors={ambassadors}
-                            pactTxStatus={pactTxStatus}
-                            refresh={() => getAmbassadors()}/>
-                      },{
-                        label:"Reactivate Ambassador",
-                        component:
-                          <ReactivateAmbassador
-                            guardians={guardians}
-                            ambassadors={ambassadors}
-                            pactTxStatus={pactTxStatus}
-                            refresh={() => getAmbassadors()}/>
-                      },{
-                        label:"Rotate Ambassador",
-                        component:
-                          <RotateAmbassador
-                            ambassadors={ambassadors}
-                            pactTxStatus={pactTxStatus}
-                            refresh={() => getAmbassadors()}/>
-                      },{
-                        label:"Vote to Freeze",
-                        component:
-                          <VoteToFreeze
-                            ambassadors={ambassadors}
-                            pactTxStatus={pactTxStatus}
-                            refresh={() => getAmbassadors()}/>
-                      },{
-                        label:"Freeze",
-                        component:
-                          <Freeze
-                            ambassadors={ambassadors}
-                            pactTxStatus={pactTxStatus}
-                            refresh={() => getAmbassadors()}/>
-                      }
-                    ]}/>
-                </CardContent>
-              </Card>
-              }/>  
-              <Route path="/forumConfig" component={ () =>
-                <Card>
-                  <CardHeader title="Contract and UI Configuration"/>
-                  <CardContent>
-                    <ForumConfig/>
-                  </CardContent>
-                </Card>
-              }/>
-              <Route path="/forumState" component={ () =>
-                <Card>
-                  <CardHeader title="Contract State"/>
-                  <CardContent>
-                    <RenderForumState forumState={forumState}/>
-                  </CardContent>
-                </Card>
-              }/>
-              <Route path="/mjolnir" component={ () =>
-                <Card>
-                  <CardHeader title="Mjolnir Powers"/>
-                  <CardContent>
-                    <MjolnirActionForms 
-                      members={members}
-                      moderators={moderators}
-                      tabIdx={mjolnirTabIdx}
+              <Route exact path="/" component={ ({match, location}) => {
+                const loc = qs.parse(location.search, { ignoreQueryPrefix: true });
+                return ( 
+  loc.app === "init" ?
+      ( loc.ui === "config" ?
+        <Card>
+          <CardHeader title="Contract and UI Configuration"/>
+          <CardContent>
+            <InitConfig/>
+          </CardContent>
+        </Card>
+      : loc.ui === "state" ?
+        <Card>
+          <CardHeader title="Contract State"/>
+          <CardContent>
+            <RenderInitState initState={initState}/>
+          </CardContent>
+        </Card>
+      : loc.ui === "guardians" ?
+        <Card>
+          <CardHeader title="Guardians"/>
+          <CardContent>
+            <RenderGuardians guardians={guardians}/>
+            <ScrollableTabs
+              tabIdx={grdTabIdx}
+              tabEntries={[
+                  {
+                    label:"Register Guardian",
+                    component:
+                      <RegisterGuardian
+                        pactTxStatus={pactTxStatus}
+                        refresh={() => getGuardians()}/>
+                  },{
+                    label:"Rotate Guardian",
+                    component:
+                      <RotateGuardian
+                        guardians={guardians}
+                        ambassadors={ambassadors}
+                        pactTxStatus={pactTxStatus}
+                        refresh={() => getAmbassadors()}/>
+                  },{
+                    label:"Propose DAO Upgrade",
+                    component:
+                      <ProposeDaoUpgrade
+                        guardians={guardians}
+                        pactTxStatus={pactTxStatus}
+                        refresh={() => getAmbassadors()}/>
+                  },{
+                    label:"Approve DAO Upgrade",
+                    component:
+                      <GuardianApproveHash
+                        guardians={guardians}
+                        pactTxStatus={pactTxStatus}
+                        refresh={() => getAmbassadors()}/>
+                  }
+              ]}/>
+          </CardContent>
+        </Card>
+      : loc.ui === "ambassadors" ?
+        <Card>
+          <CardHeader title="Ambassadors"/>
+          <CardContent>
+            <RenderAmbassadors ambassadors={ambassadors}/>
+            <ScrollableTabs
+              tabIdx={ambTabIdx}
+              tabEntries={[
+                {
+                  label:"Register Ambassador",
+                  component:
+                    <RegisterAmbassador
+                      guardians={guardians}
                       pactTxStatus={pactTxStatus}
-                      refresh={refresh}
-                    />
-                  </CardContent>
-                </Card>
-              }/>
-              <Route path="/moderators" component={ () =>
-                <Card>
-                  <CardHeader title="Moderators"/>
-                  <CardContent>
-                    <RenderModerators moderators={moderators}/>
-                    <ModeratorActionForms
-                      members={members}
-                      moderators={moderators}
+                      refresh={() => getAmbassadors()}/>
+                },{
+                  label:"Deactivate Ambassador",
+                  component:
+                    <DeactivateAmbassador
                       guardians={guardians}
                       ambassadors={ambassadors}
-                      tabIdx={moderatorTabIdx}
                       pactTxStatus={pactTxStatus}
-                      refresh={refresh}
-                    />
-                  </CardContent>
-                </Card>
-              }/>
-              <Route path="/members" component={ () =>
-                <Card>
-                  <CardHeader title="Members"/>
-                  <CardContent>
-                    <RenderMembers members={members}/>
-                    <MemberActionForms
-                      members={members}
-                      moderators={moderators}
+                      refresh={() => getAmbassadors()}/>
+                },{
+                  label:"Reactivate Ambassador",
+                  component:
+                    <ReactivateAmbassador
                       guardians={guardians}
                       ambassadors={ambassadors}
-                      tabIdx={memberTabIdx}
                       pactTxStatus={pactTxStatus}
-                      refresh={refresh}
-                    />
-                  </CardContent>
-                </Card>
-              }/>
-              <Route path="/modlog" component={ () =>
-                <Card>
-                  <CardHeader title="Moderation Log"/>
-                  <CardContent>
-                    <RenderModLog modLog={modLog}/>
-                  </CardContent>
-                </Card>
-              }/>
-              <Route path="/topics" component={ () =>
-                <Card>
-                  <CardHeader title="Topics"/>
-                  <CardContent>
-                    <RenderTopics topics={topics}/>
-                    <TopicActionForms
-                      members={members}
-                      moderators={moderators}
-                      topics={topics}
-                      tabIdx={topicTabIdx}
+                      refresh={() => getAmbassadors()}/>
+                },{
+                  label:"Rotate Ambassador",
+                  component:
+                    <RotateAmbassador
+                      ambassadors={ambassadors}
                       pactTxStatus={pactTxStatus}
-                      refresh={refresh}
-                    />
-                  </CardContent>
-                </Card>
-              }/>
-
-            <Route path="/">
-              <Redirect to="/topics" />
-            </Route>
-
+                      refresh={() => getAmbassadors()}/>
+                },{
+                  label:"Vote to Freeze",
+                  component:
+                    <VoteToFreeze
+                      ambassadors={ambassadors}
+                      pactTxStatus={pactTxStatus}
+                      refresh={() => getAmbassadors()}/>
+                },{
+                  label:"Freeze",
+                  component:
+                    <Freeze
+                      ambassadors={ambassadors}
+                      pactTxStatus={pactTxStatus}
+                      refresh={() => getAmbassadors()}/>
+                }
+              ]}/>
+          </CardContent>
+        </Card>
+      : 
+      <Card>
+        <CardHeader>404 UI not found</CardHeader>
+      </Card>)
+    : loc.app === "forum" ? 
+      ( loc.ui === "config" ? 
+        <Card>
+          <CardHeader title="Contract and UI Configuration"/>
+          <CardContent>
+            <ForumConfig/>
+          </CardContent>
+        </Card>
+      : loc.ui === "state" ?
+      <Card>
+        <CardHeader title="Contract State"/>
+        <CardContent>
+          <RenderForumState forumState={forumState}/>
+        </CardContent>
+      </Card>
+      : loc.ui === "mjolnir" ?
+      <Card>
+        <CardHeader title="Mjolnir Powers"/>
+        <CardContent>
+          <MjolnirActionForms 
+            members={members}
+            moderators={moderators}
+            tabIdx={mjolnirTabIdx}
+            pactTxStatus={pactTxStatus}
+            refresh={refresh}
+          />
+        </CardContent>
+      </Card>
+      : loc.ui === "moderators" ?
+      <Card>
+        <CardHeader title="Moderators"/>
+        <CardContent>
+          <RenderModerators moderators={moderators}/>
+          <ModeratorActionForms
+            members={members}
+            moderators={moderators}
+            guardians={guardians}
+            ambassadors={ambassadors}
+            tabIdx={moderatorTabIdx}
+            pactTxStatus={pactTxStatus}
+            refresh={refresh}
+          />
+        </CardContent>
+      </Card>
+      : loc.ui === "members" ?
+      <Card>
+        <CardHeader title="Members"/>
+        <CardContent>
+          <RenderMembers members={members}/>
+          <MemberActionForms
+            members={members}
+            moderators={moderators}
+            guardians={guardians}
+            ambassadors={ambassadors}
+            tabIdx={memberTabIdx}
+            pactTxStatus={pactTxStatus}
+            refresh={refresh}
+          />
+        </CardContent>
+      </Card>
+      : loc.ui === "modlog" ?
+      <Card>
+        <CardHeader title="Moderation Log"/>
+        <CardContent>
+          <RenderModLog modLog={modLog}/>
+        </CardContent>
+      </Card>
+      : loc.ui === "topics" ?
+      <Card>
+        <CardHeader title="Topics"/>
+        <CardContent>
+          <RenderTopics topics={topics}/>
+          <TopicActionForms
+            members={members}
+            moderators={moderators}
+            topics={topics}
+            tabIdx={topicTabIdx}
+            pactTxStatus={pactTxStatus}
+            refresh={refresh}
+          />
+        </CardContent>
+      </Card>
+      : 
+      <Card>
+        <CardHeader>404 UI not found</CardHeader>
+      </Card>)
+    : 
+    <Card>
+      <CardHeader>404 UI not found</CardHeader>
+    </Card>)}}/>
             </Switch>
           </Container>
           </NavDrawer>
