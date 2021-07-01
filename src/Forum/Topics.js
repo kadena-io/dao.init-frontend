@@ -76,8 +76,8 @@ const ViewTopicButton = ({index}) => {
 export const RenderTopics = (props) => {
   return (
     <PactJsonListAsTable
-      header={["","Author","Headline","Timestamp","Modified","Locked"]}
-      keyOrder={["index","author","headline","timestamp","modified","locked"]}
+      header={["","Headline","Author","Timestamp","Modified","Locked"]}
+      keyOrder={["index","headline","author","timestamp","modified","locked"]}
       kvFunc={{"index": ViewTopicButton}}
       json={props.topics}
     />
