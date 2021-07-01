@@ -109,6 +109,8 @@ export const renderPactValue = (val) => {
   }
 };
 
+export const FlatPaper = ({...rest}) => <Paper elevation={0} {...rest}/>;
+
 const useToplevelTableStyles = makeStyles({
   table: {
     minWidth: 650,
@@ -177,7 +179,7 @@ export const PactSingleJsonAsTable = (props) => {
         {internals()}
       </Table>
     ) : (
-    <TableContainer component={Paper}>
+    <TableContainer component={FlatPaper}>
       <Table className={classes.table} size='small' aria-label="simple table">
         {internals()}
       </Table>
@@ -254,7 +256,7 @@ export const PactJsonListAsTable = (props) => {
         {internals()}
       </Table>
     ) : (
-    <TableContainer component={Paper}>
+    <TableContainer component={FlatPaper}>
       <Table className={classes.table} size='small' aria-label="simple table">
         {internals()}
       </Table>
