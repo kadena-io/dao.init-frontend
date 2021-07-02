@@ -1,4 +1,11 @@
 import React from 'react';
+import { 
+  QueryParamProvider,
+  useQueryParam,
+  StringParam,
+  NumberParam,
+  withDefault
+ } from 'use-query-params';
 import { makeStyles } from '@material-ui/core/styles';
 import {
   AppBar,
@@ -45,9 +52,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const ScrollableTabs = (props) => {
-  const { tabEntries } = props;
+  const { tabEntries, tabIdx } = props;
   const classes = useStyles();
-  const [value, setValue] = props.tabIdx;
+  const [value, setValue] = useQueryParam(tabIdx,withDefault(NumberParam,0));
 
   const handleChange = (event, newValue) => {
     setValue(newValue);

@@ -1,5 +1,14 @@
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
+import qs from 'qs';
+import { 
+  QueryParamProvider,
+  useQueryParams,
+  useQueryParam,
+  StringParam,
+  NumberParam,
+  withDefault
+ } from 'use-query-params';
 import {
   AppBar,
   Collapse,
@@ -74,15 +83,10 @@ const ListItemLink = (props) => {
   const [open, setOpen] = React.useState(true);
   const classes = useStyles();
 
-  const renderLink = React.useMemo(
-    () => React.forwardRef((itemProps, ref) => <RouterLink to={to} ref={ref} {...itemProps} />),
-    [to],
-  );
-
   return (
     <React.Fragment>
       <li>
-        <ListItem button component={renderLink}>
+        <ListItem button onClick={to}>
           {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
           <ListItemText primary={primary} />
           {hasSubList ? (
@@ -131,7 +135,8 @@ export const NavDrawer = (props) => {
                 icon={entry.icon}
                 primary={entry.primary}
                 to={entry.to}
-                subList={entry.subList}/>
+                subList={entry.subList}
+                />
             )}
           </List>
         </React.Fragment>

@@ -7,6 +7,14 @@ import {
   Redirect,
   useHistory,
 } from 'react-router-dom';
+import { 
+  QueryParamProvider,
+  useQueryParams,
+  useQueryParam,
+  StringParam,
+  NumberParam,
+  withDefault
+ } from 'use-query-params';
 import qs from "qs";
 import _ from "lodash";
 import {
@@ -63,33 +71,16 @@ import {
 } from "./Forum/Topic.js";
 
 const App = () => {
-  const theme = React.useMemo(
-      () =>
-        createMuiTheme({
-          palette: {
-            primary: {
-              light: '#cb4584',
-              main: '#960057',
-              dark: '#cb4584',
-              contrastText: '#fff',
-            },
-            secondary: {
-              light: '#ffffff',
-              main: '#e3e8ed',
-              dark: '#b1b6bb',
-              contrastText: '#000',
-            },
-          },
-        }),
-      [],
-    );
-  
+  //Top level UI Routing Params
+  const [appRoute,setAppRoute] = useQueryParams({
+    "app": withDefault(StringParam,"init"),
+    "ui": withDefault(StringParam,"guardians")
+  });
+
   //Init Top Level States
   const [initState, setInitState] = useState( {} );
   const [guardians, setGuardians] = useState( [] );
   const [ambassadors, setAmbassadors] = useState( [] );
-  const ambTabIdx = useState(0);
-  const grdTabIdx = useState(0);
   
   const getInitState = async () => {
     const res = await getContractState("view-state");
@@ -124,12 +115,6 @@ const App = () => {
   const [topics,setTopics] = useState( {} );
   const [comments, setComments] = useState( {} );
    
-  //Forum UI States
-  const mjolnirTabIdx = useState(0);
-  const memberTabIdx = useState(0);
-  const moderatorTabIdx = useState(0);
-  const topicTabIdx = useState(0);
-
   const getForumState = async () => {
     const res = await getForumContractState("view-forum-state");
     setForumState(res);
@@ -176,10 +161,7 @@ const App = () => {
   }, []);
 
   return (
-    <ThemeProvider theme={theme}>
-      <NoSsr>
-        <CssBaseline/>
-        <Router basename={process.env.PUBLIC_URL}>
+    <React.Fragment>
           <NavDrawer
             entriesList={[
                 [{
@@ -187,16 +169,16 @@ const App = () => {
                   subList:  
                     [{
                       primary:"Config",
-                      to:"/?app=init&ui=config"
+                      to:()=>setAppRoute({app:"init", ui: "config"})
                     },{
                       primary:"Init State",
-                      to:"/?app=init&ui=state"
+                      to:()=>setAppRoute({app:"init", ui: "state"})
                     },{
                       primary:"Ambassadors",
-                      to:"/?app=init&ui=ambassadors"
+                      to:()=>setAppRoute({app:"init", ui: "ambassadors"})
                     },{
                       primary:"Guardians",
-                      to:"/?app=init&ui=guardians",
+                      to:()=>setAppRoute({app:"init", ui: "guardians"})
                     }
                   ]
                 },{
@@ -204,31 +186,32 @@ const App = () => {
                   subList:  
                     [{
                       primary:"Config",
-                      to:"/?app=forum&ui=config"
+                      to:()=>setAppRoute({app:"forum", ui: "config"})
                     },{
                       primary:"Forum State",
-                      to:"/?app=forum&ui=state"
+                      to:()=>setAppRoute({app:"forum", ui: "state"})
                     },{
                       primary:"Mod Log",
-                      to:"/?app=forum&ui=modlog"
+                      to:()=>setAppRoute({app:"forum", ui: "modlog"})
                     },{
                       primary:"Mjolnir",
-                      to:"/?app=forum&ui=mjolnir"
+                      to:()=>setAppRoute({app:"forum", ui: "mjolnir"})
                     },{
                       primary:"Moderators",
-                      to:"/?app=forum&ui=moderators"
+                      to:()=>setAppRoute({app:"forum", ui: "moderators"})
                     },{
                       primary:"Members",
-                      to:"/?app=forum&ui=members"
+                      to:()=>setAppRoute({app:"forum", ui: "members"})
                     },{
                       primary:"Topics",
-                      to:"/?app=forum&ui=topics"
+                      to:()=>setAppRoute({app:"forum", ui: "topics"})
                     }
                   ]
                 }]
           ]}>
           <Container>
             <Switch>
+            {/* TODO: clean this up and migrate to using useQueryParams */}
               <Route exact path="/" component={ ({match, location}) => {
                 const loc = qs.parse(location.search, { ignoreQueryPrefix: true });
                 console.log("routing, loc=",loc);
@@ -254,7 +237,7 @@ const App = () => {
           <CardContent>
             <RenderGuardians guardians={guardians}/>
             <ScrollableTabs
-              tabIdx={grdTabIdx}
+              tabIdx="grdTab"
               tabEntries={[
                   {
                     label:"Register Guardian",
@@ -294,7 +277,7 @@ const App = () => {
           <CardContent>
             <RenderAmbassadors ambassadors={ambassadors}/>
             <ScrollableTabs
-              tabIdx={ambTabIdx}
+              tabIdx={"ambTab"}
               tabEntries={[
                 {
                   label:"Register Ambassador",
@@ -367,7 +350,6 @@ const App = () => {
           <MjolnirActionForms 
             members={members}
             moderators={moderators}
-            tabIdx={mjolnirTabIdx}
             pactTxStatus={pactTxStatus}
             refresh={refresh}
           />
@@ -383,7 +365,6 @@ const App = () => {
             moderators={moderators}
             guardians={guardians}
             ambassadors={ambassadors}
-            tabIdx={moderatorTabIdx}
             pactTxStatus={pactTxStatus}
             refresh={refresh}
           />
@@ -399,7 +380,6 @@ const App = () => {
             moderators={moderators}
             guardians={guardians}
             ambassadors={ambassadors}
-            tabIdx={memberTabIdx}
             pactTxStatus={pactTxStatus}
             refresh={refresh}
           />
@@ -421,7 +401,6 @@ const App = () => {
             members={members}
             moderators={moderators}
             topics={topics}
-            tabIdx={topicTabIdx}
             pactTxStatus={pactTxStatus}
             refresh={refresh}
           />
@@ -441,9 +420,7 @@ const App = () => {
             </Switch>
           </Container>
           </NavDrawer>
-        </Router>
-      </NoSsr>
-    </ThemeProvider>
+  </React.Fragment>
   );
 };
 
