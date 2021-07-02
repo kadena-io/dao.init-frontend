@@ -1,37 +1,22 @@
 //basic React api imports
 import React, { useState, useEffect } from "react";
 import {
-  BrowserRouter as Router,
   Switch,
   Route,
   Redirect,
-  useHistory,
 } from 'react-router-dom';
 import { 
-  QueryParamProvider,
   useQueryParams,
-  useQueryParam,
   StringParam,
-  NumberParam,
   withDefault
  } from 'use-query-params';
-import qs from "qs";
 import _ from "lodash";
-import {
-  createMuiTheme,
-  ThemeProvider,
- } from '@material-ui/core/styles';
 //semantic ui for styling
 import {
-  Button,
   Container,
-  Card, CardHeader, CardContent,
-  CssBaseline, NoSsr
-} from '@material-ui/core';
+  Card, CardHeader, CardContent} from '@material-ui/core';
 import { NavDrawer } from "./NavDrawer.js";
 import { ScrollableTabs } from "./ScrollableTabs.js";
-import { BookTwoTone } from "@material-ui/icons";
-import { PactTxStatus } from "./PactTxStatus.js";
 
 //config file for blockchain calls
 import  {
@@ -169,16 +154,16 @@ const App = () => {
                   subList:  
                     [{
                       primary:"Config",
-                      to:()=>setAppRoute({app:"init", ui: "config"})
+                      to:{app:"init", ui: "config"}
                     },{
                       primary:"Init State",
-                      to:()=>setAppRoute({app:"init", ui: "state"})
+                      to:{app:"init", ui: "state"}
                     },{
                       primary:"Ambassadors",
-                      to:()=>setAppRoute({app:"init", ui: "ambassadors"})
+                      to:{app:"init", ui: "ambassadors"}
                     },{
                       primary:"Guardians",
-                      to:()=>setAppRoute({app:"init", ui: "guardians"})
+                      to:{app:"init", ui: "guardians"}
                     }
                   ]
                 },{
@@ -186,52 +171,47 @@ const App = () => {
                   subList:  
                     [{
                       primary:"Config",
-                      to:()=>setAppRoute({app:"forum", ui: "config"})
+                      to:{app:"forum", ui: "config"}
                     },{
                       primary:"Forum State",
-                      to:()=>setAppRoute({app:"forum", ui: "state"})
+                      to:{app:"forum", ui: "state"}
                     },{
                       primary:"Mod Log",
-                      to:()=>setAppRoute({app:"forum", ui: "modlog"})
+                      to:{app:"forum", ui: "modlog"}
                     },{
                       primary:"Mjolnir",
-                      to:()=>setAppRoute({app:"forum", ui: "mjolnir"})
+                      to:{app:"forum", ui: "mjolnir"}
                     },{
                       primary:"Moderators",
-                      to:()=>setAppRoute({app:"forum", ui: "moderators"})
+                      to:{app:"forum", ui: "moderators"}
                     },{
                       primary:"Members",
-                      to:()=>setAppRoute({app:"forum", ui: "members"})
+                      to:{app:"forum", ui: "members"}
                     },{
                       primary:"Topics",
-                      to:()=>setAppRoute({app:"forum", ui: "topics"})
+                      to:{app:"forum", ui: "topics"}
                     }
                   ]
                 }]
           ]}>
           <Container>
             <Switch>
-            {/* TODO: clean this up and migrate to using useQueryParams */}
-              <Route exact path="/" component={ ({match, location}) => {
-                const loc = qs.parse(location.search, { ignoreQueryPrefix: true });
-                console.log("routing, loc=",loc);
-                return ( 
-  loc.app === "init" ?
-      ( loc.ui === "config" ?
+  { appRoute.app === "init" ?
+      ( appRoute.ui === "config" ?
         <Card>
           <CardHeader title="Contract and UI Configuration"/>
           <CardContent>
             <InitConfig/>
           </CardContent>
         </Card>
-      : loc.ui === "state" ?
+      : appRoute.ui === "state" ?
         <Card>
           <CardHeader title="Contract State"/>
           <CardContent>
             <RenderInitState initState={initState}/>
           </CardContent>
         </Card>
-      : loc.ui === "guardians" ?
+      : appRoute.ui === "guardians" ?
         <Card>
           <CardHeader title="Guardians"/>
           <CardContent>
@@ -271,7 +251,7 @@ const App = () => {
               ]}/>
           </CardContent>
         </Card>
-      : loc.ui === "ambassadors" ?
+      : appRoute.ui === "ambassadors" ?
         <Card>
           <CardHeader title="Ambassadors"/>
           <CardContent>
@@ -327,23 +307,23 @@ const App = () => {
               ]}/>
           </CardContent>
         </Card>
-      : <Redirect to="/?app=forum&ui=topics">{console.log(`redirecting, got :${loc}`)}</Redirect> )
-    : loc.app === "forum" ? 
-      ( loc.ui === "config" ? 
+      : <Redirect to="/?app=forum&ui=topics">{console.log(`redirecting, got :${appRoute}`)}</Redirect> )
+    : appRoute.app === "forum" ? 
+      ( appRoute.ui === "config" ? 
         <Card>
           <CardHeader title="Contract and UI Configuration"/>
           <CardContent>
             <ForumConfig/>
           </CardContent>
         </Card>
-      : loc.ui === "state" ?
+      : appRoute.ui === "state" ?
       <Card>
         <CardHeader title="Contract State"/>
         <CardContent>
           <RenderForumState forumState={forumState}/>
         </CardContent>
       </Card>
-      : loc.ui === "mjolnir" ?
+      : appRoute.ui === "mjolnir" ?
       <Card>
         <CardHeader title="Mjolnir Powers"/>
         <CardContent>
@@ -355,7 +335,7 @@ const App = () => {
           />
         </CardContent>
       </Card>
-      : loc.ui === "moderators" ?
+      : appRoute.ui === "moderators" ?
       <Card>
         <CardHeader title="Moderators"/>
         <CardContent>
@@ -370,7 +350,7 @@ const App = () => {
           />
         </CardContent>
       </Card>
-      : loc.ui === "members" ?
+      : appRoute.ui === "members" ?
       <Card>
         <CardHeader title="Members"/>
         <CardContent>
@@ -385,14 +365,14 @@ const App = () => {
           />
         </CardContent>
       </Card>
-      : loc.ui === "modlog" ?
+      : appRoute.ui === "modlog" ?
       <Card>
         <CardHeader title="Moderation Log"/>
         <CardContent>
           <RenderModLog modLog={modLog}/>
         </CardContent>
       </Card>
-      : loc.ui === "topics" ?
+      : appRoute.ui === "topics" ?
       <Card>
         <CardHeader title="Topics"/>
         <CardContent>
@@ -406,17 +386,13 @@ const App = () => {
           />
         </CardContent>
       </Card>
-      : loc.ui === "topic" && _.has(loc, 'topicId') ?
+      : appRoute.ui === "topic" ?
       <RenderTopic 
         topics={topics}
-        topicId={loc.topicId}
       />
-      : <Redirect to="/?app=forum&ui=topics">{console.log(`redirecting, got :${loc}`,loc)}</Redirect> )
-    : <Redirect to="/?app=forum&ui=topics">{console.log(`redirecting, got :${loc}`,loc)}</Redirect> 
-    )}}/>
-    <Route path="/">
-      <Redirect to="/?app=forum&ui=topics"/>
-    </Route>
+      : <Redirect to="/?app=forum&ui=topics">{console.log(`redirecting, got :${appRoute}`,appRoute)}</Redirect> )
+    : <Redirect to="/?app=forum&ui=topics">{console.log(`redirecting, got :${appRoute}`,appRoute)}</Redirect> 
+  }
             </Switch>
           </Container>
           </NavDrawer>

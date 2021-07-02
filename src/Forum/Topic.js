@@ -1,64 +1,34 @@
 //basic React api imports
-import React, { useState } from "react";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Redirect,
-  useHistory,
-} from 'react-router-dom'
+import React from "react";
+import { 
+  useQueryParams,
+  StringParam } from 'use-query-params';
 //make JS less terrible
 import _ from "lodash";
 //Material Stuff
 import {
-  Button,
   ButtonGroup,
-  CardActions,
   Card,
   CardHeader,
   CardContent,
-  Checkbox,
-  ClickAwayListener,
   Grid,
-  Grow,
-  LinearProgress,
   IconButton,
-  MenuItem,
-  MenuList,
-  Paper,
-  Popper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-  Typography,
 } from '@material-ui/core';
 import RemoveCircleOutlineIcon from '@material-ui/icons/RemoveCircleOutline';
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 import LockIcon from '@material-ui/icons/Lock';
-import LockOpenIcon from '@material-ui/icons/LockOpen';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import {
   makeStyles,
 } from '@material-ui/styles';
 //pact-lang-api for blockchain calls
-import Pact from "pact-lang-api";
 //config file for blockchain calls
-import { daoAPI, forumAPI } from "../kadena-config.js";
 import {
-  PactJsonListAsTable,
   PactSingleJsonAsTable,
-  MakeForm,
   dashStyleNames2Text,
-  updateParams,
  } from "../util.js";
-import { sendMemberCmd } from "./Members.js";
-import { ScrollableTabs } from "../ScrollableTabs.js";
 import { RenderMD } from "../Markdown.js";
 
 const useStyles = makeStyles(() => ({
@@ -72,8 +42,12 @@ const useStyles = makeStyles(() => ({
 }));
 
 export const RenderTopic = (props) => {
-  const {topicId,topics} = props;
-  const topic = _.find(topics,t=>t.index === topicId);
+  const {topics} = props;
+  const [appRoute,setAppRoute] = useQueryParams({
+    "topicId": StringParam
+  });
+  const topic = _.find(topics,t=>t.index === appRoute.topicId);
+  console.log("renderTopic",appRoute.topicId,topic,topics);
   return (
     _.has(topic, 'body') ?
     <Card>
@@ -100,7 +74,12 @@ export const RenderTopic = (props) => {
 )};
 
 export const TopicButtons = (props) => {
-  const history = useHistory();
+   const [appRoute,setAppRoute] = useQueryParams({
+    "ui": StringParam,
+    "forumTab":StringParam,
+    "modTab":StringParam,
+    "author":StringParam,
+  });
   return (
     <ButtonGroup
     disableElevation
@@ -117,15 +96,15 @@ export const TopicButtons = (props) => {
         label="Member Actions"
       >
         <IconButton size="small"
-          onClick={()=> updateParams({ui:"topics",forumTab:"upVote"},history)}>
+          onClick={()=> setAppRoute({ui:"topics",forumTab:"upVote"})}>
           <ThumbUpIcon/>
         </IconButton>
         <IconButton size="small"
-          onClick={()=> updateParams({ui:"topics",forumTab:"removeVote"},history)}>
+          onClick={()=> setAppRoute({ui:"topics",forumTab:"removeVote"})}>
           <RemoveCircleOutlineIcon/>
         </IconButton>
         <IconButton size="small"
-          onClick={()=> updateParams({ui:"topics",forumTab:"downVote"},history)}>
+          onClick={()=> setAppRoute({ui:"topics",forumTab:"downVote"})}>
           <ThumbDownIcon/>
         </IconButton>
       </ButtonGroup>
@@ -136,16 +115,16 @@ export const TopicButtons = (props) => {
         variant="contained"
       >
         <IconButton size="small"
-          onClick={()=> updateParams({ui:"moderators",modTab:"lock"},history)}>
+          onClick={()=> setAppRoute({ui:"moderators",modTab:"lock"})}>
           {/* TODO: make this icon change based on chain state */}
           <LockIcon/>
         </IconButton>
         <IconButton size="small"
-          onClick={()=> updateParams({ui:"moderators",modTab:"delete"},history)}>
+          onClick={()=> setAppRoute({ui:"moderators",modTab:"delete"})}>
           <DeleteIcon/>
         </IconButton>
         <IconButton size="small"
-          onClick={()=> updateParams({ui:"members",modTab:"edit",author:props.topic.author},history)}>
+          onClick={()=> setAppRoute({ui:"members",modTab:"edit",author:props.topic.author})}>
           <EditIcon/>
         </IconButton>
       </ButtonGroup>

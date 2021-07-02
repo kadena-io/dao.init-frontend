@@ -1,12 +1,7 @@
 import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import qs from 'qs';
 import { 
-  QueryParamProvider,
   useQueryParams,
-  useQueryParam,
   StringParam,
-  NumberParam,
   withDefault
  } from 'use-query-params';
 import {
@@ -21,19 +16,13 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  ListSubheader,
   Toolbar,
-  Typography,
 } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
-import DraftsIcon from '@material-ui/icons/Drafts';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MenuIcon from '@material-ui/icons/Menu';
-import SendIcon from '@material-ui/icons/Send';
-import StarBorder from '@material-ui/icons/StarBorder';
 
 import logo from "./kadena_r_rev_3_whi_lor.png";
 
@@ -82,11 +71,17 @@ const ListItemLink = (props) => {
   const hasSubList = subList && Array.isArray(subList) ;
   const [open, setOpen] = React.useState(true);
   const classes = useStyles();
+  //Top level UI Routing Params
+  const [,setAppRoute] = useQueryParams({
+    "app": withDefault(StringParam,"init"),
+    "ui": withDefault(StringParam,"guardians")
+  });
+
 
   return (
     <React.Fragment>
       <li>
-        <ListItem button onClick={to}>
+        <ListItem button onClick={()=>setAppRoute(to)}>
           {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
           <ListItemText primary={primary} />
           {hasSubList ? (
@@ -148,7 +143,6 @@ export const NavDrawer = (props) => {
 
   return (
     <div className={classes.root}>
-      <CssBaseline />
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
           <IconButton

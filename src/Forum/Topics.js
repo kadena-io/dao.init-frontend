@@ -7,6 +7,12 @@ import {
   Redirect,
   useHistory,
 } from 'react-router-dom';
+import { 
+  useQueryParams,
+  StringParam,
+  withDefault,
+  NumberParam
+ } from 'use-query-params';
 //make JS less terrible
 import _ from "lowdash";
 //Material Stuff
@@ -64,11 +70,16 @@ const useStyles = makeStyles(() => ({
 }));
 
 const ViewTopicButton = ({index}) => {
-  const history = useHistory();
+  //Top level UI Routing Params
+  const [_,setAppRoute] = useQueryParams({
+    "app": withDefault(StringParam,"forum"),
+    "ui": withDefault(StringParam,"topic"),
+    "topicId": NumberParam,
+  });
   return <Button 
     variant="outlined" 
     color="default" 
-    onClick={()=> updateParams({app:"forum",ui:"topic","topicId":index},history)}>
+    onClick={()=> setAppRoute({app:"forum",ui:"topic",topicId:index})}>
     View
   </Button>
 }
@@ -113,11 +124,13 @@ const PostTopic = (props) => {
       label:'Author',
       className:classes.formControl,
       onChange:setAuthor,
+      value:author,
       options:moderators.map(g=>g.name).concat(members.map(m=>m.name)),
     },{
       type:'textFieldSingle',
       label:'Headline',
       className:classes.formControl,
+      value:headline,
       onChange:setHeadline,
     },{
       type:'markdown',

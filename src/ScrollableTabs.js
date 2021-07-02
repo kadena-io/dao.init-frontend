@@ -1,8 +1,6 @@
 import React from 'react';
 import { 
-  QueryParamProvider,
   useQueryParam,
-  StringParam,
   NumberParam,
   withDefault
  } from 'use-query-params';

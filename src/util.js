@@ -1,5 +1,5 @@
 // For util functions
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useMemo} from "react";
 //make JS less terrible
 import _ from "lodash";
 import qs from "qs";
@@ -14,6 +14,7 @@ import {
   TableRow,
   Paper,
   Checkbox,
+  FormControl,
 } from '@material-ui/core';
 import {
   Button,
@@ -26,13 +27,6 @@ import {
 //config file for blockchain calls
 import { PactTxStatus } from "./PactTxStatus.js";
 import { MDEditor } from "./Markdown";
-
-export const updateParams = (newParams, history) => {
-  const curSearch = qs.parse(history.location.search, { ignoreQueryPrefix: true });
-  const merged = _.merge(curSearch,newParams);
-  console.log(`updateParams: /?${qs.stringify(merged)}`);
-  history.push(`/?${qs.stringify(merged)}`);
-};
 
 export const useInputStyles = makeStyles((theme) => ({
   root: {
@@ -51,6 +45,13 @@ export const useInputStyles = makeStyles((theme) => ({
   },
   textField: {
     width: '25ch',
+  },
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2),
   },
 }));
 
@@ -275,7 +276,7 @@ const MakeInputField = (props) => {
     value,
   } = props.inputField;
 
-  return ( type === 'select'
+  const field = ( type === 'select'
     ? <TextField
         id="outlined-multiline-static"
         select
@@ -284,6 +285,7 @@ const MakeInputField = (props) => {
         className={className}
         variant="outlined"
         label={label}
+        value={value}
         onChange={e => {
           // console.log(`Selected ${e.target.value}`,e); 
           onChange(e.target.value)}
@@ -331,7 +333,9 @@ const MakeInputField = (props) => {
           value={value}
           onChange={onChange}/>
     : null
-  )
+  );
+
+  return field;
 
 };
 
