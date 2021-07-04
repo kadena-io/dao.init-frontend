@@ -149,7 +149,7 @@ const PostTopic = (props) => {
   );
 };
 
-export const TopicActionForms = (props) => {
+export const TopicsActionForms = (props) => {
   const {
     members,
     moderators,

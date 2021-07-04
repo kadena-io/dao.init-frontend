@@ -49,7 +49,7 @@ import {
 import { RenderModLog } from "./Forum/ModLog.js";
 import {
   RenderTopics,
-  TopicActionForms,
+  TopicsActionForms,
 } from "./Forum/Topics.js";
 import {
   RenderTopic,
@@ -377,7 +377,7 @@ const App = () => {
         <CardHeader title="Topics"/>
         <CardContent>
           <RenderTopics topics={topics}/>
-          <TopicActionForms
+          <TopicsActionForms
             members={members}
             moderators={moderators}
             topics={topics}
