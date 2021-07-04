@@ -58,8 +58,8 @@ import {
 const App = () => {
   //Top level UI Routing Params
   const [appRoute,setAppRoute] = useQueryParams({
-    "app": withDefault(StringParam,"init"),
-    "ui": withDefault(StringParam,"guardians")
+    "app": withDefault(StringParam,"forum"),
+    "ui": withDefault(StringParam,"topics")
   });
 
   //Init Top Level States
@@ -328,6 +328,7 @@ const App = () => {
         <CardHeader title="Mjolnir Powers"/>
         <CardContent>
           <MjolnirActionForms 
+            tabIdx="mjolnirTab"
             members={members}
             moderators={moderators}
             pactTxStatus={pactTxStatus}
@@ -341,6 +342,7 @@ const App = () => {
         <CardContent>
           <RenderModerators moderators={moderators}/>
           <ModeratorActionForms
+            tabIdx="modTab"
             members={members}
             moderators={moderators}
             guardians={guardians}
@@ -356,6 +358,7 @@ const App = () => {
         <CardContent>
           <RenderMembers members={members}/>
           <MemberActionForms
+            tabIdx="memTab"
             members={members}
             moderators={moderators}
             guardians={guardians}
@@ -378,6 +381,7 @@ const App = () => {
         <CardContent>
           <RenderTopics topics={topics}/>
           <TopicsActionForms
+            tabIdx="memTab"
             members={members}
             moderators={moderators}
             topics={topics}
@@ -390,9 +394,19 @@ const App = () => {
       <RenderTopic 
         topics={topics}
       />
-      : <Redirect to="/?app=forum&ui=topics">{console.log(`redirecting, got :${appRoute}`,appRoute)}</Redirect> )
-    : <Redirect to="/?app=forum&ui=topics">{console.log(`redirecting, got :${appRoute}`,appRoute)}</Redirect> 
-  }
+      : <React.Fragment>
+        {() => {
+          console.log("Redirecting, this didn't match:", appRoute);
+          setAppRoute({app:"forum",ui:"topics"})}
+        }
+      </React.Fragment> )
+    : <React.Fragment>
+        {() => {
+          console.log("Redirecting, this didn't match:", appRoute);
+          setAppRoute({app:"forum",ui:"topics"})}
+        }
+      </React.Fragment>
+    }
             </Switch>
           </Container>
           </NavDrawer>

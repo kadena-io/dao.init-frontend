@@ -78,6 +78,7 @@ export const TopicButtons = (props) => {
     "ui": StringParam,
     "forumTab":StringParam,
     "modTab":StringParam,
+    "memTab":StringParam,
     "author":StringParam,
   });
   return (
@@ -96,15 +97,15 @@ export const TopicButtons = (props) => {
         label="Member Actions"
       >
         <IconButton size="small"
-          onClick={()=> setAppRoute({ui:"topics",forumTab:"upVote"})}>
+          onClick={()=> setAppRoute({ui:"topics",forumTab:"0"})}>
           <ThumbUpIcon/>
         </IconButton>
         <IconButton size="small"
-          onClick={()=> setAppRoute({ui:"topics",forumTab:"removeVote"})}>
+          onClick={()=> setAppRoute({ui:"topics",forumTab:"1"})}>
           <RemoveCircleOutlineIcon/>
         </IconButton>
         <IconButton size="small"
-          onClick={()=> setAppRoute({ui:"topics",forumTab:"downVote"})}>
+          onClick={()=> setAppRoute({ui:"topics",forumTab:"2"})}>
           <ThumbDownIcon/>
         </IconButton>
       </ButtonGroup>
@@ -115,16 +116,16 @@ export const TopicButtons = (props) => {
         variant="contained"
       >
         <IconButton size="small"
-          onClick={()=> setAppRoute({ui:"moderators",modTab:"lock"})}>
+          onClick={()=> setAppRoute({ui:"moderators",modTab:"1"})}>
           {/* TODO: make this icon change based on chain state */}
           <LockIcon/>
         </IconButton>
         <IconButton size="small"
-          onClick={()=> setAppRoute({ui:"moderators",modTab:"delete"})}>
+          onClick={()=> setAppRoute({ui:"moderators",modTab:"2"})}>
           <DeleteIcon/>
         </IconButton>
         <IconButton size="small"
-          onClick={()=> setAppRoute({ui:"members",modTab:"edit",author:props.topic.author})}>
+          onClick={()=> setAppRoute({ui:"members",memTab:"2",author:props.topic.author})}>
           <EditIcon/>
         </IconButton>
       </ButtonGroup>

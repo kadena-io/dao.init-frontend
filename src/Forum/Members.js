@@ -246,6 +246,205 @@ const BecomeMember = (props) => {
   );
 };
 
+const DisableMember = (props) => {
+  const {refresh, moderators, members} = props;
+  const [mod, setMod] = useState( "" );
+  const [member, setMember] = useState( "" );
+  const {txStatus, setTxStatus,
+    tx, setTx,
+    txRes, setTxRes} = props.pactTxStatus;
+  const classes = useStyles();
+
+  const handleSubmit = (evt) => {
+      evt.preventDefault();
+      try {
+        sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,mod
+          ,`(${forumAPI.contractAddress}.disable-member "${mod}" "${member}")`
+          ,{}
+          ,"moderator" 
+        );
+      } catch (e) {
+        console.log("disable-member Submit Error",typeof e, e, mod, member);
+        setTxRes(e);
+        setTxStatus("validation-error");
+      }
+      };
+  const inputFields = [
+    {
+      type:'select',
+      label:'Select your Moderator Account',
+      className:classes.formControl,
+      onChange:setMod,
+      options:moderators.map((m)=>m['name']),
+    },{
+      type:'select',
+      label:'Select Member Account',
+      className:classes.formControl,
+      onChange:setMember,
+      options:members.map((m)=>m['name']),
+    }
+  ];
+
+  return (
+    <MakeForm
+      inputFields={inputFields}
+      onSubmit={handleSubmit}
+      tx={tx} txStatus={txStatus} txRes={txRes}
+      setTxStatus={setTxStatus}/>
+  );
+};
+
+
+const EnableMember = (props) => {
+  const {refresh, moderators, members} = props;
+  const [mod, setMod] = useState( "" );
+  const [member, setMember] = useState( "" );
+  const {txStatus, setTxStatus,
+    tx, setTx,
+    txRes, setTxRes} = props.pactTxStatus;
+  const classes = useStyles();
+
+  const handleSubmit = (evt) => {
+      evt.preventDefault();
+      try {
+        sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,mod
+          ,`(${forumAPI.contractAddress}.enable-member "${mod}" "${member}")`
+          ,{}
+          ,"moderator" 
+        );
+      } catch (e) {
+        console.log("enable-member Submit Error",typeof e, e, mod, member);
+        setTxRes(e);
+        setTxStatus("validation-error");
+      }
+      };
+  const inputFields = [
+    {
+      type:'select',
+      label:'Select your Moderator Account',
+      className:classes.formControl,
+      onChange:setMod,
+      options:moderators.map((m)=>m['name']),
+    },{
+      type:'select',
+      label:'Select Member Account',
+      className:classes.formControl,
+      onChange:setMember,
+      options:members.map((m)=>m['name']),
+    }
+  ];
+
+  return (
+    <MakeForm
+      inputFields={inputFields}
+      onSubmit={handleSubmit}
+      tx={tx} txStatus={txStatus} txRes={txRes}
+      setTxStatus={setTxStatus}/>
+  );
+};
+
+const RotateModerator = (props) => {
+  const {refresh, moderators} = props;
+  const [mod, setMod] = useState( "" );
+  const [newKs, setNewKs] = useState( {} );
+  const {txStatus, setTxStatus,
+    tx, setTx,
+    txRes, setTxRes} = props.pactTxStatus;
+  const classes = useStyles();
+
+  const handleSubmit = (evt) => {
+      evt.preventDefault();
+      try {
+        sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,mod
+          ,`(${forumAPI.contractAddress}.rotate-moderator "${mod}" (read-keyset 'ks))`
+          ,{ks: JSON.parse(newKs)}
+          ,"moderator" 
+        );
+      } catch (e) {
+        console.log("rotate-moderator Submit Error",typeof e, e, mod, newKs);
+        setTxRes(e);
+        setTxStatus("validation-error");
+      }
+      };
+  const inputFields = [
+    {
+      type:'select',
+      label:'Select your Moderator Account',
+      className:classes.formControl,
+      onChange:setMod,
+      options:moderators.map((m)=>m['name']),
+    },{
+      type:'textFieldMulti',
+      label:'New Keyset',
+      className:classes.formControl,
+      placeholder:JSON.stringify({"pred":"keys-all","keys":["8c59a322800b3650f9fc5b6742aa845bc1c35c2625dabfe5a9e9a4cada32c543"]},undefined,2),
+      value:newKs,
+      onChange:setNewKs,
+    }
+  ];
+
+  return (
+    <MakeForm
+      inputFields={inputFields}
+      onSubmit={handleSubmit}
+      tx={tx} txStatus={txStatus} txRes={txRes}
+      setTxStatus={setTxStatus}/>
+  );
+};
+
+const RotateMember = (props) => {
+  const {refresh, members} = props;
+  const [member, setMember] = useState( "" );
+  const [newKs, setNewKs] = useState( {} );
+  const {txStatus, setTxStatus,
+    tx, setTx,
+    txRes, setTxRes} = props.pactTxStatus;
+  const classes = useStyles();
+
+  const handleSubmit = (evt) => {
+      evt.preventDefault();
+      try {
+        sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,member
+          ,`(${forumAPI.contractAddress}.rotate-member "${member}" (read-keyset 'ks))`
+          ,{ks: JSON.parse(newKs)}
+          ,"member" 
+        );
+      } catch (e) {
+        console.log("rotate-member Submit Error",typeof e, e, member, newKs);
+        setTxRes(e);
+        setTxStatus("validation-error");
+      }
+      };
+  const inputFields = [
+    {
+      type:'select',
+      label:'Select your Member Account',
+      className:classes.formControl,
+      onChange:setMember,
+      options:members.map((m)=>m['name']),
+    },{
+      type:'textFieldMulti',
+      label:'New Keyset',
+      className:classes.formControl,
+      placeholder:JSON.stringify({"pred":"keys-all","keys":["8c59a322800b3650f9fc5b6742aa845bc1c35c2625dabfe5a9e9a4cada32c543"]},undefined,2),
+      value:newKs,
+      onChange:setNewKs,
+    }
+  ];
+
+  return (
+    <MakeForm
+      inputFields={inputFields}
+      onSubmit={handleSubmit}
+      tx={tx} txStatus={txStatus} txRes={txRes}
+      setTxStatus={setTxStatus}/>
+  );
+};
+
 export const ModeratorActionForms = (props) => {
   const {
     members,
@@ -268,6 +467,29 @@ export const ModeratorActionForms = (props) => {
             component:
               <BecomeModerator
                 guardians={guardians}
+                pactTxStatus={pactTxStatus}
+                refresh={()=>getMembers()}/>
+          },{
+            label:"Rotate Moderator",
+            component:
+              <RotateModerator
+                moderators={moderators}
+                pactTxStatus={pactTxStatus}
+                refresh={()=>getMembers()}/>
+          },{
+            label:"Enable Member",
+            component:
+              <EnableMember
+                members={members}
+                moderators={moderators}
+                pactTxStatus={pactTxStatus}
+                refresh={()=>getMembers()}/>
+          },{
+            label:"Disable Member",
+            component:
+              <DisableMember
+                members={members}
+                moderators={moderators}
                 pactTxStatus={pactTxStatus}
                 refresh={()=>getMembers()}/>
           }
@@ -298,6 +520,13 @@ export const MemberActionForms = (props) => {
             component:
               <BecomeMember
                 ambassadors={ambassadors}
+                pactTxStatus={pactTxStatus}
+                refresh={()=>getMembers()}/>
+          },{
+            label:"Rotate Member",
+            component:
+              <RotateMember
+                members={members}
                 pactTxStatus={pactTxStatus}
                 refresh={()=>getMembers()}/>
           }

@@ -4,6 +4,7 @@ import {
   NumberParam,
   withDefault
  } from 'use-query-params';
+import _ from "lodash";
 import { makeStyles } from '@material-ui/core/styles';
 import {
   AppBar,
@@ -53,6 +54,8 @@ export const ScrollableTabs = (props) => {
   const { tabEntries, tabIdx } = props;
   const classes = useStyles();
   const [value, setValue] = useQueryParam(tabIdx,withDefault(NumberParam,0));
+  
+  if (value >= _.size(tabEntries)) {setValue(0)}
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
