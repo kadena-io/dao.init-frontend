@@ -141,20 +141,23 @@ const App = () => {
                   primary:"dao.forum",
                   subList:  
                     [{
-                      primary:"Config",
-                      to:{app:"forum", ui: "config"}
-                    },{
-                      primary:"Forum State",
-                      to:{app:"forum", ui: "state"}
-                    },{
-                      primary:"Mod Log",
-                      to:{app:"forum", ui: "modlog"}
-                    },{
-                      primary:"Mjolnir",
-                      to:{app:"forum", ui: "mjolnir"}
-                    },{
-                      primary:"Moderators",
-                      to:{app:"forum", ui: "moderators"}
+                      primary:"Admin",
+                      subList:[{
+                        primary:"Config",
+                        to:{app:"forum", ui: "config"}
+                      },{
+                        primary:"Forum State",
+                        to:{app:"forum", ui: "state"}
+                      },{
+                        primary:"Mod Log",
+                        to:{app:"forum", ui: "modlog"}
+                      },{
+                        primary:"Mjolnir",
+                        to:{app:"forum", ui: "mjolnir"}
+                      },{
+                        primary:"Moderators",
+                        to:{app:"forum", ui: "moderators"}
+                      }]
                     },{
                       primary:"Members",
                       to:{app:"forum", ui: "members"}

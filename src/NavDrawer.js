@@ -81,7 +81,7 @@ const ListItemLink = (props) => {
   return (
     <React.Fragment>
       <li>
-        <ListItem button onClick={()=>setAppRoute(to)}>
+        <ListItem button onClick={()=> {return (to ? setAppRoute(to) : setOpen(!open))}}>
           {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
           <ListItemText primary={primary} />
           {hasSubList ? (

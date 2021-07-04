@@ -27,13 +27,16 @@ import { RenderInitState } from "./InitState.js";
 
 export const initDrawerEntries = {
   primary:"dao.init",
-  subList:  
+  subList:
     [{
-      primary:"Config",
-      to:{app:"init", ui: "config"}
-    },{
-      primary:"Init State",
-      to:{app:"init", ui: "state"}
+      primary:"Config & State",
+      subList:[{
+        primary:"Config",
+        to:{app:"init", ui: "config"}
+      },{
+        primary:"Init State",
+        to:{app:"init", ui: "state"}
+      }]
     },{
       primary:"Ambassadors",
       to:{app:"init", ui: "ambassadors"}
