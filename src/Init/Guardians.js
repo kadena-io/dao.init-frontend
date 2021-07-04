@@ -7,11 +7,11 @@ import {
 //pact-lang-api for blockchain calls
 import Pact from "pact-lang-api";
 //config file for blockchain calls
-import { daoAPI } from "./kadena-config.js";
+import { daoAPI } from "../kadena-config.js";
 import {
   PactJsonListAsTable,
   MakeForm,
- } from "./util.js";
+ } from "../util.js";
 
 const useStyles = makeStyles(() => ({
   formControl: {

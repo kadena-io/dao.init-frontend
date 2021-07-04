@@ -2,8 +2,6 @@
 import React, { useState, useEffect } from "react";
 import {
   Switch,
-  Route,
-  Redirect,
 } from 'react-router-dom';
 import { 
   useQueryParams,
@@ -16,27 +14,12 @@ import {
   Container,
   Card, CardHeader, CardContent} from '@material-ui/core';
 import { NavDrawer } from "./NavDrawer.js";
-import { ScrollableTabs } from "./ScrollableTabs.js";
 
-//config file for blockchain calls
-import  {
-  RegisterGuardian,
-  RenderGuardians,
-  RegisterAmbassador,
-  DeactivateAmbassador,
-  ReactivateAmbassador,
-  RotateGuardian,
-  ProposeDaoUpgrade,
-  GuardianApproveHash,
-} from "./Guardians.js";
 import {
-  RenderAmbassadors,
-  RotateAmbassador,
-  VoteToFreeze,
-  Freeze,
-} from "./Ambassadors.js";
-import { InitConfig } from "./InitConfig.js"
-import { RenderInitState, getContractState } from "./InitState.js";
+  initDrawerEntries,
+  InitApp
+} from "./Init/Init.js";
+import { getContractState } from "./Init/InitState.js";
 
 import { ForumConfig, RenderForumState, getForumContractState } from "./Forum/ForumConfig.js";
 import { MjolnirActionForms } from "./Forum/Mjolnir.js";
@@ -127,10 +110,14 @@ const App = () => {
   };
 
   const refresh = {
+    getInitState: getInitState,
+    getGuardians: getGuardians,
+    getAmbassadors: getAmbassadors,
     getForumState: getForumState,
     getMembers: getMembers,
     getTopics: getTopics,
     getComments: getComments,
+    getModLog: getModLog,
   };
 
   useEffect(() => {
@@ -149,24 +136,8 @@ const App = () => {
     <React.Fragment>
           <NavDrawer
             entriesList={[
-                [{
-                  primary:"dao.init",
-                  subList:  
-                    [{
-                      primary:"Config",
-                      to:{app:"init", ui: "config"}
-                    },{
-                      primary:"Init State",
-                      to:{app:"init", ui: "state"}
-                    },{
-                      primary:"Ambassadors",
-                      to:{app:"init", ui: "ambassadors"}
-                    },{
-                      primary:"Guardians",
-                      to:{app:"init", ui: "guardians"}
-                    }
-                  ]
-                },{
+                [ initDrawerEntries
+                ,{
                   primary:"dao.forum",
                   subList:  
                     [{
@@ -197,117 +168,15 @@ const App = () => {
           <Container>
             <Switch>
   { appRoute.app === "init" ?
-      ( appRoute.ui === "config" ?
-        <Card>
-          <CardHeader title="Contract and UI Configuration"/>
-          <CardContent>
-            <InitConfig/>
-          </CardContent>
-        </Card>
-      : appRoute.ui === "state" ?
-        <Card>
-          <CardHeader title="Contract State"/>
-          <CardContent>
-            <RenderInitState initState={initState}/>
-          </CardContent>
-        </Card>
-      : appRoute.ui === "guardians" ?
-        <Card>
-          <CardHeader title="Guardians"/>
-          <CardContent>
-            <RenderGuardians guardians={guardians}/>
-            <ScrollableTabs
-              tabIdx="grdTab"
-              tabEntries={[
-                  {
-                    label:"Register Guardian",
-                    component:
-                      <RegisterGuardian
-                        pactTxStatus={pactTxStatus}
-                        refresh={() => getGuardians()}/>
-                  },{
-                    label:"Rotate Guardian",
-                    component:
-                      <RotateGuardian
-                        guardians={guardians}
-                        ambassadors={ambassadors}
-                        pactTxStatus={pactTxStatus}
-                        refresh={() => getAmbassadors()}/>
-                  },{
-                    label:"Propose DAO Upgrade",
-                    component:
-                      <ProposeDaoUpgrade
-                        guardians={guardians}
-                        pactTxStatus={pactTxStatus}
-                        refresh={() => getAmbassadors()}/>
-                  },{
-                    label:"Approve DAO Upgrade",
-                    component:
-                      <GuardianApproveHash
-                        guardians={guardians}
-                        pactTxStatus={pactTxStatus}
-                        refresh={() => getAmbassadors()}/>
-                  }
-              ]}/>
-          </CardContent>
-        </Card>
-      : appRoute.ui === "ambassadors" ?
-        <Card>
-          <CardHeader title="Ambassadors"/>
-          <CardContent>
-            <RenderAmbassadors ambassadors={ambassadors}/>
-            <ScrollableTabs
-              tabIdx={"ambTab"}
-              tabEntries={[
-                {
-                  label:"Register Ambassador",
-                  component:
-                    <RegisterAmbassador
-                      guardians={guardians}
-                      pactTxStatus={pactTxStatus}
-                      refresh={() => getAmbassadors()}/>
-                },{
-                  label:"Deactivate Ambassador",
-                  component:
-                    <DeactivateAmbassador
-                      guardians={guardians}
-                      ambassadors={ambassadors}
-                      pactTxStatus={pactTxStatus}
-                      refresh={() => getAmbassadors()}/>
-                },{
-                  label:"Reactivate Ambassador",
-                  component:
-                    <ReactivateAmbassador
-                      guardians={guardians}
-                      ambassadors={ambassadors}
-                      pactTxStatus={pactTxStatus}
-                      refresh={() => getAmbassadors()}/>
-                },{
-                  label:"Rotate Ambassador",
-                  component:
-                    <RotateAmbassador
-                      ambassadors={ambassadors}
-                      pactTxStatus={pactTxStatus}
-                      refresh={() => getAmbassadors()}/>
-                },{
-                  label:"Vote to Freeze",
-                  component:
-                    <VoteToFreeze
-                      ambassadors={ambassadors}
-                      pactTxStatus={pactTxStatus}
-                      refresh={() => getAmbassadors()}/>
-                },{
-                  label:"Freeze",
-                  component:
-                    <Freeze
-                      ambassadors={ambassadors}
-                      pactTxStatus={pactTxStatus}
-                      refresh={() => getAmbassadors()}/>
-                }
-              ]}/>
-          </CardContent>
-        </Card>
-      : <Redirect to="/?app=forum&ui=topics">{console.log(`redirecting, got :${appRoute}`)}</Redirect> )
+    <InitApp 
+      appRoute={appRoute}
+      setAppRoute={setAppRoute}
+      initState={initState}
+      guardians={guardians}
+      ambassadors={ambassadors}
+      pactTxStatus={pactTxStatus}
+      refresh={refresh}
+      />
     : appRoute.app === "forum" ? 
       ( appRoute.ui === "config" ? 
         <Card>
