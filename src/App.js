@@ -8,7 +8,8 @@ import {
   StringParam,
   withDefault
  } from 'use-query-params';
-import _ from "lodash";
+import createPersistedState from 'use-persisted-state';
+import _ from 'lodash';
 //semantic ui for styling
 import {
   Container,
@@ -35,6 +36,10 @@ import {
   TopicsActionForms,
 } from "./Forum/Topics.js";
 import {
+  RenderComments,
+  CommentsActionForms,
+} from "./Forum/Comments.js";
+import {
   RenderTopic,
 } from "./Forum/Topic.js";
 
@@ -46,9 +51,9 @@ const App = () => {
   });
 
   //Init Top Level States
-  const [initState, setInitState] = useState( {} );
-  const [guardians, setGuardians] = useState( [] );
-  const [ambassadors, setAmbassadors] = useState( [] );
+  const [initState, setInitState] = createPersistedState("initState")({});
+  const [guardians, setGuardians] = createPersistedState("guardians")([]);
+  const [ambassadors, setAmbassadors] = createPersistedState("ambassadors")([]);
   
   const getInitState = async () => {
     const res = await getContractState("view-state");
@@ -67,8 +72,8 @@ const App = () => {
 
   // Tx Status Top Level State
   const [txStatus, setTxStatus] = useState("");
-  const [tx, setTx] = useState( {} );
-  const [txRes, setTxRes] = useState( {} );
+  const [tx, setTx] = useState({});
+  const [txRes, setTxRes] = useState({});
   const pactTxStatus = {
     tx:tx,setTx:setTx,
     txStatus:txStatus,setTxStatus:setTxStatus,
@@ -76,12 +81,12 @@ const App = () => {
   };
 
   //Forum Top Level States
-  const [forumState, setForumState] = useState( {} );
-  const [members, setMembers] = useState([]);
-  const [moderators, setModerators] = useState([]);
-  const [modLog, setModLog] = useState( [] );
-  const [topics,setTopics] = useState( {} );
-  const [comments, setComments] = useState( {} );
+  const [forumState, setForumState] = createPersistedState("forumState")({});
+  const [members, setMembers] = createPersistedState("members")([]);
+  const [moderators, setModerators] = createPersistedState("moderators")([]);
+  const [modLog, setModLog] = createPersistedState("modLog")([]);
+  const [topics,setTopics] = createPersistedState("topics")([]);
+  const [comments, setComments] = createPersistedState("comments")([]);
    
   const getForumState = async () => {
     const res = await getForumContractState("view-forum-state");
@@ -119,6 +124,8 @@ const App = () => {
     getComments: getComments,
     getModLog: getModLog,
   };
+
+  const refreshAll = async () => _.forIn(refresh,(k,v) => v());
 
   useEffect(() => {
     getGuardians();
@@ -164,6 +171,9 @@ const App = () => {
                     },{
                       primary:"Topics",
                       to:{app:"forum", ui: "topics"}
+                    },{
+                      primary:"Comments",
+                      to:{app:"forum", ui: "comments"}
                     }
                   ]
                 }]
@@ -217,6 +227,8 @@ const App = () => {
             tabIdx="modTab"
             members={members}
             moderators={moderators}
+            topics={topics}
+            comments={comments}
             guardians={guardians}
             ambassadors={ambassadors}
             pactTxStatus={pactTxStatus}
@@ -233,6 +245,8 @@ const App = () => {
             tabIdx="memTab"
             members={members}
             moderators={moderators}
+            topics={topics}
+            comments={comments}
             guardians={guardians}
             ambassadors={ambassadors}
             pactTxStatus={pactTxStatus}
@@ -253,10 +267,26 @@ const App = () => {
         <CardContent>
           <RenderTopics topics={topics}/>
           <TopicsActionForms
-            tabIdx="memTab"
+            tabIdx="topicsTab"
             members={members}
             moderators={moderators}
             topics={topics}
+            pactTxStatus={pactTxStatus}
+            refresh={refresh}
+          />
+        </CardContent>
+      </Card>
+      : appRoute.ui === "comments" ?
+      <Card>
+        <CardHeader title="Comments"/>
+        <CardContent>
+          <RenderComments comments={comments}/>
+          <CommentsActionForms
+            tabIdx="comments"
+            members={members}
+            moderators={moderators}
+            topics={topics}
+            comments={comments}
             pactTxStatus={pactTxStatus}
             refresh={refresh}
           />

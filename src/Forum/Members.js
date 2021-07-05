@@ -1,5 +1,11 @@
 //basic React api imports
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { 
+  useQueryParams,
+  StringParam,
+ } from 'use-query-params';
+//make JS less terrible
+import _ from "lodash";
 //Material Stuff
 import {
   makeStyles,
@@ -445,19 +451,287 @@ const RotateMember = (props) => {
   );
 };
 
-export const ModeratorActionForms = (props) => {
-  const {
-    members,
-    moderators,
-    guardians,
-    tabIdx,
-    pactTxStatus,
-  } = props;
-  const {
+export const DeleteTopic = (props) => {
+  const {refresh, moderators, topics} = props;
+  const [mod, setMod] = useState( "" );
+  const [topicId, setTopicId] = useState( "" );
+  const {txStatus, setTxStatus,
+    tx, setTx,
+    txRes, setTxRes} = props.pactTxStatus;
+  const classes = useStyles();
+
+  const [appRoute,] = useQueryParams({
+    "topicId": StringParam
+  });
+
+  // console.log("DeleteTopic Loaded",appRoute,topicId,topics);
+
+  useEffect(()=> {
+    // console.log("DeleteTopic useEffect fired",appRoute,topicId,topics);
+    if (_.size(topics)) {
+      let topic = _.find(topics,t=>t.index === appRoute.topicId);
+      if (_.size(topic)) {
+        setTopicId(topic.index);
+      };
+    } else {
+      setTopicId("");
+    }
+  },[topics, appRoute, topicId]);
+  
+  const handleSubmit = (evt) => {
+      evt.preventDefault();
+      try {
+        sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,mod
+          ,`(${forumAPI.contractAddress}.delete-topic "${mod}" "${topicId}")`
+          ,{}
+          ,"moderator" 
+        );
+      } catch (e) {
+        console.log("delete-topic Submit Error",typeof e, e, mod, topicId);
+        setTxRes(e);
+        setTxStatus("validation-error");
+      }
+      };
+  const inputFields = [
+    {
+      type:'select',
+      label:'Select your Moderator Account',
+      className:classes.formControl,
+      onChange:setMod,
+      value:mod,
+      options:moderators.map((m)=>m['name']),
+    },{
+      type:'select',
+      label:'Select Topic Index',
+      className:classes.formControl,
+      onChange:setTopicId,
+      value:topicId,
+      options:topics.map((m)=>m['index']),
+    }
+  ];
+
+  return (
+    <MakeForm
+      inputFields={inputFields}
+      onSubmit={handleSubmit}
+      tx={tx} txStatus={txStatus} txRes={txRes}
+      setTxStatus={setTxStatus}/>
+  );
+};
+
+
+export const UnDeleteTopic = (props) => {
+  const {refresh, moderators, topics} = props;
+  const [mod, setMod] = useState( "" );
+  const [topicId, setTopicId] = useState( "" );
+  const {txStatus, setTxStatus,
+    tx, setTx,
+    txRes, setTxRes} = props.pactTxStatus;
+  const classes = useStyles();
+
+  const [appRoute,] = useQueryParams({
+    "topicId": StringParam
+  });
+
+  useEffect(()=> {
+    if (_.size(topics)) {
+      let topic = _.find(topics,t=>t.index === appRoute.topicId);
+      if (_.size(topic)) {
+        setTopicId(topic.index);
+      };
+    } else {
+      setTopicId("");
+    }
+  },[topics, appRoute, topicId]);
+  
+  const handleSubmit = (evt) => {
+      evt.preventDefault();
+      try {
+        sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,mod
+          ,`(${forumAPI.contractAddress}.undelete-topic "${mod}" "${topicId}")`
+          ,{}
+          ,"moderator" 
+        );
+      } catch (e) {
+        console.log("undelete-topic Submit Error",typeof e, e, mod, topicId);
+        setTxRes(e);
+        setTxStatus("validation-error");
+      }
+      };
+  const inputFields = [
+    {
+      type:'select',
+      label:'Select your Moderator Account',
+      className:classes.formControl,
+      onChange:setMod,
+      value:mod,
+      options:moderators.map((m)=>m['name']),
+    },{
+      type:'select',
+      label:'Select Topic Index',
+      className:classes.formControl,
+      onChange:setTopicId,
+      value:topicId,
+      options:topics.map((m)=>m['index']),
+    }
+  ];
+
+  return (
+    <MakeForm
+      inputFields={inputFields}
+      onSubmit={handleSubmit}
+      tx={tx} txStatus={txStatus} txRes={txRes}
+      setTxStatus={setTxStatus}/>
+  );
+};
+
+export const LockTopic = (props) => {
+  const {refresh, moderators, topics} = props;
+  const [mod, setMod] = useState( "" );
+  const [topicId, setTopicId] = useState( "" );
+  const {txStatus, setTxStatus,
+    tx, setTx,
+    txRes, setTxRes} = props.pactTxStatus;
+  const classes = useStyles();
+
+  const [appRoute,] = useQueryParams({
+    "topicId": StringParam
+  });
+
+  useEffect(()=> {
+    if (_.size(topics)) {
+      let topic = _.find(topics,t=>t.index === appRoute.topicId);
+      if (_.size(topic)) {
+        setTopicId(topic.index);
+      };
+    } else {
+      setTopicId("");
+    }
+  },[topics, appRoute, topicId]);
+  
+  const handleSubmit = (evt) => {
+      evt.preventDefault();
+      try {
+        sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,mod
+          ,`(${forumAPI.contractAddress}.lock-topic "${mod}" "${topicId}")`
+          ,{}
+          ,"moderator" 
+        );
+      } catch (e) {
+        console.log("lock-topic Submit Error",typeof e, e, mod, topicId);
+        setTxRes(e);
+        setTxStatus("validation-error");
+      }
+      };
+  const inputFields = [
+    {
+      type:'select',
+      label:'Select your Moderator Account',
+      className:classes.formControl,
+      onChange:setMod,
+      value:mod,
+      options:moderators.map((m)=>m['name']),
+    },{
+      type:'select',
+      label:'Select Topic Index',
+      className:classes.formControl,
+      onChange:setTopicId,
+      value:topicId,
+      options:topics.map((m)=>m['index']),
+    }
+  ];
+
+  return (
+    <MakeForm
+      inputFields={inputFields}
+      onSubmit={handleSubmit}
+      tx={tx} txStatus={txStatus} txRes={txRes}
+      setTxStatus={setTxStatus}/>
+  );
+};
+
+export const UnlockTopic = (props) => {
+  const {refresh, moderators, topics} = props;
+  const [mod, setMod] = useState( "" );
+  const [topicId, setTopicId] = useState( "" );
+  const {txStatus, setTxStatus,
+    tx, setTx,
+    txRes, setTxRes} = props.pactTxStatus;
+  const classes = useStyles();
+
+  const [appRoute,] = useQueryParams({
+    "topicId": StringParam
+  });
+
+  useEffect(()=> {
+    if (_.size(topics)) {
+      let topic = _.find(topics,t=>t.index === appRoute.topicId);
+      if (_.size(topic)) {
+        setTopicId(topic.index);
+      };
+    } else {
+      setTopicId("");
+    }
+  },[topics, appRoute, topicId]);
+  
+  const handleSubmit = (evt) => {
+      evt.preventDefault();
+      try {
+        sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,mod
+          ,`(${forumAPI.contractAddress}.unlock-topic "${mod}" "${topicId}")`
+          ,{}
+          ,"moderator" 
+        );
+      } catch (e) {
+        console.log("unlock-topic Submit Error",typeof e, e, mod, topicId);
+        setTxRes(e);
+        setTxStatus("validation-error");
+      }
+      };
+  const inputFields = [
+    {
+      type:'select',
+      label:'Select your Moderator Account',
+      className:classes.formControl,
+      onChange:setMod,
+      value:mod,
+      options:moderators.map((m)=>m['name']),
+    },{
+      type:'select',
+      label:'Select Topic Index',
+      className:classes.formControl,
+      onChange:setTopicId,
+      value:topicId,
+      options:topics.map((m)=>m['index']),
+    }
+  ];
+
+  return (
+    <MakeForm
+      inputFields={inputFields}
+      onSubmit={handleSubmit}
+      tx={tx} txStatus={txStatus} txRes={txRes}
+      setTxStatus={setTxStatus}/>
+  );
+};
+
+export const ModeratorActionForms = ({
+  members,
+  moderators,
+  guardians,
+  topics,
+  tabIdx,
+  pactTxStatus,
+  refresh: {
     getForumState,
     getMembers,
-  } = props.refresh;
-
+    getTopics,
+  },
+}) => {
   return (
     <ScrollableTabs
       tabIdx={tabIdx}
@@ -492,24 +766,57 @@ export const ModeratorActionForms = (props) => {
                 moderators={moderators}
                 pactTxStatus={pactTxStatus}
                 refresh={()=>getMembers()}/>
+          },{
+            label:"Delete Topic",
+            component:
+              <DeleteTopic
+                moderators={moderators}
+                topics={topics}
+                pactTxStatus={pactTxStatus}
+                refresh={()=>getTopics()}/>
+          },{
+            label:"UnDelete Topic",
+            component:
+              <UnDeleteTopic
+                moderators={moderators}
+                topics={topics}
+                pactTxStatus={pactTxStatus}
+                refresh={()=>getTopics()}/>
+          },{
+            label:"Lock Topic",
+            component:
+              <LockTopic
+                moderators={moderators}
+                topics={topics}
+                pactTxStatus={pactTxStatus}
+                refresh={()=>getTopics()}/>
+          },{
+            label:"Unlock Topic",
+            component:
+              <LockTopic
+                moderators={moderators}
+                topics={topics}
+                pactTxStatus={pactTxStatus}
+                refresh={()=>getTopics()}/>
           }
       ]}/>
   );
-}
+};
 
-export const MemberActionForms = (props) => {
-  const {
-    members,
-    moderators,
-    guardians,
-    ambassadors,
-    tabIdx,
-    pactTxStatus,
-  } = props;
-  const {
+export const MemberActionForms = ({
+  members,
+  moderators,
+  guardians,
+  ambassadors,
+  topics,
+  tabIdx,
+  pactTxStatus,
+  refresh: {
     getForumState,
     getMembers,
-  } = props.refresh;
+    getTopics,
+    }
+}) => {
 
   return (
     <ScrollableTabs

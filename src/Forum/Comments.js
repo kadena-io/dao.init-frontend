@@ -69,51 +69,53 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const ViewTopicButton = ({index}) => {
-  //Top level UI Routing Params
-  const [,setAppRoute] = useQueryParams({
-    "app": withDefault(StringParam,"forum"),
-    "ui": withDefault(StringParam,"topic"),
-    "topicId": NumberParam,
-  });
-  return <Button 
-    variant="outlined" 
-    color="default" 
-    onClick={()=> setAppRoute({app:"forum",ui:"topic",topicId:index})}>
-    View
-  </Button>
-}
-
-export const RenderTopics = (props) => {
+export const RenderComments = ({comments}) => {
   return (
     <PactJsonListAsTable
-      header={["","Headline","Author","Timestamp","Modified","Locked"]}
-      keyOrder={["index","headline","author","timestamp","modified","locked"]}
-      kvFunc={{"index": ViewTopicButton}}
-      json={props.topics}
+      header={["","Body","Author","Timestamp","Modified","Locked"]}
+      keyOrder={["index","body","author","timestamp","modified","locked"]}
+      json={comments}
     />
 )};
 
-export const PostTopic = (props) => {
-  const {refresh, members, moderators} = props;
-  const [author, setAuthor] = useState( "" );
-  const [headline, setHeadline] = useState("");
-  const [body, setBody] = useState("");
-  const {txStatus, setTxStatus,
+export const CommentOnTopic = ({
+  members,
+  moderators,
+  topics,
+  refresh,
+  pactTxStatus: {txStatus, setTxStatus,
     tx, setTx,
-    txRes, setTxRes} = props.pactTxStatus;
+    txRes, setTxRes}
+  }) => {
+  const [author, setAuthor] = useState( "" );
+  const [topicId, setTopicId] = useState( "" );
+  const [body, setBody] = useState("");
   const classes = useStyles();
+  const [appRoute,] = useQueryParams({
+    "topicId": StringParam
+  });
+
+  useEffect(()=> {
+    let topic = _.find(topics,t=>t.index === appRoute.topicId);
+    if (_.size(topic)) {
+      // console.log("modifyTopic",appRoute.topicId,topic,topics);
+      setTopicId(topic.index);
+    } else {
+      // console.log("modifyTopic index not found",appRoute.topicId, topics);
+      setTopicId("");
+    }
+  },[topics, appRoute, topicId]);
 
   const handleSubmit = (evt) => {
       evt.preventDefault();
       try {
         sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
           ,author
-          ,`(${forumAPI.contractAddress}.post-topic (read-msg 'headline) "${author}" (read-msg 'body))`
-          ,{headline: headline, body: body}
+          ,`(${forumAPI.contractAddress}.post-topic-comment "${author}" (read-msg 'body) "${topicId}")`
+          ,{body: body}
           );
       } catch (e) {
-        console.log("post-topic Submit Error",typeof e, e, author, headline, body);
+        console.log("post-topic-comment Submit Error",typeof e, e, author, body, topicId);
         setTxRes(e);
         setTxStatus("validation-error");
       }
@@ -127,14 +129,15 @@ export const PostTopic = (props) => {
       value:author,
       options:moderators.map(g=>g.name).concat(members.map(m=>m.name)),
     },{
-      type:'textFieldSingle',
-      label:'Headline',
+      type:'select',
+      label:'Topic Index',
       className:classes.formControl,
-      value:headline,
-      onChange:setHeadline,
+      onChange:setTopicId,
+      value:topicId,
+      options:topics.map(v=>v["index"]),
     },{
       type:'markdown',
-      label:"Contents",
+      label:"Comment Contents",
       value:body,
       onChange:setBody,
     }
@@ -149,61 +152,70 @@ export const PostTopic = (props) => {
   );
 };
 
-export const ModifyTopic = (props) => {
-  const {refresh, topics} = props;
-  const [author,setAuthor] = useState("");
-  const [topicId,setTopicId] = useState("");
-  const [headline, setHeadline] = useState("");
-  const [body, setBody] = useState("");
-  const {txStatus, setTxStatus,
+
+export const ReplyToComment = ({
+  members,
+  moderators,
+  comments,
+  refresh,
+  pactTxStatus: {txStatus, setTxStatus,
     tx, setTx,
-    txRes, setTxRes} = props.pactTxStatus;
+    txRes, setTxRes}
+  }) => {
+  const [author, setAuthor] = useState( "" );
+  const [commentId, setCommentId] = useState( "" );
+  const [body, setBody] = useState("");
+  const [manualOverride,setManualOverride] = useState(false);
   const classes = useStyles();
   const [appRoute,] = useQueryParams({
-    "topicId": StringParam
+    "commentId": StringParam
   });
 
   useEffect(()=> {
-    let topic = _.find(topics,t=>t.index === appRoute.topicId);
-    if (_.size(topic)) {
-      // console.log("modifyTopic",appRoute.topicId,topic,topics);
-      setTopicId(topic.index);
-      setAuthor(topic.author);
-      setBody(topic.body);
-      setHeadline(topic.headline);
-    } else {
-      // console.log("modifyTopic index not found",appRoute.topicId, topics);
-      setTopicId("");
-      setAuthor("");
-      setBody("");
-      setHeadline("");
+    let comment = _.find(comments,t=>t.index === appRoute.topicId);
+    if (!manualOverride) {
+      if (_.size(comment)) {
+        // console.log("modifyTopic",appRoute.topicId,topic,topics);
+        setCommentId(comment.index);
+      } else {
+        // console.log("modifyTopic index not found",appRoute.topicId, topics);
+        setCommentId("");
+      }
     }
-  },[topics, appRoute.topicId]);
+  },[comments, appRoute, commentId, manualOverride]);
 
   const handleSubmit = (evt) => {
       evt.preventDefault();
       try {
         sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
           ,author
-          ,`(${forumAPI.contractAddress}.modify-topic "${topicId}" (read-msg 'headline) (read-msg 'body))`
-          ,{headline: headline, body: body}
+          ,`(${forumAPI.contractAddress}.post-comment-comment "${author}" (read-msg 'body) "${commentId}")`
+          ,{body: body}
           );
       } catch (e) {
-        console.log("modify-topic Submit Error",typeof e, e, author, headline, body);
+        console.log("post-comment-comment Submit Error",typeof e, e, author, body, commentId);
         setTxRes(e);
         setTxStatus("validation-error");
       }
       };
   const inputFields = [
     {
-      type:'textFieldSingle',
-      label:'Headline',
+      type:'select',
+      label:'Author',
       className:classes.formControl,
-      value:headline,
-      onChange:setHeadline,
+      onChange:setAuthor,
+      value:author,
+      options:moderators.map(g=>g.name).concat(members.map(m=>m.name)),
+    },{
+      type:'select',
+      label:'Comment Index',
+      className:classes.formControl,
+      onChange:(v) => {setManualOverride(true); return setCommentId(v)},
+      value:commentId,
+      options:comments.map(v=>v["index"]),
     },{
       type:'markdown',
-      label:"Contents",
+      label:"Comment Contents",
       value:body,
       onChange:setBody,
     }
@@ -218,7 +230,8 @@ export const ModifyTopic = (props) => {
   );
 };
 
-export const TopicsActionForms = (props) => {
+
+export const CommentsActionForms = (props) => {
   const {
     members,
     moderators,
@@ -237,20 +250,23 @@ export const TopicsActionForms = (props) => {
       tabIdx={tabIdx}
       tabEntries={[
           {
-            label:"Post Topic",
+            label:"Comment on Topic",
             component:
-              <PostTopic
+              <CommentOnTopic
                 members={members}
                 moderators={moderators}
-                pactTxStatus={pactTxStatus}
-                refresh={()=> getTopics()}/>
-          },{
-            label:"Edit Topic",
-            component:
-              <ModifyTopic
                 topics={topics}
                 pactTxStatus={pactTxStatus}
-                refresh={() => getTopics()}/>
+                refresh={() => {getTopics(); getComments(); return null}}/>
+          },{
+            label:"Reply to Comment",
+            component:
+              <ReplyToComment
+                members={members}
+                moderators={moderators}
+                comments={comments}
+                pactTxStatus={pactTxStatus}
+                refresh={() => getComments()}/>
           }
       ]}/>
   );

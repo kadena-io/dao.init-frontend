@@ -13,13 +13,17 @@ import {
   CardContent,
   Grid,
   IconButton,
+  Tooltip,
 } from '@material-ui/core';
 import RemoveCircleOutlineIcon from '@material-ui/icons/RemoveCircleOutline';
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 import LockIcon from '@material-ui/icons/Lock';
+import LockOpenIcon from '@material-ui/icons/LockOpen';
 import DeleteIcon from '@material-ui/icons/Delete';
+import RestoreFromTrashIcon from '@material-ui/icons/RestoreFromTrash';
 import EditIcon from '@material-ui/icons/Edit';
+import CommentIcon from '@material-ui/icons/Comment';
 import {
   makeStyles,
 } from '@material-ui/styles';
@@ -43,7 +47,7 @@ const useStyles = makeStyles(() => ({
 
 export const RenderTopic = (props) => {
   const {topics} = props;
-  const [appRoute,setAppRoute] = useQueryParams({
+  const [appRoute,] = useQueryParams({
     "topicId": StringParam
   });
   const topic = _.find(topics,t=>t.index === appRoute.topicId);
@@ -73,14 +77,17 @@ export const RenderTopic = (props) => {
   
 )};
 
-export const TopicButtons = (props) => {
-   const [appRoute,setAppRoute] = useQueryParams({
+export const TopicButtons = ({topic}) => {
+   const [,setAppRoute] = useQueryParams({
     "ui": StringParam,
     "forumTab":StringParam,
     "modTab":StringParam,
     "memTab":StringParam,
+    "topicsTab":StringParam,
     "author":StringParam,
+    "topicId":StringParam,
   });
+
   return (
     <ButtonGroup
     disableElevation
@@ -96,18 +103,24 @@ export const TopicButtons = (props) => {
         variant="contained"
         label="Member Actions"
       >
+        <Tooltip title="Vote For Topic">
         <IconButton size="small"
           onClick={()=> setAppRoute({ui:"topics",forumTab:"0"})}>
           <ThumbUpIcon/>
         </IconButton>
+        </Tooltip>
+        <Tooltip title="Remove Your Vote">
         <IconButton size="small"
           onClick={()=> setAppRoute({ui:"topics",forumTab:"1"})}>
           <RemoveCircleOutlineIcon/>
         </IconButton>
+        </Tooltip>
+        <Tooltip title="Vote Against Topic">
         <IconButton size="small"
           onClick={()=> setAppRoute({ui:"topics",forumTab:"2"})}>
           <ThumbDownIcon/>
         </IconButton>
+        </Tooltip>
       </ButtonGroup>
       <ButtonGroup
         disableElevation
@@ -115,19 +128,52 @@ export const TopicButtons = (props) => {
         color="default"
         variant="contained"
       >
+      <React.Fragment>
+        {topic.locked ? 
+        <Tooltip title="Unlock Topic">
         <IconButton size="small"
-          onClick={()=> setAppRoute({ui:"moderators",modTab:"1"})}>
-          {/* TODO: make this icon change based on chain state */}
+          onClick={()=> setAppRoute({ui:"moderators",modTab:"7"})}>
+          <LockOpenIcon/>
+        </IconButton>
+        </Tooltip>
+        : 
+        <Tooltip title="Lock Topic">
+        <IconButton size="small"
+          onClick={()=> setAppRoute({ui:"moderators",modTab:"6"})}>
           <LockIcon/>
         </IconButton>
+        </Tooltip>
+        }
+      </React.Fragment>
+      <React.Fragment>
+        {topic.deleted ? 
+        <Tooltip title="Restore Deleted Topic">
         <IconButton size="small"
-          onClick={()=> setAppRoute({ui:"moderators",modTab:"2"})}>
+          onClick={()=> setAppRoute({ui:"moderators",modTab:"5"})}>
+          <RestoreFromTrashIcon/>
+        </IconButton>
+        </Tooltip>
+        : 
+        <Tooltip title="Delete Topic">
+        <IconButton size="small"
+          onClick={()=> setAppRoute({ui:"moderators",modTab:"4"})}>
           <DeleteIcon/>
         </IconButton>
+        </Tooltip>
+        }
+      </React.Fragment>
+      <Tooltip title="Edit Topic">
         <IconButton size="small"
-          onClick={()=> setAppRoute({ui:"members",memTab:"2",author:props.topic.author})}>
+          onClick={()=> setAppRoute({ui:"topics",topicsTab:"1"})}>
           <EditIcon/>
         </IconButton>
+        </Tooltip>
+      <Tooltip title="Comment on Topic">
+        <IconButton size="small"
+          onClick={()=> setAppRoute({ui:"comments",topicsTab:"0"})}>
+          <CommentIcon/>
+        </IconButton>
+        </Tooltip>
       </ButtonGroup>
     </ButtonGroup>
   );
