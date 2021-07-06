@@ -163,22 +163,19 @@ export const ModifyTopic = (props) => {
     "topicId": StringParam
   });
 
+  const [routed,setRouted] = useState(false);
   useEffect(()=> {
-    let topic = _.find(topics,t=>t.index === appRoute.topicId);
-    if (_.size(topic)) {
-      // console.log("modifyTopic",appRoute.topicId,topic,topics);
-      setTopicId(topic.index);
-      setAuthor(topic.author);
-      setBody(topic.body);
-      setHeadline(topic.headline);
-    } else {
-      // console.log("modifyTopic index not found",appRoute.topicId, topics);
-      setTopicId("");
-      setAuthor("");
-      setBody("");
-      setHeadline("");
-    }
-  },[topics, appRoute.topicId]);
+    try {
+      if (!routed && _.has(appRoute, ["topicId"])) {
+        let topic = _.find(topics,t=>t.index === appRoute.topicId);
+        setTopicId(topic.index);
+        setAuthor(topic.author);
+        setBody(topic.body);
+        setHeadline(topic.headline)
+        setRouted(true);
+      }
+    } catch (e) {}
+  },[topics, appRoute, topicId, routed]);
 
   const handleSubmit = (evt) => {
       evt.preventDefault();

@@ -95,16 +95,16 @@ export const CommentOnTopic = ({
     "topicId": StringParam
   });
 
+  const [routed,setRouted] = useState(false);
   useEffect(()=> {
-    let topic = _.find(topics,t=>t.index === appRoute.topicId);
-    if (_.size(topic)) {
-      // console.log("modifyTopic",appRoute.topicId,topic,topics);
-      setTopicId(topic.index);
-    } else {
-      // console.log("modifyTopic index not found",appRoute.topicId, topics);
-      setTopicId("");
-    }
-  },[topics, appRoute, topicId]);
+    try {
+      if (!routed && _.has(appRoute, ["topicId"])) {
+        let topic = _.find(topics,t=>t.index === appRoute.topicId);
+        setTopicId(topic.index);
+        setRouted(true);
+      }
+    } catch (e) {}
+  },[topics, appRoute, topicId,routed]);
 
   const handleSubmit = (evt) => {
       evt.preventDefault();
@@ -153,6 +153,77 @@ export const CommentOnTopic = ({
 };
 
 
+
+export const EditComment = ({
+  members,
+  moderators,
+  comments,
+  refresh,
+  pactTxStatus: {txStatus, setTxStatus,
+    tx, setTx,
+    txRes, setTxRes}
+  }) => {
+  const [author, setAuthor] = useState( "" );
+  const [commentId, setCommentId] = useState( "" );
+  const [body, setBody] = useState("");
+  const classes = useStyles();
+  const [appRoute,] = useQueryParams({
+    "commentId": StringParam
+  });
+
+  const [routed,setRouted] = useState(false);
+  useEffect(()=> {
+    try {
+      if (!routed && _.has(appRoute, ["commentId"])) {
+        let comment = _.find(comments,t=>t.index === appRoute.commentId);
+        setCommentId(comment.index);
+        setAuthor(comment.author);
+        setBody(comment.body);
+        setRouted(true);
+      }
+    } catch (e) {}
+  },[comments, appRoute, commentId, routed]);
+
+  const handleSubmit = (evt) => {
+      evt.preventDefault();
+      try {
+        sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,author
+          ,`(${forumAPI.contractAddress}.modify-comment "${commentId}" (read-msg 'body) )`
+          ,{body: body}
+          );
+      } catch (e) {
+        console.log("modiy-comment Submit Error",typeof e, e, author, body, commentId);
+        setTxRes(e);
+        setTxStatus("validation-error");
+      }
+      };
+  const inputFields = [
+    {
+      type:'select',
+      label:'Comment Index',
+      className:classes.formControl,
+      onChange:setCommentId,
+      value:commentId,
+      options:comments.map(v=>v["index"]),
+    },{
+      type:'markdown',
+      label:"Comment Contents",
+      value:body,
+      onChange:setBody,
+    }
+  ];
+
+  return (
+    <MakeForm
+      inputFields={inputFields}
+      onSubmit={handleSubmit}
+      tx={tx} txStatus={txStatus} txRes={txRes}
+      setTxStatus={setTxStatus}/>
+  );
+};
+
+
 export const ReplyToComment = ({
   members,
   moderators,
@@ -165,24 +236,22 @@ export const ReplyToComment = ({
   const [author, setAuthor] = useState( "" );
   const [commentId, setCommentId] = useState( "" );
   const [body, setBody] = useState("");
-  const [manualOverride,setManualOverride] = useState(false);
+
   const classes = useStyles();
   const [appRoute,] = useQueryParams({
     "commentId": StringParam
   });
 
+  const [routed,setRouted] = useState(false);
   useEffect(()=> {
-    let comment = _.find(comments,t=>t.index === appRoute.topicId);
-    if (!manualOverride) {
-      if (_.size(comment)) {
-        // console.log("modifyTopic",appRoute.topicId,topic,topics);
+    try {
+      if (!routed && _.has(appRoute, ["commentId"])) {
+        let comment = _.find(comments,t=>t.index === appRoute.commentId);
         setCommentId(comment.index);
-      } else {
-        // console.log("modifyTopic index not found",appRoute.topicId, topics);
-        setCommentId("");
+        setRouted(true);
       }
-    }
-  },[comments, appRoute, commentId, manualOverride]);
+    } catch (e) {}
+  },[comments, appRoute, commentId, routed]);
 
   const handleSubmit = (evt) => {
       evt.preventDefault();
@@ -210,7 +279,7 @@ export const ReplyToComment = ({
       type:'select',
       label:'Comment Index',
       className:classes.formControl,
-      onChange:(v) => {setManualOverride(true); return setCommentId(v)},
+      onChange:(v) => setCommentId(v),
       value:commentId,
       options:comments.map(v=>v["index"]),
     },{
@@ -262,6 +331,15 @@ export const CommentsActionForms = (props) => {
             label:"Reply to Comment",
             component:
               <ReplyToComment
+                members={members}
+                moderators={moderators}
+                comments={comments}
+                pactTxStatus={pactTxStatus}
+                refresh={() => getComments()}/>
+          },{
+            label:"Modify Comment",
+            component:
+              <EditComment
                 members={members}
                 moderators={moderators}
                 comments={comments}

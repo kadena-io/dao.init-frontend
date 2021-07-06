@@ -464,19 +464,16 @@ export const DeleteTopic = (props) => {
     "topicId": StringParam
   });
 
-  // console.log("DeleteTopic Loaded",appRoute,topicId,topics);
-
+  const [routed,setRouted] = useState(false);
   useEffect(()=> {
-    // console.log("DeleteTopic useEffect fired",appRoute,topicId,topics);
-    if (_.size(topics)) {
-      let topic = _.find(topics,t=>t.index === appRoute.topicId);
-      if (_.size(topic)) {
+    try {
+      if (!routed && _.has(appRoute, ["topicId"])) {
+        let topic = _.find(topics,t=>t.index === appRoute.topicId);
         setTopicId(topic.index);
-      };
-    } else {
-      setTopicId("");
-    }
-  },[topics, appRoute, topicId]);
+        setRouted(true);
+      }
+    } catch (e) {}
+  },[topics, appRoute, topicId,routed]);
   
   const handleSubmit = (evt) => {
       evt.preventDefault();
@@ -534,16 +531,16 @@ export const UnDeleteTopic = (props) => {
     "topicId": StringParam
   });
 
+  const [routed,setRouted] = useState(false);
   useEffect(()=> {
-    if (_.size(topics)) {
-      let topic = _.find(topics,t=>t.index === appRoute.topicId);
-      if (_.size(topic)) {
+    try {
+      if (!routed && _.has(appRoute, ["topicId"])) {
+        let topic = _.find(topics,t=>t.index === appRoute.topicId);
         setTopicId(topic.index);
-      };
-    } else {
-      setTopicId("");
-    }
-  },[topics, appRoute, topicId]);
+        setRouted(true);
+      }
+    } catch (e) {}
+  },[topics, appRoute, topicId,routed]);
   
   const handleSubmit = (evt) => {
       evt.preventDefault();
@@ -600,16 +597,16 @@ export const LockTopic = (props) => {
     "topicId": StringParam
   });
 
+  const [routed,setRouted] = useState(false);
   useEffect(()=> {
-    if (_.size(topics)) {
-      let topic = _.find(topics,t=>t.index === appRoute.topicId);
-      if (_.size(topic)) {
+    try {
+      if (!routed && _.has(appRoute, ["topicId"])) {
+        let topic = _.find(topics,t=>t.index === appRoute.topicId);
         setTopicId(topic.index);
-      };
-    } else {
-      setTopicId("");
-    }
-  },[topics, appRoute, topicId]);
+        setRouted(true);
+      }
+    } catch (e) {}
+  },[topics, appRoute, topicId, routed])
   
   const handleSubmit = (evt) => {
       evt.preventDefault();
@@ -666,16 +663,16 @@ export const UnlockTopic = (props) => {
     "topicId": StringParam
   });
 
+  const [routed,setRouted] = useState(false);
   useEffect(()=> {
-    if (_.size(topics)) {
-      let topic = _.find(topics,t=>t.index === appRoute.topicId);
-      if (_.size(topic)) {
+    try {
+      if (!routed && _.has(appRoute, ["topicId"])) {
+        let topic = _.find(topics,t=>t.index === appRoute.topicId);
         setTopicId(topic.index);
-      };
-    } else {
-      setTopicId("");
-    }
-  },[topics, appRoute, topicId]);
+        setRouted(true);
+      }
+    } catch (e) {}
+  },[topics, appRoute, topicId, routed]);
   
   const handleSubmit = (evt) => {
       evt.preventDefault();
@@ -719,17 +716,320 @@ export const UnlockTopic = (props) => {
   );
 };
 
+export const DeleteTopicComment = ({
+  moderators,
+  comments,
+  refresh,
+  pactTxStatus: {
+    txStatus, setTxStatus,
+    tx, setTx,
+    txRes, setTxRes} 
+}) => {
+  const [mod, setMod] = useState( "" );
+  const [commentId, setCommentId] = useState( "" );
+  const classes = useStyles();
+
+  const [appRoute,] = useQueryParams({
+    "commentId": StringParam
+  });
+
+  const [routed,setRouted] = useState(false);
+  useEffect(()=> {
+    try {
+      if (!routed && _.has(appRoute, ["commentId"])) {
+        let comment = _.find(comments,t=>t.index === appRoute.commentId);
+        setCommentId(comment.index);
+        setRouted(true);
+      }
+    } catch (e) {}
+  },[comments, appRoute, commentId, routed]);
+  
+  const handleSubmit = (evt) => {
+      evt.preventDefault();
+      try {
+        sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,mod
+          ,`(${forumAPI.contractAddress}.delete-topic-comment "${mod}" "${commentId}")`
+          ,{}
+          ,"moderator" 
+        );
+      } catch (e) {
+        console.log("delete-topic-comment Submit Error",typeof e, e, mod, commentId);
+        setTxRes(e);
+        setTxStatus("validation-error");
+      }
+      };
+  const inputFields = [
+    {
+      type:'select',
+      label:'Select your Moderator Account',
+      className:classes.formControl,
+      onChange:setMod,
+      value:mod,
+      options:moderators.map((m)=>m['name']),
+    },{
+      type:'select',
+      label:'Select Comment Index',
+      className:classes.formControl,
+      onChange:setCommentId,
+      value:commentId,
+      options:comments.map((m)=>m['index']),
+    }
+  ];
+
+  return (
+    <MakeForm
+      inputFields={inputFields}
+      onSubmit={handleSubmit}
+      tx={tx} txStatus={txStatus} txRes={txRes}
+      setTxStatus={setTxStatus}/>
+  );
+};
+
+
+export const VoteOnTopic = ({
+  members,
+  moderators,
+  topics,
+  refresh,
+  pactTxStatus: {
+    txStatus, setTxStatus,
+    tx, setTx,
+    txRes, setTxRes} 
+}) => {
+  const [member,setMember] = useState("");
+  const [vote, setVote] = useState( "" );
+  const [topicId, setTopicId] = useState( "" );
+  const classes = useStyles();
+
+  const [appRoute,] = useQueryParams({
+    "topicId":StringParam,
+    "vote":StringParam
+  });
+
+  const [routed,setRouted] = useState(false);
+  useEffect(()=> {
+    try {
+      if (!routed && _.has(appRoute, ["topicId", "vote"])) {
+        let topic = _.find(topics,t=>t.index === appRoute.topicId);
+        setTopicId(topic.index);
+        setVote(appRoute.vote);
+        setRouted(true);
+      }
+    } catch (e) {}
+  },[topics, appRoute, topicId, routed, vote]);
+  
+  const handleSubmit = (evt) => {
+      evt.preventDefault();
+      try {
+        sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,member
+          ,`(${forumAPI.contractAddress}.vote-on-topic "${member}" "${topicId}" "${vote}")`
+          ,{}
+        );
+      } catch (e) {
+        console.log("vote-on-topic Submit Error",typeof e, e, member, topicId, vote);
+        setTxRes(e);
+        setTxStatus("validation-error");
+      }
+      };
+  const inputFields = [
+    {
+      type:'select',
+      label:'Member Account',
+      className:classes.formControl,
+      onChange:setMember,
+      value:member,
+      options:moderators.map(g=>g.name).concat(members.map(m=>m.name)),
+    },{
+      type:'select',
+      label:'Select Topic Index',
+      className:classes.formControl,
+      onChange:setTopicId,
+      value:topicId,
+      options:topics.map((m)=>m['index']),
+    },{
+      type:'select',
+      label:'Select Vote',
+      className:classes.formControl,
+      onChange:setVote,
+      value:vote,
+      options:["upvote","remove","downvote"],
+    }
+  ];
+
+  return (
+    <MakeForm
+      inputFields={inputFields}
+      onSubmit={handleSubmit}
+      tx={tx} txStatus={txStatus} txRes={txRes}
+      setTxStatus={setTxStatus}/>
+  );
+};
+
+export const VoteOnComment = ({
+  moderators,
+  members,
+  comments,
+  refresh,
+  pactTxStatus: {
+    txStatus, setTxStatus,
+    tx, setTx,
+    txRes, setTxRes} 
+}) => {
+  const [member,setMember] = useState("");
+  const [vote, setVote] = useState( "" );
+  const [commentId, setCommentId] = useState( "" );
+  const classes = useStyles();
+
+  const [appRoute,] = useQueryParams({
+    "commentId":StringParam,
+    "vote":StringParam
+  });
+
+  const [routed,setRouted] = useState(false);
+  useEffect(()=> {
+    try {
+      if (!routed && _.has(appRoute, ["commentId"])) {
+        let comment = _.find(comments,t=>t.index === appRoute.commentId);
+        setCommentId(comment.index);
+        setVote(appRoute.vote);
+        setRouted(true);
+      }
+    } catch (e) {}
+  },[comments, appRoute, commentId, vote, routed]);
+  
+  const handleSubmit = (evt) => {
+      evt.preventDefault();
+      try {
+        sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,member
+          ,`(${forumAPI.contractAddress}.vote-on-comment "${member}" "${commentId}" "${vote}")`
+          ,{}
+        );
+      } catch (e) {
+        console.log("vote-on-comment Submit Error",typeof e, e, member, commentId, vote);
+        setTxRes(e);
+        setTxStatus("validation-error");
+      }
+      };
+  const inputFields = [
+    {
+      type:'select',
+      label:'Member Account',
+      className:classes.formControl,
+      onChange:setMember,
+      value:member,
+      options:moderators.map(g=>g.name).concat(members.map(m=>m.name)),
+    },{
+      type:'select',
+      label:'Select Comment Index',
+      className:classes.formControl,
+      onChange:setCommentId,
+      value:commentId,
+      options:comments.map((m)=>m['index']),
+    },{
+      type:'select',
+      label:'Select Vote',
+      className:classes.formControl,
+      onChange:setVote,
+      value:vote,
+      options:["upvote","remove","downvote"],
+    }
+  ];
+
+  return (
+    <MakeForm
+      inputFields={inputFields}
+      onSubmit={handleSubmit}
+      tx={tx} txStatus={txStatus} txRes={txRes}
+      setTxStatus={setTxStatus}/>
+  );
+};
+
+export const DeleteCommentComment = ({
+  moderators,
+  comments,
+  refresh,
+  pactTxStatus: {
+    txStatus, setTxStatus,
+    tx, setTx,
+    txRes, setTxRes} 
+}) => {
+  const [mod, setMod] = useState( "" );
+  const [commentId, setCommentId] = useState( "" );
+  const classes = useStyles();
+
+  const [appRoute,] = useQueryParams({
+    "commentId": StringParam
+  });
+
+  const [routed,setRouted] = useState(false);
+  useEffect(()=> {
+    try {
+      if (!routed && _.has(appRoute, ["commentId"])) {
+        let comment = _.find(comments,t=>t.index === appRoute.commentId);
+        setCommentId(comment.index);
+        setRouted(true);
+      }
+    } catch (e) {}
+  },[comments, appRoute, commentId, routed]);
+  
+  const handleSubmit = (evt) => {
+      evt.preventDefault();
+      try {
+        sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,mod
+          ,`(${forumAPI.contractAddress}.delete-comment-comment "${mod}" "${commentId}")`
+          ,{}
+          ,"moderator" 
+        );
+      } catch (e) {
+        console.log("delete-comment-comment Submit Error",typeof e, e, mod, commentId);
+        setTxRes(e);
+        setTxStatus("validation-error");
+      }
+      };
+  const inputFields = [
+    {
+      type:'select',
+      label:'Select your Moderator Account',
+      className:classes.formControl,
+      onChange:setMod,
+      value:mod,
+      options:moderators.map((m)=>m['name']),
+    },{
+      type:'select',
+      label:'Select Comment Index',
+      className:classes.formControl,
+      onChange:setCommentId,
+      value:commentId,
+      options:comments.map((m)=>m['index']),
+    }
+  ];
+
+  return (
+    <MakeForm
+      inputFields={inputFields}
+      onSubmit={handleSubmit}
+      tx={tx} txStatus={txStatus} txRes={txRes}
+      setTxStatus={setTxStatus}/>
+  );
+};
+
 export const ModeratorActionForms = ({
   members,
   moderators,
   guardians,
   topics,
+  comments,
   tabIdx,
   pactTxStatus,
   refresh: {
     getForumState,
     getMembers,
     getTopics,
+    getComments,
   },
 }) => {
   return (
@@ -798,6 +1098,22 @@ export const ModeratorActionForms = ({
                 topics={topics}
                 pactTxStatus={pactTxStatus}
                 refresh={()=>getTopics()}/>
+          },{
+            label:"Delete Topic Comment",
+            component:
+              <DeleteTopicComment
+                moderators={moderators}
+                comments={comments}
+                pactTxStatus={pactTxStatus}
+                refresh={()=>getComments()}/>
+          },{
+            label:"Delete Comment Comment",
+            component:
+              <DeleteCommentComment
+                moderators={moderators}
+                comments={comments}
+                pactTxStatus={pactTxStatus}
+                refresh={()=>getComments()}/>
           }
       ]}/>
   );
@@ -809,12 +1125,14 @@ export const MemberActionForms = ({
   guardians,
   ambassadors,
   topics,
+  comments,
   tabIdx,
   pactTxStatus,
   refresh: {
     getForumState,
     getMembers,
     getTopics,
+    getComments,
     }
 }) => {
 
@@ -836,6 +1154,24 @@ export const MemberActionForms = ({
                 members={members}
                 pactTxStatus={pactTxStatus}
                 refresh={()=>getMembers()}/>
+          },{
+            label:"Vote on Topic",
+            component:
+              <VoteOnTopic
+                members={members}
+                moderators={moderators}
+                topics={topics}
+                pactTxStatus={pactTxStatus}
+                refresh={()=>getTopics()}/>
+          },{
+            label:"Vote on Comment",
+            component:
+              <VoteOnComment
+                members={members}
+                moderators={moderators}
+                comments={comments}
+                pactTxStatus={pactTxStatus}
+                refresh={()=>getComments()}/>
           }
       ]}/>
   );

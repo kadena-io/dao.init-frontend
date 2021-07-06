@@ -282,7 +282,7 @@ const App = () => {
         <CardContent>
           <RenderComments comments={comments}/>
           <CommentsActionForms
-            tabIdx="comments"
+            tabIdx="commentsTab"
             members={members}
             moderators={moderators}
             topics={topics}
