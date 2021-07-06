@@ -1,23 +1,23 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "d309297aea9d8048305f6ac71eb82448",
+    "revision": "760c4fcb22570e2206244530b53b0b8c",
     "url": "/dao.init-frontend/index.html"
   },
   {
-    "revision": "dec406f239e8f6ba5cde",
+    "revision": "760bc5f79abb58a27870",
     "url": "/dao.init-frontend/static/css/2.199d4a19.chunk.css"
   },
   {
-    "revision": "dec406f239e8f6ba5cde",
-    "url": "/dao.init-frontend/static/js/2.52187dfe.chunk.js"
+    "revision": "760bc5f79abb58a27870",
+    "url": "/dao.init-frontend/static/js/2.f9368bb8.chunk.js"
   },
   {
     "revision": "5b691bc977ca7f537343ee6205f18cc9",
-    "url": "/dao.init-frontend/static/js/2.52187dfe.chunk.js.LICENSE.txt"
+    "url": "/dao.init-frontend/static/js/2.f9368bb8.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "4a90be526404ef76760a",
-    "url": "/dao.init-frontend/static/js/main.fcd27bf4.chunk.js"
+    "revision": "d69e999da4ec8594aba2",
+    "url": "/dao.init-frontend/static/js/main.c6281ad4.chunk.js"
   },
   {
     "revision": "1db12103b28cc0196cff",
