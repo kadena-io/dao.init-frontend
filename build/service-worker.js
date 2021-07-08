@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/dao.init-frontend/precache-manifest.512657ed74cda02c486f1d47eec140ef.js"
+  "/dao.init-frontend/precache-manifest.74673fafce011f7f82b5080c0fb0a758.js"
 );
 
 self.addEventListener('message', (event) => {
