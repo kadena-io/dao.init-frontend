@@ -55,9 +55,11 @@ import {
   MakeForm,
   updateParams,
  } from "../util.js";
-import { sendMemberCmd } from "./Members.js";
+import { 
+  sendMemberCmd, 
+  VoteOnTopic, } from "./Members.js";
 import { ScrollableTabs } from "../ScrollableTabs.js";
-import { RenderMD } from "../Markdown.js";
+import { CommentOnTopic } from "./Comments.js";
 
 const useStyles = makeStyles(() => ({
   formControl: {
@@ -248,6 +250,24 @@ export const TopicsActionForms = (props) => {
                 topics={topics}
                 pactTxStatus={pactTxStatus}
                 refresh={() => getTopics()}/>
+          },{
+            label:"Vote on Topic",
+            component:
+              <VoteOnTopic
+                members={members}
+                moderators={moderators}
+                topics={topics}
+                pactTxStatus={pactTxStatus}
+                refresh={()=>getTopics()}/>
+          },{
+            label:"Comment on Topic",
+            component:
+              <CommentOnTopic
+                members={members}
+                moderators={moderators}
+                topics={topics}
+                pactTxStatus={pactTxStatus}
+                refresh={() => {getTopics(); getComments(); return null}}/>
           }
       ]}/>
   );

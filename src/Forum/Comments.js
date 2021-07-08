@@ -319,15 +319,6 @@ export const CommentsActionForms = (props) => {
       tabIdx={tabIdx}
       tabEntries={[
           {
-            label:"Comment on Topic",
-            component:
-              <CommentOnTopic
-                members={members}
-                moderators={moderators}
-                topics={topics}
-                pactTxStatus={pactTxStatus}
-                refresh={() => {getTopics(); getComments(); return null}}/>
-          },{
             label:"Reply to Comment",
             component:
               <ReplyToComment

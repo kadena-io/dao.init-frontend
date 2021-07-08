@@ -1,5 +1,5 @@
 //basic React api imports
-import React from "react";
+import React, {useState} from "react";
 import { 
   useQueryParams,
   StringParam } from 'use-query-params';
@@ -11,9 +11,16 @@ import {
   Card,
   CardHeader,
   CardContent,
+  Divider,
   Grid,
   IconButton,
   Tooltip,
+  List,
+  ListSubheader,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Collapse,
 } from '@material-ui/core';
 import RemoveCircleOutlineIcon from '@material-ui/icons/RemoveCircleOutline';
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
@@ -24,6 +31,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import RestoreFromTrashIcon from '@material-ui/icons/RestoreFromTrash';
 import EditIcon from '@material-ui/icons/Edit';
 import CommentIcon from '@material-ui/icons/Comment';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
 import {
   makeStyles,
 } from '@material-ui/styles';
@@ -32,10 +41,12 @@ import {
 import {
   PactSingleJsonAsTable,
   dashStyleNames2Text,
+  renderPactValue,
  } from "../util.js";
 import { RenderMD } from "../Markdown.js";
+import { CommentsActionForms } from "./Comments.js";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: "5px auto",
     minWidth: 120,
@@ -43,39 +54,169 @@ const useStyles = makeStyles(() => ({
   selectEmpty: {
     marginTop: "10px auto",
   },
+  nested: {
+    paddingLeft: theme.spacing(8),
+  }
 }));
 
-export const RenderTopic = (props) => {
-  const {topics} = props;
-  const [appRoute,] = useQueryParams({
-    "topicId": StringParam
-  });
+export const RenderTopic = ({
+  topics,
+  comments,
+  members,
+  moderators,
+  pactTxStatus,
+  refresh,
+}) => {
+  const [appRoute,setAppRoute] = useQueryParams({
+  "ui": StringParam,
+  "forumTab":StringParam,
+  "modTab":StringParam,
+  "memTab":StringParam,
+  "topicsTab":StringParam,
+  "author":StringParam,
+  "topicId":StringParam,
+  "commentId":StringParam,
+});
   const topic = _.find(topics,t=>t.index === appRoute.topicId);
-  console.log("renderTopic",appRoute.topicId,topic,topics);
+  // console.log("renderTopic",appRoute.topicId,topic,topics);
   return (
     _.has(topic, 'body') ?
     <Card>
       <CardHeader title={topic.headline}/>
       <CardContent>
-        <Grid container direction="row" justify="space-between" alignItems="center" spacing={1}>
-          <Grid item lg={8}>
+      <List>
+        <ListItem>
+            <RenderMD mdText={topic.body} />
+        </ListItem>
+        <ListItem>
+            <TopicButtons topic={topic}/>
+        </ListItem>
+        <ListItem>
             <PactSingleJsonAsTable
               keyFormatter={dashStyleNames2Text}
               json={[_.pick(topic,["author", "deleted", "locked", "modified", "timestamp"])]}
             />
-          </Grid>
-          <Grid item lg={2}>
-            <TopicButtons topic={topic}/>
-          </Grid>
-          <Grid item lg={12}>
-            <RenderMD mdText={topic.body} />
-          </Grid>
-        </Grid> 
+        </ListItem>
+        </List>
+
+        <Divider/>
+        <RenderComments 
+          topicId={topic['index']} 
+          topics={topics} 
+          comments={comments}
+          members={members}
+          moderators={moderators}
+          pactTxStatus={pactTxStatus}
+          refresh={refresh}
+          setAppRoute={setAppRoute}
+          />
       </CardContent>
     </Card>
     : <React.Fragment/>
   
 )};
+
+const RenderComments = ({
+  topicId,
+  topics,
+  comments,
+  members,
+  moderators,
+  pactTxStatus,
+  refresh,
+  setAppRoute,
+}) => {
+  const topic = _.find(topics, {'index':topicId});
+  const topicComments = topic['comment-indexs']
+  // TODO: display comments in order of upvotes
+  
+  return <React.Fragment>
+    <List component="div" disablePadding>
+    {topicComments.map((commentId)=> 
+      <RenderComment 
+        topicId={topicId}
+        commentId={commentId}
+        comments={comments}
+        isNested={0}
+        members={members}
+        moderators={moderators}
+        topics={topics}
+        pactTxStatus={pactTxStatus}
+        refresh={refresh}
+        setAppRoute={setAppRoute}
+        />
+    )}
+    </List>
+  </React.Fragment>
+};
+
+const RenderComment = ({
+  topicId, 
+  commentId,
+  comments,
+  isNested,
+  members,
+  moderators,
+  topics,
+  pactTxStatus,
+  refresh,
+  setAppRoute,
+}) => {
+  const comment = _.find(comments, {'index':commentId});
+  // console.log(commentId,comments, comment);
+  const [showInteract,setShowInteract] = useState(false);
+  const classes = {"paddingLeft": `${isNested * 2}em`};
+
+  const secondaryText = isNested ? (
+    `Reply by ${comment.author} on ${renderPactValue(comment.timestamp)}${comment.modified ? " [edited]" : ""}`
+  ) : (
+    `Comment by ${comment.author} on ${renderPactValue(comment.timestamp)}${comment.modified ? " [edited]" : ""}`
+  );
+
+  const handleInteractClick = () => {
+    setAppRoute({commentId:comment.index});
+    setShowInteract(!showInteract);
+  };
+  
+  return <React.Fragment>
+    <ListItem key={comment.index} style={isNested ? classes : null}>
+      <RenderMD mdText={`*${secondaryText}* \n\n` + comment.body} />
+      { showInteract ? 
+          <ExpandLess onClick={handleInteractClick}/> 
+          : <ExpandMore onClick={handleInteractClick}/> }
+    </ListItem>
+    <Collapse in={showInteract} timeout="auto" unmountOnExit>
+      <CommentsActionForms
+        tabIdx="inTopicTab"
+        members={members}
+        moderators={moderators}
+        topics={topics}
+        comments={comments}
+        pactTxStatus={pactTxStatus}
+        refresh={refresh}
+      />
+    </Collapse>
+    <div style={isNested ? classes : null}>
+    <Divider component="li"/>
+      <List component="div" disablePadding style={isNested ? classes : null}>
+        {comment['child-indexs'].map((childId) => 
+          <RenderComment 
+            topicId={topicId}
+            commentId={childId}
+            comments={comments}
+            isNested={isNested + 1}
+            members={members}
+            moderators={moderators}
+            topics={topics}
+            pactTxStatus={pactTxStatus}
+            refresh={refresh}
+            setAppRoute={setAppRoute}
+            />
+        )}
+      </List>
+    </div>
+  </React.Fragment>
+}
 
 export const TopicButtons = ({topic}) => {
    const [,setAppRoute] = useQueryParams({
@@ -96,13 +237,6 @@ export const TopicButtons = ({topic}) => {
     variant="contained"
     lable="Member Actions"
   >
-      <ButtonGroup
-        disableElevation
-        orientation="vertical"
-        color="primary"
-        variant="contained"
-        label="Member Actions"
-      >
         <Tooltip title="Vote For Topic">
         <IconButton size="small"
           onClick={()=> setAppRoute({ui:"topics",forumTab:"0"})}>
@@ -121,14 +255,6 @@ export const TopicButtons = ({topic}) => {
           <ThumbDownIcon/>
         </IconButton>
         </Tooltip>
-      </ButtonGroup>
-      <ButtonGroup
-        disableElevation
-        orientation="vertical"
-        color="default"
-        variant="contained"
-      >
-      <React.Fragment>
         {topic.locked ? 
         <Tooltip title="Unlock Topic">
         <IconButton size="small"
@@ -144,24 +270,12 @@ export const TopicButtons = ({topic}) => {
         </IconButton>
         </Tooltip>
         }
-      </React.Fragment>
-      <React.Fragment>
-        {topic.deleted ? 
-        <Tooltip title="Restore Deleted Topic">
+      <Tooltip title={topic.deleted ? "Restore Deleted Topic" : "Delete Topic"}>
         <IconButton size="small"
-          onClick={()=> setAppRoute({ui:"moderators",modTab:"5"})}>
-          <RestoreFromTrashIcon/>
+          onClick={()=> setAppRoute({ui:"moderators",modTab:topic.delete ? "5" : "4"})}>
+          {topic.delete ? <RestoreFromTrashIcon/> : <DeleteIcon/>}
         </IconButton>
-        </Tooltip>
-        : 
-        <Tooltip title="Delete Topic">
-        <IconButton size="small"
-          onClick={()=> setAppRoute({ui:"moderators",modTab:"4"})}>
-          <DeleteIcon/>
-        </IconButton>
-        </Tooltip>
-        }
-      </React.Fragment>
+      </Tooltip>
       <Tooltip title="Edit Topic">
         <IconButton size="small"
           onClick={()=> setAppRoute({ui:"topics",topicsTab:"1"})}>
@@ -170,11 +284,10 @@ export const TopicButtons = ({topic}) => {
         </Tooltip>
       <Tooltip title="Comment on Topic">
         <IconButton size="small"
-          onClick={()=> setAppRoute({ui:"comments",commentsTab:"0"})}>
+          onClick={()=> setAppRoute({ui:"topics",commentsTab:"3"})}>
           <CommentIcon/>
         </IconButton>
         </Tooltip>
       </ButtonGroup>
-    </ButtonGroup>
   );
 }

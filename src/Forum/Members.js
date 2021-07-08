@@ -1107,7 +1107,7 @@ export const ModeratorActionForms = ({
                 pactTxStatus={pactTxStatus}
                 refresh={()=>getComments()}/>
           },{
-            label:"Delete Comment Comment",
+            label:"Delete Comment Reply",
             component:
               <DeleteCommentComment
                 moderators={moderators}
@@ -1154,15 +1154,6 @@ export const MemberActionForms = ({
                 members={members}
                 pactTxStatus={pactTxStatus}
                 refresh={()=>getMembers()}/>
-          },{
-            label:"Vote on Topic",
-            component:
-              <VoteOnTopic
-                members={members}
-                moderators={moderators}
-                topics={topics}
-                pactTxStatus={pactTxStatus}
-                refresh={()=>getTopics()}/>
           },{
             label:"Vote on Comment",
             component:

@@ -89,7 +89,7 @@ const App = () => {
   const [comments, setComments] = createPersistedState("comments")([]);
    
   const getForumState = async () => {
-    const res = await getForumContractState("view-forum-state");
+    const res = await getForumContractState("view-state");
     setForumState(res);
   };
 
@@ -282,11 +282,11 @@ const App = () => {
         <CardContent>
           <RenderComments comments={comments}/>
           <CommentsActionForms
+            topics={topics}
+            comments={comments}
             tabIdx="commentsTab"
             members={members}
             moderators={moderators}
-            topics={topics}
-            comments={comments}
             pactTxStatus={pactTxStatus}
             refresh={refresh}
           />
@@ -295,6 +295,11 @@ const App = () => {
       : appRoute.ui === "topic" ?
       <RenderTopic 
         topics={topics}
+        comments={comments}
+        members={members}
+        moderators={moderators}
+        pactTxStatus={pactTxStatus}
+        refresh={refresh}
       />
       : <React.Fragment>
         {() => {
