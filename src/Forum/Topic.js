@@ -7,6 +7,7 @@ import {
 import _ from "lodash";
 //Material Stuff
 import {
+  Box,
   ButtonGroup,
   Card,
   CardHeader,
@@ -82,11 +83,16 @@ export const RenderTopic = ({
   return (
     _.has(topic, 'body') ?
     <Card>
-      <CardHeader title={topic.headline}/>
+      <CardHeader title={
+        <Box textOverflow="ellipsis" overflow="hidden">
+          {topic.headline}
+        </Box>}/>
       <CardContent>
       <List>
         <ListItem>
+        <Box textOverflow="ellipsis" overflow="hidden">
             <RenderMD mdText={topic.body} />
+        </Box>
         </ListItem>
         <ListItem>
             <TopicButtons topic={topic}/>

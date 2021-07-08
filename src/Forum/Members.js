@@ -1119,6 +1119,57 @@ export const ModeratorActionForms = ({
   );
 };
 
+export const ModeratorTopicForms = ({
+  moderators,
+  topics,
+  tabIdx,
+  pactTxStatus,
+  refresh: {
+    getTopics,
+    getComments,
+  },
+}) => {
+  return (
+    <ScrollableTabs
+      tabIdx={tabIdx}
+      tabEntries={[
+          {
+            label:"Delete Topic",
+            component:
+              <DeleteTopic
+                moderators={moderators}
+                topics={topics}
+                pactTxStatus={pactTxStatus}
+                refresh={()=>getTopics()}/>
+          },{
+            label:"UnDelete Topic",
+            component:
+              <UnDeleteTopic
+                moderators={moderators}
+                topics={topics}
+                pactTxStatus={pactTxStatus}
+                refresh={()=>getTopics()}/>
+          },{
+            label:"Lock Topic",
+            component:
+              <LockTopic
+                moderators={moderators}
+                topics={topics}
+                pactTxStatus={pactTxStatus}
+                refresh={()=>getTopics()}/>
+          },{
+            label:"Unlock Topic",
+            component:
+              <LockTopic
+                moderators={moderators}
+                topics={topics}
+                pactTxStatus={pactTxStatus}
+                refresh={()=>getTopics()}/>
+          }
+      ]}/>
+  );
+};
+
 export const MemberActionForms = ({
   members,
   moderators,

@@ -19,16 +19,24 @@ import _ from "lodash";
 import {
   Button,
   ButtonGroup,
-  CardActions,
+  Box,
   Card,
-  CardHeader,
+  CardActions,
   CardContent,
+  CardHeader,
   Checkbox,
   ClickAwayListener,
+  Collapse,
+  Divider,
   Grid,
   Grow,
-  LinearProgress,
   IconButton,
+  LinearProgress,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListSubheader,
   MenuItem,
   MenuList,
   Paper,
@@ -40,11 +48,14 @@ import {
   TableHead,
   TableRow,
   TextField,
+  Tooltip,
   Typography,
 } from '@material-ui/core';
 import {
   makeStyles,
 } from '@material-ui/styles';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
 //pact-lang-api for blockchain calls
 import Pact from "pact-lang-api";
 //config file for blockchain calls
@@ -54,12 +65,14 @@ import {
   PactSingleJsonAsTable,
   MakeForm,
   updateParams,
+  renderPactValue,
  } from "../util.js";
 import { 
   sendMemberCmd, 
   VoteOnTopic, } from "./Members.js";
 import { ScrollableTabs } from "../ScrollableTabs.js";
 import { CommentOnTopic } from "./Comments.js";
+import { ModeratorTopicForms } from "./Members.js";
 
 const useStyles = makeStyles(() => ({
   formControl: {
@@ -69,32 +82,88 @@ const useStyles = makeStyles(() => ({
   selectEmpty: {
     marginTop: "10px auto",
   },
+  inline: {
+    display: "inline",
+  },
 }));
 
-const ViewTopicButton = ({index}) => {
-  //Top level UI Routing Params
+export const RenderTopics = ({
+  topics,
+  moderators,
+  pactTxStatus,
+  refresh,
+}) => {
+  
   const [,setAppRoute] = useQueryParams({
-    "app": withDefault(StringParam,"forum"),
-    "ui": withDefault(StringParam,"topic"),
-    "topicId": NumberParam,
-  });
-  return <Button 
-    variant="outlined" 
-    color="default" 
-    onClick={()=> setAppRoute({app:"forum",ui:"topic",topicId:index})}>
-    View
-  </Button>
+  "ui": StringParam,
+  "topicsTab":StringParam,
+  "topicId":StringParam,
+});
+  return <React.Fragment>
+    <List component="div" disablePadding>
+    {topics.map((topic)=> 
+      <RenderTopic
+        moderators={moderators}
+        topic={topic}
+        topics={topics}
+        pactTxStatus={pactTxStatus}
+        refresh={refresh}
+        setAppRoute={setAppRoute}
+        />
+    )}
+    </List>
+  </React.Fragment>
+};
+
+const RenderTopic = ({
+  moderators,
+  topic,
+  topics,
+  pactTxStatus,
+  refresh,
+  setAppRoute,
+}) => {
+  // console.log(commentId,comments, comment);
+  const [showInteract,setShowInteract] = useState(false);
+  const classes = useStyles();
+  
+  const secondaryText = `Comment by ${topic.author} on ${renderPactValue(topic.timestamp)}${topic.modified ? " [edited]" : ""}`
+
+  const handleInteractClick = () => {
+    setAppRoute({topicId:topic.index});
+    setShowInteract(!showInteract);
+  };
+  
+  return <React.Fragment>
+    <ListItem button
+      onClick={()=> setAppRoute({app:"forum",ui:"topic",topicId:topic.index})}>
+      <ListItemText
+        primary={
+        <Box textOverflow="ellipsis" overflow="hidden">
+          {topic.headline}
+        </Box>}
+        secondary={
+        <Box textOverflow="ellipsis" overflow="hidden">
+          {secondaryText}
+        </Box>}
+        />
+      { showInteract ? 
+          <ExpandLess onClick={handleInteractClick}/> 
+          : <ExpandMore onClick={handleInteractClick}/> }
+    </ListItem>
+    <Collapse in={showInteract} timeout="auto" unmountOnExit>
+      <ModeratorTopicForms
+        tabIdx="topicsTab"
+        moderators={moderators}
+        topics={topics}
+        pactTxStatus={pactTxStatus}
+        refresh={refresh}
+      />
+    </Collapse>
+    <Divider component="li"/>
+  </React.Fragment>
 }
 
-export const RenderTopics = (props) => {
-  return (
-    <PactJsonListAsTable
-      header={["","Headline","Author","Timestamp","Modified","Locked"]}
-      keyOrder={["index","headline","author","timestamp","modified","locked"]}
-      kvFunc={{"index": ViewTopicButton}}
-      json={props.topics}
-    />
-)};
 
 export const PostTopic = (props) => {
   const {refresh, members, moderators} = props;

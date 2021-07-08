@@ -265,7 +265,12 @@ const App = () => {
       <Card>
         <CardHeader title="Topics"/>
         <CardContent>
-          <RenderTopics topics={topics}/>
+          <RenderTopics 
+            topics={topics}
+            moderators={moderators}
+            pactTxStatus={pactTxStatus}
+            refresh={refresh}
+            />
           <TopicsActionForms
             tabIdx="topicsTab"
             members={members}
