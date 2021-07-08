@@ -60,6 +60,8 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+const nestedConst = 0.25;
+
 export const RenderTopic = ({
   topics,
   comments,
@@ -171,7 +173,7 @@ const RenderComment = ({
   const comment = _.find(comments, {'index':commentId});
   // console.log(commentId,comments, comment);
   const [showInteract,setShowInteract] = useState(false);
-  const classes = {"paddingLeft": `${isNested * 2}em`};
+  const classes = {"paddingLeft": `${isNested * nestedConst}em`};
 
   const secondaryText = isNested ? (
     `Reply by ${comment.author} on ${renderPactValue(comment.timestamp)}${comment.modified ? " [edited]" : ""}`
@@ -191,7 +193,7 @@ const RenderComment = ({
           <ExpandLess onClick={handleInteractClick}/> 
           : <ExpandMore onClick={handleInteractClick}/> }
     </ListItem>
-    <Collapse in={showInteract} timeout="auto" unmountOnExit>
+    <Collapse in={showInteract} timeout="auto" unmountOnExit style={isNested ? {"marginLeft": `${isNested * nestedConst}em`}:null}>
       <CommentsActionForms
         tabIdx="inTopicTab"
         members={members}
@@ -204,7 +206,7 @@ const RenderComment = ({
     </Collapse>
     <div style={isNested ? classes : null}>
     <Divider component="li"/>
-      <List component="div" disablePadding style={isNested ? classes : null}>
+      <List component="div" disablePadding>
         {comment['child-indexs'].map((childId) => 
           <RenderComment 
             topicId={topicId}

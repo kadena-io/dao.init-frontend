@@ -54,6 +54,7 @@ import {
 import {
   makeStyles,
 } from '@material-ui/styles';
+import GavelIcon from '@material-ui/icons/Gavel';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 //pact-lang-api for blockchain calls
@@ -135,9 +136,9 @@ const RenderTopic = ({
   };
   
   return <React.Fragment>
-    <ListItem button
-      onClick={()=> setAppRoute({app:"forum",ui:"topic",topicId:topic.index})}>
+    <ListItem button disableRipple>
       <ListItemText
+        onClick={()=> setAppRoute({app:"forum",ui:"topic",topicId:topic.index})}
         primary={
         <Box textOverflow="ellipsis" overflow="hidden">
           {topic.headline}
@@ -147,9 +148,7 @@ const RenderTopic = ({
           {secondaryText}
         </Box>}
         />
-      { showInteract ? 
-          <ExpandLess onClick={handleInteractClick}/> 
-          : <ExpandMore onClick={handleInteractClick}/> }
+        <GavelIcon onClick={handleInteractClick}/> 
     </ListItem>
     <Collapse in={showInteract} timeout="auto" unmountOnExit>
       <ModeratorTopicForms
