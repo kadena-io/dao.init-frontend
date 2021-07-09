@@ -264,7 +264,7 @@ export const PactJsonListAsTable = (props) => {
     )
 )};
 
-const MakeInputField = (props) => {
+export const MakeInputField = (props) => {
   const {
     type,
     label,
@@ -304,6 +304,7 @@ const MakeInputField = (props) => {
         fullWidth
         value={value}
         className={className}
+        placeholder={placeholder}
         variant='outlined'
         label={label}
         onChange={e => onChange(e.target.value)}

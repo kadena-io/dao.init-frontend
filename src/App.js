@@ -16,6 +16,12 @@ import {
   Card, CardHeader, CardContent} from '@material-ui/core';
 import { NavDrawer } from "./NavDrawer.js";
 
+import { 
+  walletDrawerEntries,
+  WalletApp,
+  Wallet,
+ } from "./Wallet.js";
+
 import {
   initDrawerEntries,
   InitApp
@@ -140,10 +146,11 @@ const App = () => {
   }, []);
 
   return (
-    <React.Fragment>
+    <Wallet>
           <NavDrawer
             entriesList={[
-                [ initDrawerEntries
+                [ walletDrawerEntries
+                , initDrawerEntries
                 ,{
                   primary:"dao.forum",
                   subList:  
@@ -180,7 +187,12 @@ const App = () => {
           ]}>
           <Container>
             <Switch>
-  { appRoute.app === "init" ?
+  { appRoute.app === "wallet" ?
+    <WalletApp
+      appRoute={appRoute}
+      setAppRoute={setAppRoute}
+    />
+    : appRoute.app === "init" ?
     <InitApp 
       appRoute={appRoute}
       setAppRoute={setAppRoute}
@@ -322,7 +334,7 @@ const App = () => {
             </Switch>
           </Container>
           </NavDrawer>
-  </React.Fragment>
+    </Wallet>
   );
 };
 
