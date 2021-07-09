@@ -106,6 +106,7 @@ const sendGuardianCmd = async (
         setTxStatus('failure');
       }
     } catch(e) {
+      setTxRes(e);
       console.log("tx status set to validation error",e);
       //set state for transaction construction error
       setTxStatus('validation-error');
