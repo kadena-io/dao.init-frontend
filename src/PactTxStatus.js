@@ -75,7 +75,7 @@ export const PactTxStatus = (props) => {
                   <Grid item>
                     <Divider orientation="vertical" flexItem />
                     <Button size='small' onClick={()=>setModalOpen(true)}>
-                      View
+                      View Error
                     </Button>
                   </Grid>
                 : <React.Fragment/>}
@@ -129,7 +129,7 @@ export const PactTxStatus = (props) => {
                     onClose={() => setModalOpen(false)}
                   >
                     <Container maxWidth="md">
-                        <Paper>{txRes.toString()}</Paper>
+                        <Paper>{JSON.stringify(txRes)}</Paper>
                     </Container>
                   </Modal>
                 </div>
