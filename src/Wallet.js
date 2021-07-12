@@ -321,7 +321,7 @@ const EntrySelector = ({
 export const WalletConfig = () => {
   const {wallet, walletDispatch} = useContext(WalletContext);
   const [saved,setSaved] = useState(false);
-  const [walletName,setWalletName] = useState("Chainweaver");
+  const [walletName,setWalletName] = useState("");
   const [signingKey, setSigningKey] = useState("");
   const [networkId, setNetworkId] = useState("testnet04");
   const [gasPrice, setGasPrice] = useState("");
@@ -407,7 +407,7 @@ export const WalletConfig = () => {
         autoComplete="off"
         onSubmit={(evt) => handleSubmit(evt)}>
         <EntrySelector label="Wallet Name" getVal={walletName} setVal={setWalletName} allOpts={_.keys(wallet.otherWallets)}/>
-        <EntrySelector label="Network ID" getVal={networkId} setVal={setNetworkId} allOpts={_.keys(wallet.otherWallets, v=>v.networkId)}/>
+        <EntrySelector label="Network ID" getVal={networkId} setVal={setNetworkId} allOpts={_.uniq(_.concat(_.map(wallet.otherWallets, 'networkId'), "mainnet01", "testnet04"))}/>
         {inputFields.map(f =>
           <MakeInputField inputField={f}/>
         )}
