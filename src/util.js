@@ -363,7 +363,9 @@ export const MakeForm = (props) => {
           {txStatus === 'pending'
             ? null
             : <Button variant="outlined" color="default" type="submit" disabled={wasSubmitted}>
-                {wasSubmitted ? "Complete Signing in Wallet": `Sign with ${walletName} using key ${signingKey.substring(0,4)}...${signingKey.substring(signingKey.length - 4)}`}
+                {walletName ? 
+                  (wasSubmitted ? "Complete Signing in Wallet": `Sign with ${walletName} using key ${signingKey.substring(0,4)}...${signingKey.substring(signingKey.length - 4)}`)
+                  : "Configure and select a wallet before proceeding"}
               </Button>
           }
         </CardActions>
