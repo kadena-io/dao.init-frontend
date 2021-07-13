@@ -24,7 +24,7 @@ export const getContractState = async (cmd) => {
     );
     const all = res.result.data;
     //sorts memories by least recent
-    console.log("local query data",all);
+    console.debug("local query data",all);
     return(all);
 };
 

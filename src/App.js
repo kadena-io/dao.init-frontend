@@ -19,7 +19,6 @@ import { NavDrawer } from "./NavDrawer.js";
 import { 
   walletDrawerEntries,
   WalletApp,
-  Wallet,
  } from "./Wallet.js";
 
 import {
@@ -142,11 +141,10 @@ const App = () => {
     getModLog();
     getTopics();
     getComments();
-    console.log('useEffect App.js Fired');
+    console.debug('App.useEffect[] fired');
   }, []);
 
   return (
-    <Wallet>
           <NavDrawer
             entriesList={[
                 [ walletDrawerEntries
@@ -334,7 +332,6 @@ const App = () => {
             </Switch>
           </Container>
           </NavDrawer>
-    </Wallet>
   );
 };
 

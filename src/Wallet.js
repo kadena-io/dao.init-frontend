@@ -113,7 +113,7 @@ const walletReducer = (state, action) => {
   }
 }
 
-export const Wallet = ({children}) => {
+export const Wallet = ({contractConfigs, children}) => {
   //Wallet State
   const usePersistedWallet = createPersistedState("pactWallet5");
   const [persistedWallet,setPersistedWallet] = usePersistedWallet({});
@@ -121,9 +121,15 @@ export const Wallet = ({children}) => {
   // Experimental wrapper for "emit" bug found in https://github.com/donavon/use-persisted-state/issues/56
   useEffect(()=>{
     if (_.size(wallet) && ! _.isEqual(walletContextDefault, wallet)) {
-      console.log("Wallet.useEffect[persistedWallet,walletProvider,setPersistedWallet]", persistedWallet, " =to=> ", wallet);
+      console.debug("Wallet.useEffect[persistedWallet,walletProvider,setPersistedWallet]", persistedWallet, " =to=> ", wallet);
       setPersistedWallet(wallet);}}
   ,[persistedWallet,wallet,setPersistedWallet]);
+
+  useEffect(()=>{
+    console.debug("Wallet.useEffect[] fired, contratConfigs added: ", _.keys(contractConfigs));
+    _.mapKeys(contractConfigs,(k)=>walletDispatch({type:"addConfig", configName:k, config:contractConfigs[k]}))
+  }
+  ,[])
 
   return <WalletContext.Provider value={{wallet,walletDispatch}}>
           {children}
@@ -332,7 +338,7 @@ export const WalletConfig = () => {
   const [txRes, setTxRes] = useState({});
 
   useEffect(()=> {
-    console.log("WalletConfig useEffect on load fired with", wallet)
+    console.debug("WalletConfig useEffect on load fired with", wallet)
     if (_.size(wallet.current)) {
         if (wallet.current.walletName) {setWalletName(wallet.current.walletName)}
         if (wallet.current.signingKey) {setSigningKey(wallet.current.signingKey)}
@@ -376,25 +382,11 @@ export const WalletConfig = () => {
         const n = {walletName:walletName, signingKey:signingKey, gasPrice:gasPrice, networkId:networkId};
         walletDispatch({type: 'updateWallet', newWallet: n});
         setSaved(true);
-        console.log("WalletConfig set. locale: ", n, " while context is: ", wallet.current);
+        console.debug("WalletConfig set. locale: ", n, " while context is: ", wallet.current);
       }
   };
   const inputFields = [
     {
-    //   type:'select',
-    //   label:'Wallet',
-    //   className:classes.formControl,
-    //   onChange:setWalletName,
-    //   value:walletName,
-    //   options:["Chainweaver", "Zelcore"],
-    // },{
-    //   type:'select',
-    //   label:'Network',
-    //   className:classes.formControl,
-    //   onChange:setNetworkId,
-    //   value:networkId,
-    //   options:["testnet04", "mainnet01"],
-    // },{
       type:'textFieldSingle',
       label:'Gas Price',
       className:classes.formControl,
