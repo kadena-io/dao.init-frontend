@@ -143,6 +143,8 @@ export const useWallet = () => {
   return wallet;
 };
 
+export const useWalletContex = () => useContext(WalletContext);
+
 export const walletDrawerEntries = {
   primary:"Wallet",
   subList:
@@ -335,7 +337,7 @@ export const CurrentWallet = () => {
   const {current} = useWallet();
   
   return <Container style={{"paddingTop":"2em"}}>
-    <Typography component="h2">Saved Wallets</Typography>
+    <Typography component="h2">Active Wallet</Typography>
     <PactSingleJsonAsTable
       json={current}
       keyFormatter={keyFormatter}

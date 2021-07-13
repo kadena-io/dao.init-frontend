@@ -4,27 +4,35 @@ import {
   StringParam,
   withDefault
  } from 'use-query-params';
+import _ from 'lodash';
 import {
   AppBar,
   Collapse,
-  CssBaseline,
   Divider,
   Drawer,
+  Button,
   Hidden,
   IconButton,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
+  Menu,
+  MenuItem,
   Toolbar,
 } from '@material-ui/core';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles, useTheme, withStyles } from '@material-ui/core/styles';
 
+import AccountBalanceWalletIcon from '@material-ui/icons/AccountBalanceWallet';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import MenuIcon from '@material-ui/icons/Menu';
 
 import logo from "./kadena_r_rev_3_whi_lor.png";
+
+import { useWalletContex } from './Wallet.js';
+import { useMemo } from 'react';
+import { wallet } from 'pact-lang-api';
 
 const drawerWidth = 240;
 
@@ -63,6 +71,9 @@ const useStyles = makeStyles((theme) => ({
   },
   logo: {
     height: "60px",
+  },
+  logoDiv: {
+    flexGrow: 1,
   }
 }));
 
@@ -108,11 +119,36 @@ const ListItemLink = (props) => {
   );
 };
 
+const StyledMenuItem = withStyles((theme) => ({
+  root: {
+    '&:focus': {
+      backgroundColor: theme.palette.warning.main,
+      '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
+        color: theme.palette.common.white,
+      },
+    },
+  },
+}))(MenuItem);
+
 export const NavDrawer = (props) => {
   const { window, entriesList } = props;
+  const {wallet: {current, otherWallets}, walletDispatch} = useWalletContex();
   const classes = useStyles();
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const openWalletMenu = Boolean(anchorEl);
+
+  const handleWalletMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleWalletMenuClose = (newWallet) => {
+    setAnchorEl(null);
+    if (newWallet) {
+      walletDispatch({type:'updateWallet',newWallet:otherWallets[newWallet]})
+    }
+  };
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -154,7 +190,38 @@ export const NavDrawer = (props) => {
           >
             <MenuIcon />
           </IconButton>
-          <img src={logo} alt="logo" className={classes.logo}/>
+          <div className={classes.logoDiv}>
+            <img src={logo} alt="logo" className={classes.logo}/>
+          </div>
+          {current.walletName && (
+            <div>
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={handleWalletMenu}
+                startIcon={<AccountBalanceWalletIcon edge="end" />}
+              >
+                {current.walletName}
+              </Button>
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorEl}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={openWalletMenu}
+                onClose={handleWalletMenuClose}
+              >
+                {_.keys(otherWallets).map((name)=><StyledMenuItem onClick={()=>handleWalletMenuClose(name)}>{name}</StyledMenuItem>)}
+              </Menu>
+            </div>
+          )}
         </Toolbar>
       </AppBar>
       <nav className={classes.drawer} aria-label="mailbox folders">
