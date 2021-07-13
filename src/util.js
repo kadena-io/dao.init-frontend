@@ -361,7 +361,7 @@ export const MakeForm = (props) => {
           {txStatus === 'pending'
             ? null
             : <Button variant="outlined" color="default" type="submit" disabled={wasSubmitted}>
-                Submit
+                {wasSubmitted ? "Complete Signing in Wallet": "Sign & Send"}
               </Button>
           }
         </CardActions>

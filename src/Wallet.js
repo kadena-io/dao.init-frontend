@@ -136,7 +136,10 @@ export const Wallet = ({contractConfigs, children}) => {
          </WalletContext.Provider>
 }
 
-export const useWallet = () => useContext(WalletContext);
+export const useWallet = () => {
+  const {wallet} = useContext(WalletContext);
+  return wallet;
+};
 
 export const walletDrawerEntries = {
   primary:"Wallet",
@@ -166,6 +169,7 @@ export const WalletApp = ({
   </React.Fragment>
   )
 };
+export const addGasCap = (otherCaps) => _.concat([Pact.lang.mkCap("Gas Cap", "Gas Cap", "coin.GAS", [])], otherCaps);
 
 const walletCmd = async (
   setTx,

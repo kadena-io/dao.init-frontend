@@ -8,6 +8,7 @@ import {
 import Pact from "pact-lang-api";
 //config file for blockchain calls
 import { daoAPI } from "../kadena-config.js";
+import { useWallet, addGasCap } from "../Wallet.js";
 import {
   PactJsonListAsTable,
   MakeForm,
@@ -37,22 +38,28 @@ const sendAmbassadorCmd = async (
   setTxStatus,
   setTxRes,
   refresh,
+  signingKey,
+  networkId,
+  gasPrice,
   user, cmd, envData={}, caps=[]
 ) => {
     try {
       //creates transaction to send to wallet
       const toSign = {
           pactCode: cmd,
-          caps: (Array.isArray(caps) && caps.length
+          caps: addGasCap((Array.isArray(caps) && caps.length
             ? caps :
             Pact.lang.mkCap("Ambassador Cap"
                            , "Authenticates that you're an ambassador"
                            , `${daoAPI.contractAddress}.AMBASSADOR`
-                           , [user])),
+                           , [user]))),
+          signingPubKey: signingKey,
+          networkId: networkId,
+          gasPrice: gasPrice,
           gasLimit: daoAPI.meta.gasLimit,
           chainId: daoAPI.meta.chainId,
           ttl: daoAPI.meta.ttl,
-          sender: user,
+          sender: signingKey,
           envData: envData
       }
       console.log("toSign", toSign)
@@ -60,13 +67,13 @@ const sendAmbassadorCmd = async (
       const signed = await Pact.wallet.sign(toSign)
       console.log("signed", signed)
       setTx(signed)
+      try {
       //sends signed transaction to blockchain
       const txReqKeys = await Pact.wallet.sendSigned(signed, daoAPI.meta.host)
       console.log("txReqKeys", txReqKeys)
       //set html to wait for transaction response
       //set state to wait for transaction response
       setTxStatus('pending')
-      try {
         //listens to response to transaction sent
         //  note method will timeout in two minutes
         //    for lower level implementations checkout out Pact.fetch.poll() in pact-lang-api
@@ -102,10 +109,10 @@ const sendAmbassadorCmd = async (
           //set state for transaction failure
           setTxStatus('failure');
         }
-      } catch(e) {
+      } catch(error) {
         // TODO: use break in the while loop to capture if timeout occured
-        console.log("tx api failure",e);
-        setTxRes(e);
+        console.log("tx api failure", error, JSON.stringify(error, ["message", "arguments", "type", "name"]));
+        setTxRes(error);
         setTxStatus('failure');
       }
     } catch(e) {
@@ -120,6 +127,7 @@ export const VoteToFreeze = (props) => {
     refresh,
     ambassadors,
   } = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [amb, setAmb] = useState( "" );
   const {txStatus, setTxStatus,
          tx, setTx,
@@ -140,6 +148,7 @@ export const VoteToFreeze = (props) => {
       evt.preventDefault();
       try {
         sendAmbassadorCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,amb
           ,`(${daoAPI.contractAddress}.vote-to-freeze "${amb}")`
         );
@@ -164,6 +173,7 @@ export const Freeze = (props) => {
     refresh,
     ambassadors,
   } = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [amb, setAmb] = useState( "" );
   const {txStatus, setTxStatus,
          tx, setTx,
@@ -184,6 +194,7 @@ export const Freeze = (props) => {
       evt.preventDefault();
       try {
         sendAmbassadorCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,amb
           ,`(${daoAPI.contractAddress}.freeze "${amb}")`
         );
@@ -208,6 +219,7 @@ export const RotateAmbassador = (props) => {
     refresh,
     ambassadors,
   } = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [acct, setAcct] = useState( "" );
   const [ks, setKs] = useState( "" );
   const {txStatus, setTxStatus,
@@ -220,9 +232,10 @@ export const RotateAmbassador = (props) => {
       // console.log(grd,newAmb);
       try {
         sendAmbassadorCmd(setTx,setTxStatus,setTxRes,refresh
-        ,acct
-        ,`(${daoAPI.contractAddress}.rotate-ambassador "${acct}" (read-keyset 'ks))`
-        ,{ks: JSON.parse(ks)})
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
+          ,acct
+          ,`(${daoAPI.contractAddress}.rotate-ambassador "${acct}" (read-keyset 'ks))`
+          ,{ks: JSON.parse(ks)})
       } catch (e) {
         console.log("rotate-ambassador Submit Error",typeof e, e, acct,ks);
         setTxRes(e);

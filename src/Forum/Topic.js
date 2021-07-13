@@ -193,7 +193,9 @@ const RenderComment = ({
           <ExpandLess onClick={handleInteractClick}/> 
           : <ExpandMore onClick={handleInteractClick}/> }
     </ListItem>
-    <Collapse in={showInteract} timeout="auto" unmountOnExit style={isNested ? {"marginLeft": `${isNested * nestedConst}em`}:null}>
+    <Collapse in={showInteract} timeout="auto" unmountOnExit 
+        style={isNested ? {"marginLeft": `${isNested * nestedConst}em`}:{}}
+        >
       <CommentsActionForms
         tabIdx="inTopicTab"
         members={members}

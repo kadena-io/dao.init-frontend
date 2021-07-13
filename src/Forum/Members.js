@@ -19,6 +19,7 @@ import {
   MakeForm,
  } from "../util.js";
 import { ScrollableTabs } from "../ScrollableTabs.js";
+import { useWallet, addGasCap } from "../Wallet.js";
 
 const useStyles = makeStyles(() => ({
   formControl: {
@@ -53,6 +54,9 @@ export const sendMemberCmd = async (
   setTxStatus,
   setTxRes,
   refresh,
+  signingKey,
+  networkId,
+  gasPrice,
   user,
   cmd, envData={}, role="member", caps=[]
 ) => {
@@ -60,7 +64,7 @@ export const sendMemberCmd = async (
       //creates transaction to send to wallet
       const toSign = {
           pactCode: cmd,
-          caps: (
+          caps: addGasCap(
             Array.isArray(caps) && caps.length ?
               caps :
             role === "moderator" ?
@@ -74,10 +78,13 @@ export const sendMemberCmd = async (
               , `${forumAPI.contractAddress}.MEMBER`
               , [user]) 
             : Error(`sendForumCmd(role=["member"|"moderator"]), got role=${role}`)),
+          signingPubKey: signingKey,
+          networkId: networkId,
+          gasPrice: gasPrice,
           gasLimit: forumAPI.meta.gasLimit,
           chainId: forumAPI.meta.chainId,
           ttl: forumAPI.meta.ttl,
-          sender: user,
+          sender: signingKey,
           envData: envData
       }
       console.log("toSign", toSign)
@@ -90,13 +97,13 @@ export const sendMemberCmd = async (
         throw new Error("Signing API Failed");
       }
 
-      //sends signed transaction to blockchain
-      const txReqKeys = await Pact.wallet.sendSigned(signed, forumAPI.meta.host)
-      console.log("txReqKeys", txReqKeys)
-      //set html to wait for transaction response
-      //set state to wait for transaction response
-      setTxStatus('pending')
       try {
+        //sends signed transaction to blockchain
+        const txReqKeys = await Pact.wallet.sendSigned(signed, forumAPI.meta.host)
+        console.log("txReqKeys", txReqKeys)
+        //set html to wait for transaction response
+        //set state to wait for transaction response
+        setTxStatus('pending')
         //listens to response to transaction sent
         //  note method will timeout in two minutes
         //    for lower level implementations checkout out Pact.fetch.poll() in pact-lang-api
@@ -147,6 +154,7 @@ export const sendMemberCmd = async (
 
 const BecomeModerator = (props) => {
   const {refresh, guardians} = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [user, setUser] = useState( "" );
   const [newKs, setNewKs] = useState({});
   const {txStatus, setTxStatus,
@@ -158,6 +166,7 @@ const BecomeModerator = (props) => {
       evt.preventDefault();
       try {
         sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,user
           ,`(${forumAPI.contractAddress}.become-moderator "${user}" (read-keyset 'ks))`
           ,{ks: JSON.parse(newKs)}
@@ -200,6 +209,7 @@ const BecomeModerator = (props) => {
 
 const BecomeMember = (props) => {
   const {refresh, ambassadors} = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [user, setUser] = useState( "" );
   const [newKs, setNewKs] = useState({});
   const {txStatus, setTxStatus,
@@ -211,6 +221,7 @@ const BecomeMember = (props) => {
       evt.preventDefault();
       try {
         sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,user
           ,`(${forumAPI.contractAddress}.become-member "${user}" (read-keyset 'ks))`
           ,{ks: JSON.parse(newKs)}
@@ -254,6 +265,7 @@ const BecomeMember = (props) => {
 
 const DisableMember = (props) => {
   const {refresh, moderators, members} = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [mod, setMod] = useState( "" );
   const [member, setMember] = useState( "" );
   const {txStatus, setTxStatus,
@@ -265,6 +277,7 @@ const DisableMember = (props) => {
       evt.preventDefault();
       try {
         sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,mod
           ,`(${forumAPI.contractAddress}.disable-member "${mod}" "${member}")`
           ,{}
@@ -304,6 +317,7 @@ const DisableMember = (props) => {
 
 const EnableMember = (props) => {
   const {refresh, moderators, members} = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [mod, setMod] = useState( "" );
   const [member, setMember] = useState( "" );
   const {txStatus, setTxStatus,
@@ -315,6 +329,7 @@ const EnableMember = (props) => {
       evt.preventDefault();
       try {
         sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,mod
           ,`(${forumAPI.contractAddress}.enable-member "${mod}" "${member}")`
           ,{}
@@ -353,6 +368,7 @@ const EnableMember = (props) => {
 
 const RotateModerator = (props) => {
   const {refresh, moderators} = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [mod, setMod] = useState( "" );
   const [newKs, setNewKs] = useState( {} );
   const {txStatus, setTxStatus,
@@ -364,6 +380,7 @@ const RotateModerator = (props) => {
       evt.preventDefault();
       try {
         sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,mod
           ,`(${forumAPI.contractAddress}.rotate-moderator "${mod}" (read-keyset 'ks))`
           ,{ks: JSON.parse(newKs)}
@@ -403,6 +420,7 @@ const RotateModerator = (props) => {
 
 const RotateMember = (props) => {
   const {refresh, members} = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [member, setMember] = useState( "" );
   const [newKs, setNewKs] = useState( {} );
   const {txStatus, setTxStatus,
@@ -414,6 +432,7 @@ const RotateMember = (props) => {
       evt.preventDefault();
       try {
         sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,member
           ,`(${forumAPI.contractAddress}.rotate-member "${member}" (read-keyset 'ks))`
           ,{ks: JSON.parse(newKs)}
@@ -453,6 +472,7 @@ const RotateMember = (props) => {
 
 export const DeleteTopic = (props) => {
   const {refresh, moderators, topics} = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [mod, setMod] = useState( "" );
   const [topicId, setTopicId] = useState( "" );
   const {txStatus, setTxStatus,
@@ -479,6 +499,7 @@ export const DeleteTopic = (props) => {
       evt.preventDefault();
       try {
         sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,mod
           ,`(${forumAPI.contractAddress}.delete-topic "${mod}" "${topicId}")`
           ,{}
@@ -520,6 +541,7 @@ export const DeleteTopic = (props) => {
 
 export const UnDeleteTopic = (props) => {
   const {refresh, moderators, topics} = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [mod, setMod] = useState( "" );
   const [topicId, setTopicId] = useState( "" );
   const {txStatus, setTxStatus,
@@ -546,6 +568,7 @@ export const UnDeleteTopic = (props) => {
       evt.preventDefault();
       try {
         sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,mod
           ,`(${forumAPI.contractAddress}.undelete-topic "${mod}" "${topicId}")`
           ,{}
@@ -586,6 +609,7 @@ export const UnDeleteTopic = (props) => {
 
 export const LockTopic = (props) => {
   const {refresh, moderators, topics} = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [mod, setMod] = useState( "" );
   const [topicId, setTopicId] = useState( "" );
   const {txStatus, setTxStatus,
@@ -612,6 +636,7 @@ export const LockTopic = (props) => {
       evt.preventDefault();
       try {
         sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,mod
           ,`(${forumAPI.contractAddress}.lock-topic "${mod}" "${topicId}")`
           ,{}
@@ -652,6 +677,7 @@ export const LockTopic = (props) => {
 
 export const UnlockTopic = (props) => {
   const {refresh, moderators, topics} = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [mod, setMod] = useState( "" );
   const [topicId, setTopicId] = useState( "" );
   const {txStatus, setTxStatus,
@@ -678,6 +704,7 @@ export const UnlockTopic = (props) => {
       evt.preventDefault();
       try {
         sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,mod
           ,`(${forumAPI.contractAddress}.unlock-topic "${mod}" "${topicId}")`
           ,{}
@@ -725,6 +752,7 @@ export const DeleteTopicComment = ({
     tx, setTx,
     txRes, setTxRes} 
 }) => {
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [mod, setMod] = useState( "" );
   const [commentId, setCommentId] = useState( "" );
   const classes = useStyles();
@@ -748,6 +776,7 @@ export const DeleteTopicComment = ({
       evt.preventDefault();
       try {
         sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,mod
           ,`(${forumAPI.contractAddress}.delete-topic-comment "${mod}" "${commentId}")`
           ,{}
@@ -797,6 +826,7 @@ export const VoteOnTopic = ({
     tx, setTx,
     txRes, setTxRes} 
 }) => {
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [member,setMember] = useState("");
   const [vote, setVote] = useState( "" );
   const [topicId, setTopicId] = useState( "" );
@@ -823,6 +853,7 @@ export const VoteOnTopic = ({
       evt.preventDefault();
       try {
         sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,member
           ,`(${forumAPI.contractAddress}.vote-on-topic "${member}" "${topicId}" "${vote}")`
           ,{}
@@ -877,6 +908,7 @@ export const VoteOnComment = ({
     tx, setTx,
     txRes, setTxRes} 
 }) => {
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [member,setMember] = useState("");
   const [vote, setVote] = useState( "" );
   const [commentId, setCommentId] = useState( "" );
@@ -903,6 +935,7 @@ export const VoteOnComment = ({
       evt.preventDefault();
       try {
         sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,member
           ,`(${forumAPI.contractAddress}.vote-on-comment "${member}" "${commentId}" "${vote}")`
           ,{}
@@ -956,6 +989,7 @@ export const DeleteCommentComment = ({
     tx, setTx,
     txRes, setTxRes} 
 }) => {
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [mod, setMod] = useState( "" );
   const [commentId, setCommentId] = useState( "" );
   const classes = useStyles();
@@ -979,6 +1013,7 @@ export const DeleteCommentComment = ({
       evt.preventDefault();
       try {
         sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,mod
           ,`(${forumAPI.contractAddress}.delete-comment-comment "${mod}" "${commentId}")`
           ,{}

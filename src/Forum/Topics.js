@@ -61,6 +61,7 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import Pact from "pact-lang-api";
 //config file for blockchain calls
 import { daoAPI, forumAPI } from "../kadena-config.js";
+import { useWallet, addGasCap } from "../Wallet.js";
 import {
   PactJsonListAsTable,
   PactSingleJsonAsTable,
@@ -166,6 +167,7 @@ const RenderTopic = ({
 
 export const PostTopic = (props) => {
   const {refresh, members, moderators} = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [author, setAuthor] = useState( "" );
   const [headline, setHeadline] = useState("");
   const [body, setBody] = useState("");
@@ -178,6 +180,7 @@ export const PostTopic = (props) => {
       evt.preventDefault();
       try {
         sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,author
           ,`(${forumAPI.contractAddress}.post-topic (read-msg 'headline) "${author}" (read-msg 'body))`
           ,{headline: headline, body: body}
@@ -221,6 +224,7 @@ export const PostTopic = (props) => {
 
 export const ModifyTopic = (props) => {
   const {refresh, topics} = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [author,setAuthor] = useState("");
   const [topicId,setTopicId] = useState("");
   const [headline, setHeadline] = useState("");
@@ -251,6 +255,7 @@ export const ModifyTopic = (props) => {
       evt.preventDefault();
       try {
         sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,author
           ,`(${forumAPI.contractAddress}.modify-topic "${topicId}" (read-msg 'headline) (read-msg 'body))`
           ,{headline: headline, body: body}

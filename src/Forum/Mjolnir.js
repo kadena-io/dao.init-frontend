@@ -13,6 +13,7 @@ import {
   MakeForm,
  } from "../util.js";
 import { ScrollableTabs } from "../ScrollableTabs.js";
+import { useWallet, addGasCap } from "../Wallet.js";
 
 const useStyles = makeStyles(() => ({
   formControl: {
@@ -30,19 +31,26 @@ const sendMjolnirCmd = async (
   setTxStatus,
   setTxRes,
   refresh,
+  signingKey,
+  networkId,
+  gasPrice,
   cmd, envData={}, caps=[]
 ) => {
     try {
       //creates transaction to send to wallet
       const toSign = {
           pactCode: cmd,
-          caps: (Array.isArray(caps) && caps.length
+          caps: addGasCap(Array.isArray(caps) && caps.length
             ? caps :
             Pact.lang.mkCap("Mjonlir Cap"
                            , "Authenticates that you're Mjonir"
                            , `${forumAPI.contractAddress}.MJOLNIR`)),
+          signingPubKey: signingKey,
+          networkId: networkId,
+          gasPrice: gasPrice,
           gasLimit: forumAPI.meta.gasLimit,
           chainId: forumAPI.meta.chainId,
+          sender: signingKey,
           ttl: forumAPI.meta.ttl,
           envData: envData
       }
@@ -56,13 +64,13 @@ const sendMjolnirCmd = async (
         throw new Error("Signing API Failed");
       }
 
+      try {
       //sends signed transaction to blockchain
       const txReqKeys = await Pact.wallet.sendSigned(signed, forumAPI.meta.host)
       console.log("txReqKeys", txReqKeys)
       //set html to wait for transaction response
       //set state to wait for transaction response
       setTxStatus('pending')
-      try {
         //listens to response to transaction sent
         //  note method will timeout in two minutes
         //    for lower level implementations checkout out Pact.fetch.poll() in pact-lang-api
@@ -115,6 +123,7 @@ const RotateMjolnir = (props) => {
   const {
     refresh,
   } = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [newGrd, setNewGrd] = useState( "" );
   const {txStatus, setTxStatus,
     tx, setTx,
@@ -137,6 +146,7 @@ const RotateMjolnir = (props) => {
       console.log(forumAPI);
       try {
         sendMjolnirCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,`(${forumAPI.contractAddress}.rotate-mjolnir (read-keyset 'ks))`
           ,{ks: JSON.parse(newGrd)}
         );
@@ -158,6 +168,7 @@ const RotateMjolnir = (props) => {
 
 export const DisableModerator = (props) => {
   const {refresh, moderators} = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [mod, setMod] = useState( "" );
   const {txStatus, setTxStatus,
     tx, setTx,
@@ -168,6 +179,7 @@ export const DisableModerator = (props) => {
       evt.preventDefault();
       try {
         sendMjolnirCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
         ,`(${forumAPI.contractAddress}.disable-moderator "${mod}")`
         )
       } catch (e) {
@@ -197,6 +209,7 @@ export const DisableModerator = (props) => {
 
 const EnableModerator = (props) => {
   const {refresh, moderators} = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [mod, setMod] = useState( "" );
   const {txStatus, setTxStatus,
     tx, setTx,
@@ -207,7 +220,8 @@ const EnableModerator = (props) => {
       evt.preventDefault();
       try {
         sendMjolnirCmd(setTx,setTxStatus,setTxRes,refresh
-        ,`(${forumAPI.contractAddress}.enable-moderator "${mod}")`
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
+          ,`(${forumAPI.contractAddress}.enable-moderator "${mod}")`
         )
       } catch (e) {
         console.log("disable-moderator Submit Error",typeof e, e, mod,);
@@ -236,6 +250,7 @@ const EnableModerator = (props) => {
 
 const MjolnirWriteMember = (props) => {
   const {refresh, moderators, members} = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [user, setUser] = useState( "" );
   const [newKs, setNewKs] = useState({});
   const [isMod,setIsMod] = useState(false);
@@ -248,8 +263,9 @@ const MjolnirWriteMember = (props) => {
       evt.preventDefault();
       try {
         sendMjolnirCmd(setTx,setTxStatus,setTxRes,refresh
-        ,`(${forumAPI.contractAddress}.mjolnir-write-member "${user}" (read-keyset 'ks) ${isMod})`
-        ,{ks: JSON.parse(newKs)})
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
+          ,`(${forumAPI.contractAddress}.mjolnir-write-member "${user}" (read-keyset 'ks) ${isMod})`
+          ,{ks: JSON.parse(newKs)})
       } catch (e) {
         console.log("mjolnir-write-member Submit Error",typeof e, e, user, newKs, isMod);
         setTxRes(e);

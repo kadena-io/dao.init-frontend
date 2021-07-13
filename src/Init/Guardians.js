@@ -13,6 +13,8 @@ import {
   MakeForm,
  } from "../util.js";
 
+import { useWallet, addGasCap } from "../Wallet.js";
+
 const useStyles = makeStyles(() => ({
   formControl: {
     margin: "5px auto",
@@ -29,22 +31,28 @@ const sendGuardianCmd = async (
   setTxStatus,
   setTxRes,
   refresh,
+  signingKey,
+  networkId,
+  gasPrice,
   user, cmd, envData={}, caps=[]
 ) => {
     try {
       //creates transaction to send to wallet
       const toSign = {
           pactCode: cmd,
-          caps: (Array.isArray(caps) && caps.length
+          caps: addGasCap((Array.isArray(caps) && caps.length
             ? caps :
             Pact.lang.mkCap("Guadian Cap"
                            , "Authenticates that you're a guardian"
                            , `${daoAPI.contractAddress}.GUARDIAN`
-                           , [user])),
+                           , [user]))),
           gasLimit: daoAPI.meta.gasLimit,
           chainId: daoAPI.meta.chainId,
+          signingPubKey: signingKey,
+          networkId: networkId,
+          gasPrice: gasPrice,
           ttl: daoAPI.meta.ttl,
-          sender: user,
+          sender: signingKey,
           envData: envData
       }
       console.log("toSign", toSign)
@@ -127,6 +135,7 @@ export const RegisterAmbassador = (props) => {
     refresh,
     guardians,
   } = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [grd, setGrd] = useState( "" );
   const [newAmb, setNewAmb] = useState( "" );
   const [ambGrd, setAmbGrd] = useState( "" );
@@ -164,6 +173,7 @@ export const RegisterAmbassador = (props) => {
       evt.preventDefault();
       try {
         sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,grd
           ,`(${daoAPI.contractAddress}.register-ambassador "${grd}" "${newAmb}" (read-keyset 'ks))`
           ,{ks: JSON.parse(ambGrd)}
@@ -185,6 +195,7 @@ export const RegisterAmbassador = (props) => {
 };
 
 export const DeactivateAmbassador = (props) => {
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const {refresh} = props;
   const [grd, setGrd] = useState( "" );
   const [amb, setAmb] = useState( "" );
@@ -198,8 +209,9 @@ export const DeactivateAmbassador = (props) => {
       // console.log(grd,newAmb);
       try {
         sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
-        ,grd
-        ,`(${daoAPI.contractAddress}.deactivate-ambassador "${grd}" "${amb}")`
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
+          ,grd
+          ,`(${daoAPI.contractAddress}.deactivate-ambassador "${grd}" "${amb}")`
         )
       } catch (e) {
         console.log("deactivate-ambassador Submit Error",typeof e, e, grd,);
@@ -237,6 +249,7 @@ export const ReactivateAmbassador = (props) => {
   const {
     refresh,
   } = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [grd, setGrd] = useState( "" );
   const [amb, setAmb] = useState( "" );
   const {txStatus, setTxStatus,
@@ -249,7 +262,8 @@ export const ReactivateAmbassador = (props) => {
       // console.log(grd,newAmb);
       try {
         sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
-        ,grd
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
+          ,grd
         ,`(${daoAPI.contractAddress}.reactivate-ambassador "${grd}" "${amb}")`
         )
       } catch (e) {
@@ -289,6 +303,7 @@ export const RotateGuardian = (props) => {
     refresh,
     guardians,
   } = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [grd, setGrd] = useState( "" );
   const [voteKs, setVoteKs] = useState( "" );
   const {txStatus, setTxStatus,
@@ -301,9 +316,10 @@ export const RotateGuardian = (props) => {
       // console.log(grd,newAmb);
       try {
         sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
-        ,grd
-        ,`(${daoAPI.contractAddress}.rotate-guardian "${grd}" (read-keyset 'voteKs))`
-        ,{voteKs: JSON.parse(voteKs)})
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
+          ,grd
+          ,`(${daoAPI.contractAddress}.rotate-guardian "${grd}" (read-keyset 'voteKs))`
+          ,{voteKs: JSON.parse(voteKs)})
       } catch (e) {
         console.log("rotate-guardian Submit Error",typeof e, e, grd, voteKs,);
         setTxRes(e);
@@ -342,6 +358,7 @@ export const ProposeDaoUpgrade = (props) => {
     refresh,
     guardians,
   } = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [acct, setAcct] = useState( "" );
   const [hsh, setHsh] = useState( "" );
   const {txStatus, setTxStatus,
@@ -370,6 +387,7 @@ export const ProposeDaoUpgrade = (props) => {
       evt.preventDefault();
       try {
         sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,acct
           ,`(${daoAPI.contractAddress}.propose-dao-upgrade "${acct}" "${hsh}")`
         );
@@ -394,6 +412,7 @@ export const GuardianApproveHash = (props) => {
     refresh,
     guardians,
   } = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [acct, setAcct] = useState( "" );
   const [hsh, setHsh] = useState( "" );
   const {txStatus, setTxStatus,
@@ -422,6 +441,7 @@ export const GuardianApproveHash = (props) => {
       evt.preventDefault();
       try {
         sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,acct
           ,`(${daoAPI.contractAddress}.guardian-approve-hash "${acct}" "${hsh}")`
         );
@@ -445,6 +465,7 @@ export const RegisterGuardian = (props) => {
   const {
     refresh,
   } = props;
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [grd, setGrd] = useState( "" );
   const [voteKs, setVoteKs] = useState( "" );
   const {txStatus, setTxStatus,
@@ -474,6 +495,7 @@ export const RegisterGuardian = (props) => {
       evt.preventDefault();
       try {
         sendGuardianCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,grd
           ,`(${daoAPI.contractAddress}.register-guardian "${grd}" (read-keyset 'voteKs))`
           ,{voteKs: JSON.parse(voteKs)}

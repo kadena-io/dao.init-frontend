@@ -49,6 +49,7 @@ import {
 import Pact from "pact-lang-api";
 //config file for blockchain calls
 import { daoAPI, forumAPI } from "../kadena-config.js";
+import { useWallet, addGasCap } from "../Wallet.js";
 import {
   PactJsonListAsTable,
   PactSingleJsonAsTable,
@@ -87,6 +88,7 @@ export const CommentOnTopic = ({
     tx, setTx,
     txRes, setTxRes}
   }) => {
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [author, setAuthor] = useState( "" );
   const [topicId, setTopicId] = useState( "" );
   const [body, setBody] = useState("");
@@ -110,6 +112,7 @@ export const CommentOnTopic = ({
       evt.preventDefault();
       try {
         sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,author
           ,`(${forumAPI.contractAddress}.post-topic-comment "${author}" (read-msg 'body) "${topicId}")`
           ,{body: body}
@@ -163,6 +166,7 @@ export const EditComment = ({
     tx, setTx,
     txRes, setTxRes}
   }) => {
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [author, setAuthor] = useState( "" );
   const [commentId, setCommentId] = useState( "" );
   const [body, setBody] = useState("");
@@ -188,6 +192,7 @@ export const EditComment = ({
       evt.preventDefault();
       try {
         sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,author
           ,`(${forumAPI.contractAddress}.modify-comment "${commentId}" (read-msg 'body) )`
           ,{body: body}
@@ -233,6 +238,7 @@ export const ReplyToComment = ({
     tx, setTx,
     txRes, setTxRes}
   }) => {
+  const {current: {signingKey, networkId, gasPrice}} = useWallet();
   const [author, setAuthor] = useState( "" );
   const [commentId, setCommentId] = useState( "" );
   const [body, setBody] = useState("");
@@ -257,6 +263,7 @@ export const ReplyToComment = ({
       evt.preventDefault();
       try {
         sendMemberCmd(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
           ,author
           ,`(${forumAPI.contractAddress}.post-comment-comment "${author}" (read-msg 'body) "${commentId}")`
           ,{body: body}
