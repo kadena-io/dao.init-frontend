@@ -51,8 +51,8 @@ import {
 const App = () => {
   //Top level UI Routing Params
   const [appRoute,setAppRoute] = useQueryParams({
-    "app": withDefault(StringParam,"forum"),
-    "ui": withDefault(StringParam,"topics")
+    "app": withDefault(StringParam,"wallet"),
+    "ui": withDefault(StringParam,"config")
   });
 
   //Init Top Level States
