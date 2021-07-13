@@ -319,13 +319,13 @@ const App = () => {
       : <React.Fragment>
         {() => {
           console.log("Redirecting, this didn't match:", appRoute);
-          setAppRoute({app:"forum",ui:"topics"})}
+          setAppRoute({app:"wallet",ui:"config"})}
         }
       </React.Fragment> )
     : <React.Fragment>
         {() => {
           console.log("Redirecting, this didn't match:", appRoute);
-          setAppRoute({app:"forum",ui:"topics"})}
+          setAppRoute({app:"wallet",ui:"config"})}
         }
       </React.Fragment>
     }

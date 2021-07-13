@@ -169,7 +169,7 @@ export const InitApp = ({
       </CardContent>
     </Card>
   : <React.Fragment>
-      {setAppRoute({app:"forum", ui:"topics"})}
+      {setAppRoute({app:"wallet", ui:"config"})}
   </React.Fragment>
   )
 };
