@@ -187,14 +187,14 @@ const RenderComment = ({
   };
   
   return <React.Fragment>
-    <ListItem key={comment.index} style={isNested ? classes : null}>
+    <ListItem key={comment.index} style={classes}>
       <RenderMD mdText={`*${secondaryText}* \n\n` + comment.body} />
       { showInteract ? 
           <ExpandLess onClick={handleInteractClick}/> 
           : <ExpandMore onClick={handleInteractClick}/> }
     </ListItem>
     <Collapse in={showInteract} timeout="auto" unmountOnExit 
-        style={isNested ? {"marginLeft": `${isNested * nestedConst}em`}:{}}
+        style={{"marginLeft": `${isNested * nestedConst}em`}}
         >
       <CommentsActionForms
         tabIdx="inTopicTab"

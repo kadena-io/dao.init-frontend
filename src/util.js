@@ -26,6 +26,7 @@ import {
 //config file for blockchain calls
 import { PactTxStatus } from "./PactTxStatus.js";
 import { MDEditor } from "./Markdown";
+import { useWallet } from "./Wallet.js";
 
 export const useInputStyles = makeStyles((theme) => ({
   root: {
@@ -345,6 +346,7 @@ export const MakeForm = (props) => {
     onSubmit,
     tx, txRes, txStatus, setTxStatus
   } = props;
+  const {current: {walletName, signingKey}} = useWallet();
   const [wasSubmitted,setWasSubmitted] = useState(false);
   useEffect(()=>setWasSubmitted(false),[inputFields]);
   useEffect(()=>txStatus !== "" ? setWasSubmitted(true) : setWasSubmitted(wasSubmitted), [txStatus])
@@ -361,7 +363,7 @@ export const MakeForm = (props) => {
           {txStatus === 'pending'
             ? null
             : <Button variant="outlined" color="default" type="submit" disabled={wasSubmitted}>
-                {wasSubmitted ? "Complete Signing in Wallet": "Sign & Send"}
+                {wasSubmitted ? "Complete Signing in Wallet": `Sign with ${walletName} using key ${signingKey.substring(0,4)}...${signingKey.substring(signingKey.length - 4)}`}
               </Button>
           }
         </CardActions>

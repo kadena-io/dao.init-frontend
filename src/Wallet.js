@@ -11,6 +11,7 @@ import {
   CardContent,
   CardHeader,
   Checkbox,
+  Container,
   ClickAwayListener,
   Collapse,
   Divider,
@@ -55,6 +56,7 @@ import {
   updateParams,
   renderPactValue,
  } from "./util.js";
+import { keyFormatter } from "./kadena-config.js";
 
 const useStyles = makeStyles(() => ({
   formControl: {
@@ -161,7 +163,9 @@ export const WalletApp = ({
     <Card>
       <CardHeader title="Wallet Configuration"/>
       <CardContent>
-        <WalletConfig />
+        <WalletConfig/>
+        <CurrentWallet/>
+        <OtherWallets/>
       </CardContent>
     </Card>
   : <React.Fragment>
@@ -327,6 +331,29 @@ const EntrySelector = ({
   );
 }
 
+export const CurrentWallet = () => {
+  const {current} = useWallet();
+  
+  return <Container style={{"paddingTop":"2em"}}>
+    <Typography component="h2">Saved Wallets</Typography>
+    <PactSingleJsonAsTable
+      json={current}
+      keyFormatter={keyFormatter}
+      />
+  </Container>
+};
+
+export const OtherWallets = () => {
+  const {otherWallets} = useWallet();
+  
+  return <Container style={{"paddingTop":"2em"}}>
+    <Typography component="h2">All Saved Wallets</Typography>
+    <PactSingleJsonAsTable
+      json={otherWallets}
+      keyFormatter={keyFormatter}
+      />
+  </Container>
+};
 
 export const WalletConfig = () => {
   const {wallet, walletDispatch} = useContext(WalletContext);
@@ -398,7 +425,8 @@ export const WalletConfig = () => {
       onChange:setGasPrice,
     }];
 
-  return <div>
+  return <Container style={{"paddingTop":"1em"}}>
+    <Typography component="h2">Add or Update Wallet</Typography>
       <form
         autoComplete="off"
         onSubmit={(evt) => handleSubmit(evt)}>
@@ -416,5 +444,5 @@ export const WalletConfig = () => {
       </form>
       { txStatus === 'pending' ? <LinearProgress /> : null }
       <PactTxStatus tx={tx} txRes={txRes} txStatus={txStatus} setTxStatus={setTxStatus}/>
-    </div>
+  </Container>
 };
