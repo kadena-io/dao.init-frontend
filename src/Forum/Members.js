@@ -840,10 +840,10 @@ export const VoteOnTopic = ({
   const [routed,setRouted] = useState(false);
   useEffect(()=> {
     try {
-      if (!routed && _.has(appRoute, ["topicId", "vote"])) {
+      if (!routed && _.has(appRoute, ["topicId"])) {
         let topic = _.find(topics,t=>t.index === appRoute.topicId);
         setTopicId(topic.index);
-        setVote(appRoute.vote);
+        setVote(appRoute.vote || "");
         setRouted(true);
       }
     } catch (e) {}
@@ -1140,7 +1140,7 @@ export const ModeratorActionForms = ({
                 moderators={moderators}
                 comments={comments}
                 pactTxStatus={pactTxStatus}
-                refresh={()=>getComments()}/>
+                refresh={()=>{getComments(); getTopics(); return null;}}/>
           },{
             label:"Delete Comment Reply",
             component:
@@ -1148,7 +1148,7 @@ export const ModeratorActionForms = ({
                 moderators={moderators}
                 comments={comments}
                 pactTxStatus={pactTxStatus}
-                refresh={()=>getComments()}/>
+                refresh={()=>{getComments(); getTopics(); return null;}}/>
           }
       ]}/>
   );

@@ -59,6 +59,7 @@ import {
 import { sendMemberCmd } from "./Members.js";
 import { ScrollableTabs } from "../ScrollableTabs.js";
 import { RenderMD } from "../Markdown.js";
+import { VoteOnComment } from "./Members.js";
 
 const useStyles = makeStyles(() => ({
   formControl: {
@@ -343,6 +344,15 @@ export const CommentsActionForms = (props) => {
                 comments={comments}
                 pactTxStatus={pactTxStatus}
                 refresh={() => getComments()}/>
+          },{
+            label:"Vote on Comment",
+            component:
+              <VoteOnComment
+                members={members}
+                moderators={moderators}
+                comments={comments}
+                pactTxStatus={pactTxStatus}
+                refresh={()=>getComments()}/>
           }
       ]}/>
   );

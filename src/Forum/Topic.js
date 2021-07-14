@@ -45,7 +45,11 @@ import {
   renderPactValue,
  } from "../util.js";
 import { RenderMD } from "../Markdown.js";
+import { ScrollableTabs } from "../ScrollableTabs.js";
 import { CommentsActionForms } from "./Comments.js";
+import { CommentOnTopic } from "./Comments.js";
+import { ModifyTopic } from "./Topics.js";
+import { VoteOnTopic } from "./Members.js";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -100,9 +104,15 @@ export const RenderTopic = ({
             <TopicButtons topic={topic}/>
         </ListItem>
         <ListItem>
-            <PactSingleJsonAsTable
-              keyFormatter={dashStyleNames2Text}
-              json={[_.pick(topic,["author", "deleted", "locked", "modified", "timestamp"])]}
+          <TopicActionForms
+            tabIdx="inTopicDirect"
+            members={members}
+            moderators={moderators}
+            topics={topics}
+            topic={topic}
+            comments={comments}
+            pactTxStatus={pactTxStatus}
+            refresh={refresh}
             />
         </ListItem>
         </List>
@@ -237,6 +247,8 @@ export const TopicButtons = ({topic}) => {
     "topicsTab":StringParam,
     "author":StringParam,
     "topicId":StringParam,
+    "inTopicDirect":StringParam,
+    "vote":StringParam,
   });
 
   return (
@@ -249,19 +261,19 @@ export const TopicButtons = ({topic}) => {
   >
         <Tooltip title="Vote For Topic">
         <IconButton size="small"
-          onClick={()=> setAppRoute({ui:"topics",forumTab:"0"})}>
+          onClick={()=> setAppRoute({ui:"topic",inTopicDirect:"1",vote:"upvote"})}>
           <ThumbUpIcon/>
         </IconButton>
         </Tooltip>
         <Tooltip title="Remove Your Vote">
         <IconButton size="small"
-          onClick={()=> setAppRoute({ui:"topics",forumTab:"1"})}>
+          onClick={()=> setAppRoute({ui:"topic",inTopicDirect:"1",vote:"remove"})}>
           <RemoveCircleOutlineIcon/>
         </IconButton>
         </Tooltip>
         <Tooltip title="Vote Against Topic">
         <IconButton size="small"
-          onClick={()=> setAppRoute({ui:"topics",forumTab:"2"})}>
+          onClick={()=> setAppRoute({ui:"topic",inTopicDirect:"1",vote:"downvote"})}>
           <ThumbDownIcon/>
         </IconButton>
         </Tooltip>
@@ -288,16 +300,70 @@ export const TopicButtons = ({topic}) => {
       </Tooltip>
       <Tooltip title="Edit Topic">
         <IconButton size="small"
-          onClick={()=> setAppRoute({ui:"topics",topicsTab:"1"})}>
+          onClick={()=> setAppRoute({ui:"topic",inTopicDirect:"3"})}>
           <EditIcon/>
         </IconButton>
         </Tooltip>
       <Tooltip title="Comment on Topic">
         <IconButton size="small"
-          onClick={()=> setAppRoute({ui:"topics",topicsTab:"3"})}>
+          onClick={()=> setAppRoute({ui:"topic",inTopicDirect:"1"})}>
           <CommentIcon/>
         </IconButton>
         </Tooltip>
       </ButtonGroup>
+  );
+}
+
+export const TopicActionForms = ({
+  members,
+  moderators,
+  topics,
+  topic,
+  tabIdx,
+  pactTxStatus,
+  refresh: {
+    getTopics,
+    getComments,
+  } 
+}) => {
+
+  return (
+    <ScrollableTabs
+      tabIdx={tabIdx}
+      tabEntries={[
+          {
+            label:"Post Details",
+            component:
+            <PactSingleJsonAsTable
+              keyFormatter={dashStyleNames2Text}
+              json={[_.pick(topic,["author", "deleted", "locked", "modified", "timestamp","upvotes","downvotes"])]}
+            />
+          },{
+            label:"Vote on Topic",
+            component:
+              <VoteOnTopic
+                members={members}
+                moderators={moderators}
+                topics={topics}
+                pactTxStatus={pactTxStatus}
+                refresh={()=>getTopics()}/>
+          },{
+            label:"Comment on Topic",
+            component:
+              <CommentOnTopic
+                members={members}
+                moderators={moderators}
+                topics={topics}
+                pactTxStatus={pactTxStatus}
+                refresh={() => {getTopics(); getComments(); return null}}/>
+          },{
+            label:"Edit Topic (author only)",
+            component:
+              <ModifyTopic
+                topics={topics}
+                pactTxStatus={pactTxStatus}
+                refresh={() => getTopics()}/>
+          }
+      ]}/>
   );
 }
