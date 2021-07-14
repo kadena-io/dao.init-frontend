@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "99f0b2609b38521b307f6fd43e9cc983",
+    "revision": "757e773239f3386feb45ea3828cc5d74",
     "url": "/dao.init-frontend/index.html"
   },
   {
