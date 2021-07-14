@@ -145,7 +145,7 @@ export const NavDrawer = (props) => {
 
   const handleWalletMenuClose = (newWallet) => {
     setAnchorEl(null);
-    if (newWallet) {
+    if (typeof newWallet === 'string') {
       walletDispatch({type:'updateWallet',newWallet:otherWallets[newWallet]})
     }
   };
@@ -218,7 +218,7 @@ export const NavDrawer = (props) => {
                 open={openWalletMenu}
                 onClose={handleWalletMenuClose}
               >
-                {_.keys(otherWallets).map((name)=><StyledMenuItem onClick={()=>handleWalletMenuClose(name)}>{name}</StyledMenuItem>)}
+                {_.keys(otherWallets).map((name)=><MenuItem onClick={()=>handleWalletMenuClose(name)}>{name}</MenuItem>)}
               </Menu>
             </div>
           )}

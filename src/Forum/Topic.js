@@ -294,7 +294,7 @@ export const TopicButtons = ({topic}) => {
         </Tooltip>
       <Tooltip title="Comment on Topic">
         <IconButton size="small"
-          onClick={()=> setAppRoute({ui:"topics",commentsTab:"3"})}>
+          onClick={()=> setAppRoute({ui:"topics",topicsTab:"3"})}>
           <CommentIcon/>
         </IconButton>
         </Tooltip>
