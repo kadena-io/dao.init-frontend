@@ -5,12 +5,19 @@ import gfm from 'remark-gfm';
 import "react-mde/lib/styles/css/react-mde-all.css";
 
 import {
-  Container,
+  Container, makeStyles,
 } from '@material-ui/core';
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+      '& p img': {width: "100%"},
+  }
+}));
 
 export const MDEditor = (props) => {
   const {value, onChange} = props;
   const [selectedTab, setSelectedTab] = useState("write");
+  const classes = useStyles();
 
   const saveImage = async function (data) {
     // Promise that waits for "time" milliseconds
@@ -26,7 +33,7 @@ export const MDEditor = (props) => {
         selectedTab={selectedTab}
         onTabChange={setSelectedTab}
         generateMarkdownPreview={(markdown) => {
-          const res = Promise.resolve(<ReactMarkdown remarkPlugins={[gfm]} children={markdown}/>);
+          const res = Promise.resolve(<ReactMarkdown remarkPlugins={[gfm]} children={markdown} className={classes.root}/>);
           console.log(`react-mde-preview=${res}`, res);
           return res;
         }}
@@ -43,7 +50,8 @@ export const MDEditor = (props) => {
 }
 
 export const RenderMD = (props) => {
+  const classes = useStyles();
   return  <Container>
-            <ReactMarkdown remarkPlugins={[gfm]} children={props.mdText}/>
+            <ReactMarkdown remarkPlugins={[gfm]} children={props.mdText} className={classes.root}/>
           </Container>
 }
