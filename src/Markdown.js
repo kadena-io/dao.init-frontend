@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import _ from "lodash";
-import ReactMde from "react-mde";
+import ReactMde, {Command, getDefaultCommandMap, getDefaultToolbarCommands} from "react-mde";
 import ReactMarkdown from "react-markdown";
 import gfm from 'remark-gfm';
 import "react-mde/lib/styles/css/react-mde-all.css";
@@ -16,6 +16,14 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+const cmdTag = {
+  name: "add tag",
+  icon: () => <Chip size="small" variant="outline" color="default" label="Tag" style={{marginTop: "-5px"}}/>,
+  execute: opts => {
+    opts.textApi.replaceSelection("[](tag)");
+  }
+};
+
 export const MDEditor = (props) => {
   const {value, onChange} = props;
   const [selectedTab, setSelectedTab] = useState("write");
@@ -27,11 +35,16 @@ export const MDEditor = (props) => {
     // returns true meaning that the save was successful
     return "No Attachments";
   };
-
+  const newCmds = getDefaultCommandMap();
+  newCmds["cmdTag"] = cmdTag;
+  const newCmdBar = getDefaultToolbarCommands();
+  newCmdBar.push(["cmdTag"])
   return (
       <ReactMde
         value={value}
         onChange={onChange}
+        commands={newCmds}
+        toolbarCommands={newCmdBar}
         selectedTab={selectedTab}
         onTabChange={setSelectedTab}
         generateMarkdownPreview={(markdown) => {
@@ -80,7 +93,7 @@ export const getTagsFromMd = (md) => {
             res.push(m[1]);
         }
     } while (m);
-  return res.map(v=>v.toLocaleLowerCase());
+  return _.uniq(res.map(v=>v.toLocaleLowerCase()));
 };
 
 export const ChipsFromTags = ({tags}) => tags.map(tag=>{
