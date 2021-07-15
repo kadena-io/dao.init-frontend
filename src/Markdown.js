@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import _ from "lodash";
 import ReactMde from "react-mde";
 import ReactMarkdown from "react-markdown";
 import gfm from 'remark-gfm';
 import "react-mde/lib/styles/css/react-mde-all.css";
 
 import {
+  Chip,
   Container, makeStyles,
 } from '@material-ui/core';
 
@@ -33,9 +35,18 @@ export const MDEditor = (props) => {
         selectedTab={selectedTab}
         onTabChange={setSelectedTab}
         generateMarkdownPreview={(markdown) => {
-          const res = Promise.resolve(<ReactMarkdown remarkPlugins={[gfm]} children={markdown} className={classes.root}/>);
-          console.log(`react-mde-preview=${res}`, res);
-          return res;
+          console.log(getTagsFromMdBody(markdown));
+          const chips = <ChipsFromTags tags={getTagsFromMd(markdown)}/>
+          const strippedOfTags = _.clone(markdown).replaceAll(tagRegex,'');
+          const res = Promise.resolve(
+          <div>
+            {chips}
+            <ReactMarkdown remarkPlugins={[gfm]} children={strippedOfTags} className={classes.root}/>
+          </div>
+            );
+          
+          console.debug(`react-mde-preview=${res}`, res);
+          return res
         }}
         childProps={{
           writeButton: {
@@ -49,9 +60,48 @@ export const MDEditor = (props) => {
   );
 }
 
-export const RenderMD = (props) => {
+export const RenderMD = ({mdText}) => {
   const classes = useStyles();
+  const chips = <ChipsFromTags tags={getTagsFromMd(mdText)}/>
+  const strippedOfTags = _.clone(mdText).replaceAll(tagRegex,'');
   return  <Container>
-            <ReactMarkdown remarkPlugins={[gfm]} children={props.mdText} className={classes.root}/>
+            {chips}
+            <ReactMarkdown remarkPlugins={[gfm]} children={strippedOfTags} className={classes.root}/>
           </Container>
 }
+
+const tagRegex = /\[([^\[]+)\](\(tag\))/gim;
+export const getTagsFromMd = (md) => {
+    var m;
+    var res = [];
+    do {
+        m = tagRegex.exec(md);
+        if (m) {
+            res.push(m[1]);
+        }
+    } while (m);
+  return res.map(v=>v.toLocaleLowerCase());
+};
+
+export const ChipsFromTags = ({tags}) => tags.map(tag=>{
+  console.log(tag);
+  switch (tag) {
+    case "bug hunt":
+      return <Chip size="small" color="primary" label="Bug Hunt" style={{backgroundColor:"red"}}/>;
+    case "dao":
+      return <Chip size="small" color="primary" label="DAO"/>;
+    case "frontend":
+      return <Chip variant="outlined" size="small" color="primary" label="Frontend"/>;
+    case "cold coffee":
+      return <Chip size="small" color="default" label="Cold Coffee"/>;
+    default:
+      return null;
+
+  }
+});
+  
+
+const regexMatchTags = /\[(.*[^\[]+)\](\(tag\))/gim;
+
+const getTagsFromMdBody = (body) => body.match(regexMatchTags).map(v=>v[1]);
+const removeTagsFromMdBody = body => _.clone(body).replace(regexMatchTags,'');

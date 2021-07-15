@@ -75,6 +75,7 @@ import {
 import { ScrollableTabs } from "../ScrollableTabs.js";
 import { CommentOnTopic } from "./Comments.js";
 import { ModeratorTopicForms } from "./Members.js";
+import { ChipsFromTags, getTagsFromMd } from "../Markdown.js";
 
 const useStyles = makeStyles(() => ({
   formControl: {
@@ -131,6 +132,8 @@ const RenderTopic = ({
   
   const secondaryText = `Comment by ${topic.author} on ${renderPactValue(topic.timestamp)}${topic.modified ? " [edited]" : ""}`
 
+  const chips = <ChipsFromTags tags={getTagsFromMd(topic.body)}/>;
+
   const handleInteractClick = () => {
     setAppRoute({topicId:topic.index});
     setShowInteract(!showInteract);
@@ -144,10 +147,14 @@ const RenderTopic = ({
         <Box textOverflow="ellipsis" overflow="hidden">
           {topic.headline}
         </Box>}
-        secondary={
+        secondary={<React.Fragment>
         <Box textOverflow="ellipsis" overflow="hidden">
           {secondaryText}
-        </Box>}
+        </Box>
+        <Box textOverflow="ellipsis" overflow="hidden">
+          {chips}
+        </Box></React.Fragment>
+        }
         />
         <GavelIcon onClick={handleInteractClick}/> 
     </ListItem>
