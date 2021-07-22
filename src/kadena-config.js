@@ -46,6 +46,20 @@ const host = `https://${node}/chainweb/0.0/${networkId}/chain/${chainId}/pact`;
 //creation time for request
 const creationTime = () => Math.round(new Date().getTime() / 1000) - 15;
 
+const globalConfig = {
+  explorerURL: `https://explorer.chainweb.com/${networkId.slice(0, -2)}`,
+  networkId: networkId,
+  host: host,
+  creationTime: creationTime,
+  //gas price at lowest possible denomination
+  gasPrice: 0.00000000001,
+  //high gas limit for tx
+  gasLimit: 10000,
+  //time a tx lives in mempool since creationTime
+  ttl: 28800,
+  //sender === gas payer of the transaction
+};
+
 //JSON with all necessary blockchain call data
 const daoAPI = {
   contractName: daoContractName,
@@ -105,4 +119,4 @@ const forumAPI = {
 const keyFormatter = (str) =>
   str.replace(new RegExp("[A-Z]+","gm")," $&").replace(new RegExp("^[a-z]","gm"),k => k.toUpperCase());
 
-module.exports = { daoAPI: daoAPI, forumAPI: forumAPI, keyFormatter: keyFormatter }
+module.exports = { daoAPI: daoAPI, forumAPI: forumAPI, globalConfig, keyFormatter: keyFormatter }

@@ -19,7 +19,7 @@ import {
   MakeForm,
  } from "../util.js";
 import { ScrollableTabs } from "../ScrollableTabs.js";
-import { useWallet, addGasCap } from "../Wallet.js";
+import { usePactWallet, addGasCap } from "../PactWallet.js";
 
 const useStyles = makeStyles(() => ({
   formControl: {
@@ -154,7 +154,7 @@ export const sendMemberCmd = async (
 
 const BecomeModerator = (props) => {
   const {refresh, guardians} = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [user, setUser] = useState( "" );
   const [newKs, setNewKs] = useState({});
   const {txStatus, setTxStatus,
@@ -209,7 +209,7 @@ const BecomeModerator = (props) => {
 
 const BecomeMember = (props) => {
   const {refresh, ambassadors} = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [user, setUser] = useState( "" );
   const [newKs, setNewKs] = useState({});
   const {txStatus, setTxStatus,
@@ -265,7 +265,7 @@ const BecomeMember = (props) => {
 
 const DisableMember = (props) => {
   const {refresh, moderators, members} = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [mod, setMod] = useState( "" );
   const [member, setMember] = useState( "" );
   const {txStatus, setTxStatus,
@@ -317,7 +317,7 @@ const DisableMember = (props) => {
 
 const EnableMember = (props) => {
   const {refresh, moderators, members} = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [mod, setMod] = useState( "" );
   const [member, setMember] = useState( "" );
   const {txStatus, setTxStatus,
@@ -368,7 +368,7 @@ const EnableMember = (props) => {
 
 const RotateModerator = (props) => {
   const {refresh, moderators} = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [mod, setMod] = useState( "" );
   const [newKs, setNewKs] = useState( {} );
   const {txStatus, setTxStatus,
@@ -420,7 +420,7 @@ const RotateModerator = (props) => {
 
 const RotateMember = (props) => {
   const {refresh, members} = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [member, setMember] = useState( "" );
   const [newKs, setNewKs] = useState( {} );
   const {txStatus, setTxStatus,
@@ -472,7 +472,7 @@ const RotateMember = (props) => {
 
 export const DeleteTopic = (props) => {
   const {refresh, moderators, topics} = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [mod, setMod] = useState( "" );
   const [topicId, setTopicId] = useState( "" );
   const {txStatus, setTxStatus,
@@ -541,7 +541,7 @@ export const DeleteTopic = (props) => {
 
 export const UnDeleteTopic = (props) => {
   const {refresh, moderators, topics} = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [mod, setMod] = useState( "" );
   const [topicId, setTopicId] = useState( "" );
   const {txStatus, setTxStatus,
@@ -609,7 +609,7 @@ export const UnDeleteTopic = (props) => {
 
 export const LockTopic = (props) => {
   const {refresh, moderators, topics} = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [mod, setMod] = useState( "" );
   const [topicId, setTopicId] = useState( "" );
   const {txStatus, setTxStatus,
@@ -677,7 +677,7 @@ export const LockTopic = (props) => {
 
 export const UnlockTopic = (props) => {
   const {refresh, moderators, topics} = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [mod, setMod] = useState( "" );
   const [topicId, setTopicId] = useState( "" );
   const {txStatus, setTxStatus,
@@ -752,7 +752,7 @@ export const DeleteTopicComment = ({
     tx, setTx,
     txRes, setTxRes} 
 }) => {
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [mod, setMod] = useState( "" );
   const [commentId, setCommentId] = useState( "" );
   const classes = useStyles();
@@ -826,7 +826,7 @@ export const VoteOnTopic = ({
     tx, setTx,
     txRes, setTxRes} 
 }) => {
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [member,setMember] = useState("");
   const [vote, setVote] = useState( "" );
   const [topicId, setTopicId] = useState( "" );
@@ -908,7 +908,7 @@ export const VoteOnComment = ({
     tx, setTx,
     txRes, setTxRes} 
 }) => {
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [member,setMember] = useState("");
   const [vote, setVote] = useState( "" );
   const [commentId, setCommentId] = useState( "" );
@@ -989,7 +989,7 @@ export const DeleteCommentComment = ({
     tx, setTx,
     txRes, setTxRes} 
 }) => {
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [mod, setMod] = useState( "" );
   const [commentId, setCommentId] = useState( "" );
   const classes = useStyles();

@@ -8,7 +8,7 @@ import {
 import Pact from "pact-lang-api";
 //config file for blockchain calls
 import { daoAPI } from "../kadena-config.js";
-import { useWallet, addGasCap } from "../Wallet.js";
+import { usePactWallet, addGasCap } from "../PactWallet.js";
 import {
   PactJsonListAsTable,
   MakeForm,
@@ -127,7 +127,7 @@ export const VoteToFreeze = (props) => {
     refresh,
     ambassadors,
   } = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [amb, setAmb] = useState( "" );
   const {txStatus, setTxStatus,
          tx, setTx,
@@ -173,7 +173,7 @@ export const Freeze = (props) => {
     refresh,
     ambassadors,
   } = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [amb, setAmb] = useState( "" );
   const {txStatus, setTxStatus,
          tx, setTx,
@@ -219,7 +219,7 @@ export const RotateAmbassador = (props) => {
     refresh,
     ambassadors,
   } = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [acct, setAcct] = useState( "" );
   const [ks, setKs] = useState( "" );
   const {txStatus, setTxStatus,

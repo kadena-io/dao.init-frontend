@@ -30,7 +30,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 
 import logo from "./kadena_r_rev_3_whi_lor.png";
 
-import { useWalletContex } from './Wallet.js';
+import { usePactWalletContext } from './PactWallet.js';
 
 const drawerWidth = 240;
 
@@ -130,7 +130,7 @@ const StyledMenuItem = withStyles((theme) => ({
 
 export const NavDrawer = (props) => {
   const { window, entriesList } = props;
-  const {wallet: {current, otherWallets}, walletDispatch} = useWalletContex();
+  const {wallet: {current, otherWallets}, walletDispatch} = usePactWalletContext();
   const classes = useStyles();
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);

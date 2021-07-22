@@ -18,8 +18,8 @@ import {
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
-import { daoAPI, forumAPI } from './kadena-config.js';
-import { Wallet } from './Wallet.js';
+import { daoAPI, forumAPI, globalConfig } from './kadena-config.js';
+import { PactWallet } from './PactWallet.js';
 
 const Main = () => {
   const theme = React.useMemo(
@@ -47,13 +47,13 @@ const Main = () => {
     <ThemeProvider theme={theme}>
       <NoSsr>
         <CssBaseline/>
-        <Wallet contractConfigs={{daoAPI,forumAPI}}>
+        <PactWallet contractConfigs={{daoAPI,forumAPI}} globalConfig={globalConfig}>
           <Router basename={process.env.PUBLIC_URL}>
           <QueryParamProvider ReactRouterRoute={Route}>
             <App />
           </QueryParamProvider>
           </Router>
-        </Wallet>
+        </PactWallet>
       </NoSsr>
     </ThemeProvider>
   </React.StrictMode>

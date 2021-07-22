@@ -49,7 +49,7 @@ import {
 import Pact from "pact-lang-api";
 //config file for blockchain calls
 import { daoAPI, forumAPI } from "../kadena-config.js";
-import { useWallet, addGasCap } from "../Wallet.js";
+import { usePactWallet, addGasCap } from "../PactWallet.js";
 import {
   PactJsonListAsTable,
   PactSingleJsonAsTable,
@@ -89,7 +89,7 @@ export const CommentOnTopic = ({
     tx, setTx,
     txRes, setTxRes}
   }) => {
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [author, setAuthor] = useState( "" );
   const [topicId, setTopicId] = useState( "" );
   const [body, setBody] = useState("");
@@ -167,7 +167,7 @@ export const EditComment = ({
     tx, setTx,
     txRes, setTxRes}
   }) => {
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [author, setAuthor] = useState( "" );
   const [commentId, setCommentId] = useState( "" );
   const [body, setBody] = useState("");
@@ -239,7 +239,7 @@ export const ReplyToComment = ({
     tx, setTx,
     txRes, setTxRes}
   }) => {
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [author, setAuthor] = useState( "" );
   const [commentId, setCommentId] = useState( "" );
   const [body, setBody] = useState("");

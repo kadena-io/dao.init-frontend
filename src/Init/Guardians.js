@@ -13,7 +13,7 @@ import {
   MakeForm,
  } from "../util.js";
 
-import { useWallet, addGasCap } from "../Wallet.js";
+import { usePactWallet, addGasCap } from "../PactWallet.js";
 
 const useStyles = makeStyles(() => ({
   formControl: {
@@ -135,7 +135,7 @@ export const RegisterAmbassador = (props) => {
     refresh,
     guardians,
   } = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [grd, setGrd] = useState( "" );
   const [newAmb, setNewAmb] = useState( "" );
   const [ambGrd, setAmbGrd] = useState( "" );
@@ -195,7 +195,7 @@ export const RegisterAmbassador = (props) => {
 };
 
 export const DeactivateAmbassador = (props) => {
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const {refresh} = props;
   const [grd, setGrd] = useState( "" );
   const [amb, setAmb] = useState( "" );
@@ -249,7 +249,7 @@ export const ReactivateAmbassador = (props) => {
   const {
     refresh,
   } = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [grd, setGrd] = useState( "" );
   const [amb, setAmb] = useState( "" );
   const {txStatus, setTxStatus,
@@ -303,7 +303,7 @@ export const RotateGuardian = (props) => {
     refresh,
     guardians,
   } = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [grd, setGrd] = useState( "" );
   const [voteKs, setVoteKs] = useState( "" );
   const {txStatus, setTxStatus,
@@ -358,7 +358,7 @@ export const ProposeDaoUpgrade = (props) => {
     refresh,
     guardians,
   } = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [acct, setAcct] = useState( "" );
   const [hsh, setHsh] = useState( "" );
   const {txStatus, setTxStatus,
@@ -412,7 +412,7 @@ export const GuardianApproveHash = (props) => {
     refresh,
     guardians,
   } = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [acct, setAcct] = useState( "" );
   const [hsh, setHsh] = useState( "" );
   const {txStatus, setTxStatus,
@@ -465,7 +465,7 @@ export const RegisterGuardian = (props) => {
   const {
     refresh,
   } = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [grd, setGrd] = useState( "" );
   const [voteKs, setVoteKs] = useState( "" );
   const {txStatus, setTxStatus,

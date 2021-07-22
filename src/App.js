@@ -19,7 +19,7 @@ import { NavDrawer } from "./NavDrawer.js";
 import { 
   walletDrawerEntries,
   WalletApp,
- } from "./Wallet.js";
+ } from "./PactWallet.js";
 
 import {
   initDrawerEntries,

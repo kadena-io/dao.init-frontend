@@ -26,7 +26,7 @@ import {
 //config file for blockchain calls
 import { PactTxStatus } from "./PactTxStatus.js";
 import { MDEditor } from "./Markdown";
-import { useWallet } from "./Wallet.js";
+import { usePactWallet } from "./PactWallet.js";
 
 export const useInputStyles = makeStyles((theme) => ({
   root: {
@@ -346,7 +346,7 @@ export const MakeForm = (props) => {
     onSubmit,
     tx, txRes, txStatus, setTxStatus
   } = props;
-  const {current: {walletName, signingKey}} = useWallet();
+  const {current: {walletName, signingKey}} = usePactWallet();
   const [wasSubmitted,setWasSubmitted] = useState(false);
   useEffect(()=>setWasSubmitted(false),[inputFields]);
   useEffect(()=>txStatus !== "" ? setWasSubmitted(true) : setWasSubmitted(wasSubmitted), [txStatus])

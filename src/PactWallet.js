@@ -71,17 +71,20 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const walletContextDefault = {
+const pactWalletContextDefault = {
   current: {},
   otherWallets: {},
   allKeys: [],
+  globalConfig: {},
   contractConfigs: {},
+  registeredLocals: {},
+  registeredCmds: {},
   pastPactTxs: [],
 };
 
-export const WalletContext = createContext();
+export const PactWalletContext = createContext();
 
-const walletReducer = (state, action) => {
+const pactWalletReducer = (state, action) => {
   switch (action.type) {
     case 'updateWallet':
       if (! _.has(action, "newWallet")) {throw new Error("updateWallet requires newWallet:{walletName,gasPrice,networkId,signingKey} key")};
@@ -100,12 +103,31 @@ const walletReducer = (state, action) => {
       if (! _.has(action, "newKeys")) {throw new Error("addKeys requires newKeys:[] key")};
       const allKeys2 = _.filter(_.uniq(_.concat(_.cloneDeep(state.allKeys), action.newKeys)),v=>v?true:false);
       return {...state, allKeys: allKeys2};
-    case 'addConfig':
+    case 'setContractConfig':
       if (! _.has(action, "configName")) {throw new Error("addConfig requires configName:'' key")};
       if (! _.has(action, "config")) {throw new Error("addConfig requires config:'' key")};
       const configs = _.cloneDeep(state.contractConfigs);
       configs[action.configName] = action.config;
       return {...state, contractConfigs:configs};
+    case 'setGlobalConfig':
+      if (! _.has(action, "globalConfig")) {throw new Error("addConfig requires globalConfig:<object> key")};
+      return {...state, globalConfig:action.globalConfig};
+    case 'registerLocal':
+      if (!_.has(action, "localName")) {throw new Error("registerLocal requires localName:<string> key")};
+      if (!_.has(action, "payload")) {throw new Error("registerLocal requires payload:<object> key")};
+      const registeredLocals = _.cloneDeep(state.registeredLocals);
+      registeredLocals[action.localName] = {
+        localName:action.localName,
+        payload: action.payload};
+      return {...state, registeredLocals};
+    case 'registerCmd':
+      if (!_.has(action, "cmdName")) {throw new Error("registerLocal requires localName:<string> key")};
+      if (!_.has(action, "payload")) {throw new Error("registerLocal requires payload:<object> key")};
+      const registeredCmds = _.cloneDeep(state.registeredCmds);
+      registeredCmds[action.localName] = {
+        cmdName:action.cmdName,
+        payload:action.payload};
+      return {...state, registeredCmds};
     case 'tractPactTx':
       if (! _.has(action, "newTx")) {throw new Error("trackPactTx requires newTx:'' key")};
       const newPactTxs = _.concat(_.cloneDeep(state.pastPactTxs),action.newTx);
@@ -115,35 +137,68 @@ const walletReducer = (state, action) => {
   }
 }
 
-export const Wallet = ({contractConfigs, children}) => {
-  //Wallet State
+export const PactWallet = ({globalConfig, contractConfigs, children}) => {
+  //PactWallet State
   const usePersistedWallet = createPersistedState("pactWallet5");
-  const [persistedWallet,setPersistedWallet] = usePersistedWallet({});
-  const [wallet,walletDispatch] = useReducer(walletReducer, _.size(persistedWallet) ? _.cloneDeep(persistedWallet) : walletContextDefault);
+  const [persistedPactWallet,setPersistedPactWallet] = usePersistedWallet({});
+  const [wallet,walletDispatch] = useReducer(pactWalletReducer, _.size(persistedPactWallet) ? _.cloneDeep(persistedPactWallet) : pactWalletContextDefault);
   // Experimental wrapper for "emit" bug found in https://github.com/donavon/use-persisted-state/issues/56
   useEffect(()=>{
-    if (_.size(wallet) && ! _.isEqual(walletContextDefault, wallet)) {
-      console.debug("Wallet.useEffect[persistedWallet,walletProvider,setPersistedWallet]", persistedWallet, " =to=> ", wallet);
-      setPersistedWallet(wallet);}}
-  ,[persistedWallet,wallet,setPersistedWallet]);
+    if (_.size(wallet) && ! _.isEqual(pactWalletContextDefault, wallet)) {
+      console.debug("PactWallet.useEffect[persistedPactWallet,walletProvider,setPersistedPactWallet]", persistedPactWallet, " =to=> ", wallet);
+      setPersistedPactWallet(wallet);}}
+  ,[persistedPactWallet,wallet,setPersistedPactWallet]);
 
   useEffect(()=>{
-    console.debug("Wallet.useEffect[] fired, contratConfigs added: ", _.keys(contractConfigs));
-    _.mapKeys(contractConfigs,(k)=>walletDispatch({type:"addConfig", configName:k, config:contractConfigs[k]}))
+    console.debug("PactWallet.useEffect[] fired, contratConfigs added: ", _.keys(contractConfigs));
+    _.mapKeys(contractConfigs,(k)=>walletDispatch({type:"setContractConfig", configName:k, config:contractConfigs[k]}))
+    walletDispatch({type:"setGlobalConfig", globalConfig})
   }
   ,[])
 
-  return <WalletContext.Provider value={{wallet,walletDispatch}}>
+  return <PactWalletContext.Provider value={{wallet,walletDispatch}}>
           {children}
-         </WalletContext.Provider>
+         </PactWalletContext.Provider>
 }
 
-export const useWallet = () => {
-  const {wallet} = useContext(WalletContext);
+export const usePactWallet = () => {
+  // grab the entire wallet state, with no reducer
+  const {wallet} = useContext(PactWalletContext);
   return wallet;
 };
 
-export const useWalletContex = () => useContext(WalletContext);
+export const usePactWalletContext = () => useContext(PactWalletContext);
+
+export const usePactLocal = (localName) => {
+  // get a specific registered local command...
+  const {wallet: {registeredLocals, globalConfig}} = useContext(PactWalletContext);
+  if (! _.has(registeredLocals, localName)) 
+    {throw new Error(`usePactLocal attempted to call ${localName} but it was not present in ${JSON.stringify(registeredLocals)}`)};
+  const toSign = registeredLocals[localName].toSign;
+  // ... wrap it up
+  const doLocal = useCallback(async (newToSign={}) => {
+    try {
+      // ... merge any use-site specific new toSign elements
+      const result = await Pact.fetch.local({toSign, ...newToSign}, globalConfig.host);
+      const all = result.result.data;
+      console.debug(`usePactLocal(${localName}) results`, all);
+      return all;
+    } catch (err) {
+      console.log(`local pact commande ${localName} failed`, err);
+      throw new Error(`local pact command ${localName} failed`);
+    }
+  },[globalConfig.host, localName, toSign]);
+  // ... and return it for use-site execution
+  return doLocal;
+};
+
+export const useContractConfig = (configName) => {
+  // get a specific contract config
+  const {wallet: {contractConfigs}} = useContext(PactWalletContext);
+  if (! _.has(contractConfigs, configName)) 
+    {throw new Error(`usePactConfig attempted to get ${configName} but it was not present in ${JSON.stringify(contractConfigs)}`)};
+  return contractConfigs[configName];
+};
 
 export const walletDrawerEntries = {
   primary:"Wallet",
@@ -334,7 +389,7 @@ const EntrySelector = ({
 }
 
 export const CurrentWallet = () => {
-  const {current} = useWallet();
+  const {current} = usePactWallet();
   
   return <Container style={{"paddingTop":"2em"}}>
     <Typography component="h2">Active Wallet</Typography>
@@ -346,10 +401,10 @@ export const CurrentWallet = () => {
 };
 
 export const OtherWallets = () => {
-  const {otherWallets} = useWallet();
+  const {otherWallets} = usePactWallet();
   
   return <Container style={{"paddingTop":"2em"}}>
-    <Typography component="h2">All Saved Wallets</Typography>
+    <Typography component="h2">All Saved PactWallets</Typography>
     <PactSingleJsonAsTable
       json={otherWallets}
       keyFormatter={keyFormatter}
@@ -358,7 +413,7 @@ export const OtherWallets = () => {
 };
 
 export const WalletConfig = () => {
-  const {wallet, walletDispatch} = useContext(WalletContext);
+  const {wallet, walletDispatch} = useContext(PactWalletContext);
   const [saved,setSaved] = useState(false);
   const [walletName,setWalletName] = useState("");
   const [signingKey, setSigningKey] = useState("");
@@ -384,7 +439,7 @@ export const WalletConfig = () => {
   useEffect(()=>{
     if (_.size(wallet.otherWallets[walletName])) {
       const loadingWallet = wallet.otherWallets[walletName];
-      console.debug("WalletConfig updating entries", loadingWallet)
+      console.debug("PactWalletConfig updating entries", loadingWallet)
         if (loadingWallet.walletName && loadingWallet.signingKey && loadingWallet.gasPrice && loadingWallet.networkId) {
           setGasPrice(loadingWallet.gasPrice);
           setSigningKey(loadingWallet.signingKey);

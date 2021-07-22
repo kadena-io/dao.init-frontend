@@ -61,7 +61,7 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import Pact from "pact-lang-api";
 //config file for blockchain calls
 import { daoAPI, forumAPI } from "../kadena-config.js";
-import { useWallet, addGasCap } from "../Wallet.js";
+import { usePactWallet, addGasCap } from "../PactWallet.js";
 import {
   PactJsonListAsTable,
   PactSingleJsonAsTable,
@@ -174,7 +174,7 @@ const RenderTopic = ({
 
 export const PostTopic = (props) => {
   const {refresh, members, moderators} = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [author, setAuthor] = useState( "" );
   const [headline, setHeadline] = useState("");
   const [body, setBody] = useState("");
@@ -231,7 +231,7 @@ export const PostTopic = (props) => {
 
 export const ModifyTopic = (props) => {
   const {refresh, topics} = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [author,setAuthor] = useState("");
   const [topicId,setTopicId] = useState("");
   const [headline, setHeadline] = useState("");

@@ -13,7 +13,7 @@ import {
   MakeForm,
  } from "../util.js";
 import { ScrollableTabs } from "../ScrollableTabs.js";
-import { useWallet, addGasCap } from "../Wallet.js";
+import { usePactWallet, addGasCap } from "../PactWallet.js";
 
 const useStyles = makeStyles(() => ({
   formControl: {
@@ -123,7 +123,7 @@ const RotateMjolnir = (props) => {
   const {
     refresh,
   } = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [newGrd, setNewGrd] = useState( "" );
   const {txStatus, setTxStatus,
     tx, setTx,
@@ -168,7 +168,7 @@ const RotateMjolnir = (props) => {
 
 export const DisableModerator = (props) => {
   const {refresh, moderators} = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [mod, setMod] = useState( "" );
   const {txStatus, setTxStatus,
     tx, setTx,
@@ -209,7 +209,7 @@ export const DisableModerator = (props) => {
 
 const EnableModerator = (props) => {
   const {refresh, moderators} = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [mod, setMod] = useState( "" );
   const {txStatus, setTxStatus,
     tx, setTx,
@@ -250,7 +250,7 @@ const EnableModerator = (props) => {
 
 const MjolnirWriteMember = (props) => {
   const {refresh, moderators, members} = props;
-  const {current: {signingKey, networkId, gasPrice}} = useWallet();
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
   const [user, setUser] = useState( "" );
   const [newKs, setNewKs] = useState({});
   const [isMod,setIsMod] = useState(false);
