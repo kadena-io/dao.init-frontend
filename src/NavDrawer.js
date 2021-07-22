@@ -31,8 +31,6 @@ import MenuIcon from '@material-ui/icons/Menu';
 import logo from "./kadena_r_rev_3_whi_lor.png";
 
 import { useWalletContex } from './Wallet.js';
-import { useMemo } from 'react';
-import { wallet } from 'pact-lang-api';
 
 const drawerWidth = 240;
 
@@ -160,16 +158,20 @@ export const NavDrawer = (props) => {
       {entriesList.map(entries =>
         <React.Fragment>
           <Divider />
-          <List>
+          { entries !== null && <List>
             {entries.map(entry =>
-              <ListItemLink
+              <>
+              { entry && 
+                <ListItemLink
                 icon={entry.icon}
                 primary={entry.primary}
                 to={entry.to}
                 subList={entry.subList}
-                />
+                /> 
+                }
+              </>
             )}
-          </List>
+          </List>}
         </React.Fragment>
        )}
     </div>

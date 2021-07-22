@@ -447,4 +447,4 @@ export const WalletConfig = () => {
       { txStatus === 'pending' ? <LinearProgress /> : null }
       <PactTxStatus tx={tx} txRes={txRes} txStatus={txStatus} setTxStatus={setTxStatus}/>
   </Container>
-};
+}

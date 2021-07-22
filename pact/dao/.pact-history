@@ -1,0 +1,35 @@
+  (defcap BUGGOV () false))
+      true))
+    (with-capability (GOV)
+  (defun false-pass-gov ()
+(module bug BUGGOV
+      true)))
+    (with-capability (GOV)
+  (defun false-pass-gov ()
+  (defcap GOV () false)
+(module bug GOV
+    (create-module-guard "bug")))
+  (defun mod-grd ()
+  (defun always-false-ug () (create-user-guard (always-false)))
+  (defun always-false () false)
+      true))
+    (with-capability (GOV)
+  (defun false-pass-gov ()
+      true))
+    (with-capability (GOV)
+  (defun pass-gov ()
+  (defcap GOV () (always-false))
+(module bug GOV
+?adice
+advice
+where
+?where
+(describe-module "dao.genesis")
+(describe-module dao.genesis)
+(describe dao.genesis)
+(load "genesis.repl")
+:?
+?
+type
+time
+atom
