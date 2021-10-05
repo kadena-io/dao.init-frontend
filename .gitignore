@@ -1,3 +1,4 @@
 node_modules/
 src/scratch-pad.js
 .vscode/
+.DS_Store

@@ -48,6 +48,15 @@ import {
   RenderTopic,
 } from "./Forum/Topic.js";
 
+
+import {
+  hftDrawerEntries,
+  HftApp
+} from "./HFT/Hft.js";
+import { getHftState } from "./HFT/HftState.js";
+
+
+
 const App = () => {
   //Top level UI Routing Params
   const [appRoute,setAppRoute] = useQueryParams({
@@ -119,6 +128,20 @@ const App = () => {
     setComments(res);
   };
 
+  //HFT Top Level States
+  const [hftLedger,setHftLedger] = createPersistedState("hftLedger3")({});
+  const [hftTokens,setHftTokens] = createPersistedState("hftTokens3")({});
+
+  const getHftLedger = async () => {
+    const res = await getHftState("view-ledger");
+    setHftLedger(res);
+  }
+
+  const getHftTokens = async () => {
+    const res = await getHftState("view-tokens");
+    setHftTokens(res);
+  }
+
   const refresh = {
     getInitState: getInitState,
     getGuardians: getGuardians,
@@ -128,6 +151,8 @@ const App = () => {
     getTopics: getTopics,
     getComments: getComments,
     getModLog: getModLog,
+    getHftLedger: getHftLedger,
+    getHftTokens: getHftTokens
   };
 
   const refreshAll = async () => _.forIn(refresh,(k,v) => v());
@@ -141,6 +166,8 @@ const App = () => {
     getModLog();
     getTopics();
     getComments();
+    getHftLedger();
+    getHftTokens();
     console.debug('App.useEffect[] fired');
   }, []);
 
@@ -149,6 +176,7 @@ const App = () => {
             entriesList={[
                 [ walletDrawerEntries
                 , initDrawerEntries
+                , hftDrawerEntries
                 ,{
                   primary:"dao.forum",
                   subList:  
@@ -197,6 +225,15 @@ const App = () => {
       initState={initState}
       guardians={guardians}
       ambassadors={ambassadors}
+      pactTxStatus={pactTxStatus}
+      refresh={refresh}
+      />
+    : appRoute.app === "hft" ?
+    <HftApp 
+      appRoute={appRoute}
+      setAppRoute={setAppRoute}
+      hftLedger={hftLedger}
+      hftTokens={hftTokens}
       pactTxStatus={pactTxStatus}
       refresh={refresh}
       />
