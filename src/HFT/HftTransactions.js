@@ -281,16 +281,11 @@ const TransferCreate = (props) => {
 
   const handleSubmit = (evt) => {
       evt.preventDefault();
-      console.log(Pact.lang.mkCap("MINT Cap"
-              , "Authenticates that you can mint"
-              , `${hftAPI.contractAddress}.MINT`
-              , [token, sender, Number.parseInt(amount)]));
       try {
-        console.debug("transfercreate", amount, Number.isInteger(amount), Number.parseFloat(amount).toFixed(1), Number.parseFloat(amount));
         sendHftCommand(setTx,setTxStatus,setTxRes,refresh
           ,signingKey, networkId, Number.parseFloat(gasPrice)
-          ,`(${hftAPI.contractAddress}.transfer-create "${token}" "${sender}" "${receiver}" (read-keyset 'ks) ${Number.parseFloat(amount)})`
-          ,{ks: JSON.parse(newKs)}
+          ,`(${hftAPI.contractAddress}.transfer-create "${token}" "${sender}" "${receiver}" (read-keyset 'ks) (read-decimal 'amount))`
+          ,{ks: JSON.parse(newKs), amount: amount}
           , [Pact.lang.mkCap("Transfer Cap"
               , "Authenticates that you can transfer"
               , `${hftAPI.contractAddress}.TRANSFER`
