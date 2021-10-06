@@ -26,7 +26,7 @@ import {
 //config file for blockchain calls
 import { PactTxStatus } from "./PactTxStatus.js";
 import { MDEditor } from "./Markdown";
-import { usePactWallet } from "./PactWallet.js";
+import { KeySelector, usePactWallet } from "./PactWallet.js";
 
 export const useInputStyles = makeStyles((theme) => ({
   root: {
@@ -273,7 +273,7 @@ export const MakeInputField = (props) => {
     placeholder,
     className,
     onChange,
-    value,
+    value
   } = props.inputField;
 
   const field = ( type === 'select'
@@ -333,6 +333,13 @@ export const MakeInputField = (props) => {
         <MDEditor
           value={value}
           onChange={onChange}/>
+    : type === 'keySelector' ?
+        <KeySelector
+          label={label}
+          getVal={value}
+          setVal={onChange}
+          allOpts={options}
+          />
     : null
   );
 

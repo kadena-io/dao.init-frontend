@@ -293,7 +293,7 @@ const TransferCreate = (props) => {
             ]
         );
       } catch (e) {
-        console.log("mint Submit Error",typeof e, e, token, sender, receiver, newKs, amount);
+        console.log("transfer-create Submit Error",typeof e, e, token, sender, receiver, newKs, amount);
         setTxRes(e);
         setTxStatus("validation-error");
       }
@@ -348,6 +348,148 @@ const TransferCreate = (props) => {
 };
 
 
+const Transfer = (props) => {
+  const {hftTokens, hftLedger, refresh} = props;
+  const {txStatus, setTxStatus,
+    tx, setTx,
+    txRes, setTxRes} = props.pactTxStatus;
+  const {current: {signingKey, networkId, gasPrice}} = usePactWallet();
+  const [token,setToken] = useState("");
+  const [sender,setSender] = useState("");
+  const [receiver,setReceiver] = useState("");
+  const [amount,setAmount] = useState(0.0);
+  const classes = useStyles();
+
+  const handleSubmit = (evt) => {
+      evt.preventDefault();
+      try {
+        sendHftCommand(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
+          ,`(${hftAPI.contractAddress}.transfer "${token}" "${sender}" "${receiver}" (read-decimal 'amount))`
+          ,{amount: amount}
+          , [Pact.lang.mkCap("Transfer Cap"
+              , "Authenticates that you can transfer"
+              , `${hftAPI.contractAddress}.TRANSFER`
+              , [token, sender, receiver, Number.parseFloat(amount)])
+            ]
+        );
+      } catch (e) {
+        console.log("transfer Submit Error",typeof e, e, token, sender, receiver, amount);
+        setTxRes(e);
+        setTxStatus("validation-error");
+      }
+      };
+  
+  const inputFields = [
+    {
+      type:'select',
+      label:'Select Token',
+      className:classes.formControl,
+      onChange:setToken,
+      options:hftTokens.map((g)=>g['token']),
+    },
+    {
+      type:'select',
+      label:'Sender Account',
+      className:classes.formControl,
+      onChange:setSender,
+      options:_.sortedUniq(hftLedger.map((g)=>g['account']))
+    },
+    {
+      type:'select',
+      label:'Receiver Account',
+      className:classes.formControl,
+      onChange:setReceiver,
+      options:_.sortedUniq(hftLedger.map((g)=>g['account']))
+    },
+    {
+      type:'textFieldSingle',
+      label:'Transfer Amount',
+      className:classes.formControl,
+      value:amount,
+      onChange:setAmount
+    },
+  ];
+
+  return (
+    <MakeForm
+      inputFields={inputFields}
+      onSubmit={handleSubmit}
+      tx={tx} txStatus={txStatus} txRes={txRes}
+      setTxStatus={setTxStatus}/>
+  );
+};
+
+
+const CreateAccount = (props) => {
+  const {hftTokens, hftLedger, refresh} = props;
+  const {txStatus, setTxStatus,
+    tx, setTx,
+    txRes, setTxRes} = props.pactTxStatus;
+  const {current: {signingKey, networkId, gasPrice}, allKeys} = usePactWallet();
+  const [token,setToken] = useState("");
+  const [account,setAccount] = useState("");
+  const [grdKeys,setGrdKeys] = useState([]);
+  const [grdPred,setGrdPred] = useState("keys-all");
+  const classes = useStyles();
+
+  const handleSubmit = (evt) => {
+      evt.preventDefault();
+      const newKeys = _.map(grdKeys, (k) => k.inputValue ? k.inputValue : k);
+      console.debug("create-account", token, account, grdPred, grdKeys, {ks:{pred:grdPred, keys:newKeys}});
+      try {
+        sendHftCommand(setTx,setTxStatus,setTxRes,refresh
+          ,signingKey, networkId, Number.parseFloat(gasPrice)
+          ,`(${hftAPI.contractAddress}.create-account "${token}" "${account}" (read-keyset 'ks))`
+          ,{ks:{pred:grdPred, keys:newKeys}}
+        );
+      } catch (e) {
+        console.log("create-account Submit Error",typeof e, e, token, account, grdPred, grdKeys);
+        setTxRes(e);
+        setTxStatus("validation-error");
+      }
+      };
+  
+  const inputFields = [
+    {
+      type:'select',
+      label:'Select Token',
+      className:classes.formControl,
+      onChange:setToken,
+      options:hftTokens.map((g)=>g['token']),
+    },
+    {
+      type:'textFieldSingle',
+      label:'Account Name',
+      className:classes.formControl,
+      value:account,
+      onChange:setAccount
+    },
+    {
+      type:'select',
+      label:'Select Keyset Predicate',
+      className:classes.formControl,
+      onChange:setGrdPred,
+      options:["keys-any", "keys-all", "keys-2"],
+    },
+    {
+      type:'keySelector',
+      label:'Set Guard Keys',
+      className:classes.formControl,
+      onChange:setGrdKeys,
+      value:grdKeys,
+      options:allKeys,
+    }
+  ];
+
+  return (
+    <MakeForm
+      inputFields={inputFields}
+      onSubmit={handleSubmit}
+      tx={tx} txStatus={txStatus} txRes={txRes}
+      setTxStatus={setTxStatus}/>
+  );
+};
 
 
 export const LedgerForms = ({
@@ -368,6 +510,22 @@ export const LedgerForms = ({
             label:"Transfer Create",
             component:
               <TransferCreate
+                pactTxStatus={pactTxStatus}
+                hftTokens={hftTokens}
+                hftLedger={hftLedger}
+                refresh={()=>getHftLedger()}/>
+          },{
+            label:"Transfer",
+            component:
+              <Transfer
+                pactTxStatus={pactTxStatus}
+                hftTokens={hftTokens}
+                hftLedger={hftLedger}
+                refresh={()=>getHftLedger()}/>
+          },{
+            label:"Create Account",
+            component:
+              <CreateAccount
                 pactTxStatus={pactTxStatus}
                 hftTokens={hftTokens}
                 hftLedger={hftLedger}
