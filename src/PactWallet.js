@@ -388,6 +388,71 @@ const EntrySelector = ({
   );
 }
 
+
+export const KeySelector = ({
+  label,
+  getVal,
+  setVal,
+  allOpts
+}) => {
+  const classes = useStyles();
+  let localOptions = allOpts ? _.cloneDeep(allOpts) : [""];
+
+  return (
+    <Autocomplete
+      multiple
+      limitTags={3}
+      className={classes.formControl}
+      value={getVal}
+      onChange={(event, newValue) => {
+        if (typeof newValue === 'string') {
+          setVal(newValue);
+        } else if (newValue && newValue.inputValue) {
+          // Create a new value from the user input
+          setVal(newValue.inputValue)
+        } else {
+          setVal(newValue);
+        }
+      }}
+      filterOptions={(options, params) => {
+        const filtered = filter(options, params);
+
+        // Suggest the creation of a new value
+        if (params.inputValue !== '') {
+          filtered.push({
+            inputValue: params.inputValue,
+            title: `Add "${params.inputValue}"`,
+          });
+        }
+
+        return filtered;
+      }}
+      selectOnFocus
+      fullWidth
+      clearOnBlur
+      handleHomeEndKeys
+      defaultValue={getVal ? getVal : null}
+      options={localOptions}
+      getOptionLabel={(option) => {
+        // Value selected with enter, right from the input
+        // Add "xxx" option created dynamically
+        if (option.inputValue) {
+          return option.inputValue;
+        } else {
+          // Regular option
+          return option;
+        }
+      }}
+      renderOption={(option) => option.title ? option.title : option}
+      freeSolo
+      renderInput={(params) => (
+        <TextField {...params} label={label} variant="outlined" fullWidth className={classes.formControl} />
+      )}
+    />
+  );
+}
+
+
 export const CurrentWallet = () => {
   const {current} = usePactWallet();
   
