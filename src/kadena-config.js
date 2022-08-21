@@ -58,7 +58,7 @@ const globalConfig = {
   //gas price at lowest possible denomination
   gasPrice: 0.00000000001,
   //high gas limit for tx
-  gasLimit: 10000,
+  gasLimit: 50000,
   //time a tx lives in mempool since creationTime
   ttl: 28800,
   //sender === gas payer of the transaction
